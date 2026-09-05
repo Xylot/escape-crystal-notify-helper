@@ -1,0 +1,32 @@
+{
+  "name": "escape-crystal-editor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node scripts/vendor-parser.mjs && vite --host 127.0.0.1",
+    "build": "node scripts/vendor-parser.mjs && tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test tests/*.test.mjs",
+    "test:core": "node --test tests/core.test.mjs",
+    "refresh": "node scripts/refresh.mjs",
+    "apply-proposal": "node scripts/apply-proposal.mjs"
+  },
+  "dependencies": {
+    "leaflet": "1.9.4",
+    "parse5": "7.2.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "wikiparser-node": "1.31.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "1.9.17",
+    "@types/react": "19.1.0",
+    "@types/react-dom": "19.1.1",
+    "typescript": "5.8.3",
+    "vite": "6.4.3"
+  }
+}

@@ -1,0 +1,5 @@
+.selection-mode{display:flex;gap:5px;background:#263b4b;padding:0 10px 9px;border-left:1px solid #ffffff16;border-right:1px solid #ffffff16}
+.selection-mode button{font-size:11px;padding:5px 10px;border-color:transparent;color:#9eb1bd}
+.selection-mode .chosen{background:#67cedb17;color:#67cedb;border-color:#67cedb33}
+.notice{position:fixed;bottom:14px;left:14px;right:14px;z-index:2200;background:#345569;border:1px solid #67cedb55;border-radius:5px;box-shadow:0 4px 20px #0005}
+.details>.wide{margin-top:15px}

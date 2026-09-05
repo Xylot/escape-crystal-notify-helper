@@ -1,0 +1,7 @@
+.id-entry button{flex:0 0 auto;min-width:43px;white-space:nowrap}
+.id-entry input{flex:1 1 auto;width:0}
+.location-pane .map-note{max-width:calc(100% - 45px)}
+.location-pane .map-note .dot:not(:first-child){margin-left:5px}
+.wiki-pointer{background:transparent;border:0;filter:drop-shadow(0 1px 2px #0004)}
+.map-provenance{font-size:9px;color:#9eb1bd;border-top:1px solid #ffffff10;padding:8px 12px;line-height:1.6}
+.map-provenance span{display:block;color:#cbaca4}

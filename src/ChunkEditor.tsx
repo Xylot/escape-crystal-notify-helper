@@ -1,0 +1,7 @@
+import { useState } from 'react';
+import { parseIds } from './core/coordinates.mjs';
+import type { Draft } from './types';
+export default function ChunkEditor({draft,update}:{draft:Draft;update:(d:Partial<Draft>)=>void}){
+  const [value,setValue]=useState(''),[error,setError]=useState('');
+  return <details className="code-preview"><summary>8×8 region restrictions</summary><p className="muted">Use “Chunks” above the map to select fine coverage. These restrict the boss regions, separately from entrance chunks.</p><div className="region-chips">{draft.chunks?.map(id=><button key={id} onClick={()=>update({chunks:draft.chunks!.filter(n=>n!==id)})}>{id} ×</button>)}</div><form className="id-entry" onSubmit={e=>{e.preventDefault();try{update({chunks:[...new Set([...(draft.chunks??[]),...parseIds(value,'chunk')])].sort((a,b)=>a-b)});setValue('');setError('');}catch(error){setError((error as Error).message);}}}><input aria-label="Chunk restrictions" value={value} onChange={e=>setValue(e.target.value)} placeholder="Add chunk IDs"/><button>Add</button></form>{error&&<p className="warning">{error}</p>}<button className="text-button" onClick={()=>update({chunks:undefined})}>Preserve original chunk restrictions</button>{draft.chunks!==undefined&&<p className="muted">{draft.chunks.length?`${draft.chunks.length} chunk restrictions will replace the original list.`:'The original region chunk restriction will be removed.'}</p>}</details>;
+}

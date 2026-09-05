@@ -1,0 +1,69 @@
+name: Validate, refresh and publish
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 9 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: |
+          if test -f package-lock.json; then npm ci; else npm install; fi
+      - run: npm test
+      - name: Refresh published data
+        id: refresh
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: npm run refresh
+      - name: Report stale snapshot
+        if: steps.refresh.outcome == 'failure'
+        run: echo '::warning::Refresh failed. Publishing the previous snapshot with its original timestamp.'
+      - run: npm run build
+      - name: Save successful data snapshot
+        if: github.event_name != 'pull_request' && steps.refresh.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- public/data/snapshot.json; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/data/snapshot.json
+          git commit -m 'Refresh boss data snapshot'
+          gh auth setup-git
+          git push origin HEAD:main
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: dist
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment

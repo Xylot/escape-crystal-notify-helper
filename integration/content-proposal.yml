@@ -1,0 +1,63 @@
+name: Create content proposal PR
+on:
+  workflow_dispatch:
+    inputs:
+      proposal:
+        description: Paste the reviewed JSON proposal from Escape Crystal Content Editor
+        required: true
+        type: string
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: content-proposal
+  cancel-in-progress: false
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Read proposal as data and apply validated changes
+        env:
+          CONTENT_PROPOSAL: ${{ inputs.proposal }}
+        run: |
+          node -e 'require("node:fs").writeFileSync(process.env.RUNNER_TEMP + "/proposal.json", process.env.CONTENT_PROPOSAL)'
+          node .github/content-editor/scripts/apply-proposal.mjs "$RUNNER_TEMP/proposal.json" .
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Validate plugin before opening PR
+        run: bash ./gradlew build
+      - name: Prepare branch and review text
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet; then
+            echo 'Proposal produces no changes.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          BRANCH="content-editor/proposal-${GITHUB_RUN_ID}"
+          git switch -c "$BRANCH"
+          git add src/main/java/com/escapecrystalnotify/EscapeCrystalNotifyRegion.java
+          git commit -m 'Update reviewed Escape Crystal boss coverage'
+          gh auth setup-git
+          git push origin "$BRANCH"
+          cat > "$RUNNER_TEMP/pr-body.md" <<'BODY'
+          Adds or updates reviewed boss coverage from the content editor. Existing optional arguments are preserved unless the proposal explicitly replaces entrance or chunk settings.
+
+          Validation: proposal schema and edited-entry baselines checked; Gradle build passed. Review the diff and confirm in-game instance coverage and entrance behavior before merging.
+
+          This PR uses GITHUB_TOKEN. Follow-on PR workflows may not run automatically; required validation ran in the proposal workflow. Repository-required status checks may still need a maintainer-triggered run.
+          BODY
+          gh pr create --base master --head "$BRANCH" --title 'Update Escape Crystal boss coverage' --body-file "$RUNNER_TEMP/pr-body.md"
