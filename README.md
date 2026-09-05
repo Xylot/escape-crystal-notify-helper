@@ -77,7 +77,7 @@ Wiki content and coordinate evidence originate from the [OSRS Wiki](https://olds
 
 
 
-The light-theme landing page shows unsupported bosses, with quest bosses hidden by default. Enable Include quest bosses to show them. Select a card to open the entrance/arena workspace.
+The light-theme encounter editor prioritizes authoring: arena coverage, optional entrance detection, then review and export. The current step shows one focused map, while coverage and entrance review status remain independent. Discover shows bosses needing coverage, with quest bosses hidden by default. Search, filter by category, sort by name or available locations, and switch between card and list views. My drafts includes saved quest encounters even when the quest filter is off. Select an encounter to open the guided editor; missing wiki locations load automatically. Nearby entrance objects load when entering the entrance step, with filters, selected-ID chips, and collapsible variants. Export an individual encounter from its review step, or select ready drafts in Review changes. Unfinished drafts do not block exports of other encounters. The contributor guide and source tools are also available from the mobile Workspace tools menu.
 
 
 ## Placed entrance objects

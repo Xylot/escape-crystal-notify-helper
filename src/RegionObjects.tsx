@@ -1,23 +1,49 @@
-import {useState,useEffect} from 'react';
-import {loadRegionObjects,regionObjectCandidates,objectGamevalNames,DUMPER} from './core/region-objects.mjs';
-import {loadGameval} from './core/gameval.mjs';
-import type {Boss} from './types';
-export default function RegionObjects({boss,onUse,onError,selectedRegion}:{selectedRegion?:number;boss:Boss;onUse:(id:string)=>void;onError:(message:string)=>void}){
- const entrances=boss.maps.filter(m=>m.role==='entrance');
- const [choice,setChoice]=useState(0),[region,setRegion]=useState(entrances[0]?String(entrances[0].region):''),[plane,setPlane]=useState(entrances[0]?.plane===null?'all':String(entrances[0]?.plane??'all'));
- const [data,setData]=useState<any>(null),[rows,setRows]=useState<any[]>([]),[busy,setBusy]=useState(false),[onlyEntrances,setOnlyEntrances]=useState(true),[symbols,setSymbols]=useState<any[]>([]),[symbolBusy,setSymbolBusy]=useState(false),[searchedRegion,setSearchedRegion]=useState('');
- useEffect(()=>{if(selectedRegion!==undefined){setRegion(String(selectedRegion));setRows([]);setSearchedRegion('');}},[selectedRegion]);
- const point=entrances[choice];
- return <section className="gameval-search region-objects"><p className="lookup-context">Region <strong>{region||'not located'}</strong> · {plane==='all'?'all planes':`plane ${plane}`}</p>
- {entrances.length>1&&<label className="field">Wiki entrance<select value={choice} onChange={e=>{const i=+e.target.value;setChoice(i);setRegion(String(entrances[i].region));setPlane(entrances[i].plane===null?'all':String(entrances[i].plane));setRows([]);setSearchedRegion('');}}>{entrances.map((m,i)=><option key={i} value={i}>{m.title} · {m.x}, {m.y}</option>)}</select></label>}
- <form onSubmit={async e=>{e.preventDefault();setBusy(true);try{if(!/^\d+$/.test(region))throw new Error('Enter a numeric region ID.');const next=await loadRegionObjects();setData(next);setRows(regionObjectCandidates(next,Number(region),point?{x:point.x,y:point.y}:null,plane==='all'?null:Number(plane)));setSearchedRegion(region);}catch(error){onError((error as Error).message);}finally{setBusy(false);}}}>
- <details className="inspector-disclosure"><summary>Change region or plane</summary><label className="field">Object search region<input value={region} onChange={e=>setRegion(e.target.value)}/></label><label className="field">Object search plane<select value={plane} onChange={e=>setPlane(e.target.value)}><option value="all">All planes</option>{[0,1,2,3].map(n=><option key={n}>{n}</option>)}</select></label></details><button className="primary" disabled={busy||!region}>{busy?'Loading object dump…':'Find region objects'}</button></form>
- {searchedRegion&&<><details className="inspector-disclosure"><summary>Dump source & freshness</summary><p className="muted">Region {searchedRegion} · cache {data.meta.cache} · generated {data.meta.generatedAt}<br/><a href={`https://github.com/${DUMPER}/tree/${data.sha}/data`} target="_blank" rel="noreferrer">Pinned dump source ↗</a></p></details><label className="quest-toggle"><input type="checkbox" checked={onlyEntrances} onChange={e=>setOnlyEntrances(e.target.checked)}/> Entrance-like objects only</label>
- <button disabled={symbolBusy} onClick={async()=>{setSymbolBusy(true);try{setSymbols(await loadGameval());}catch(error){onError((error as Error).message);}finally{setSymbolBusy(false);}}}>{symbolBusy?'Matching IDs…':'Match gameval names'}</button>
- <div className="gameval-results">{rows.filter(r=>!onlyEntrances||r.entrance).slice(0,100).map((r,i)=><article className="evidence" key={`${r.id}-${r.x}-${r.y}-${r.level}-${i}`}><span className="badge">{r.distance===0?'Exact wiki tile':'Placed object'} · plane {r.level}</span><h3>{r.name}</h3><p>Tile {r.x}, {r.y}{r.distance!==null?` · ${r.distance.toFixed(1)} tiles from wiki entrance`:''}</p><strong>Placed ID: {r.id}</strong><p>Actions: {r.definition.actions?.filter(Boolean).join(', ')||'None on base object'}</p><button onClick={()=>onUse(String(r.id))}>Add placed ID {r.id}</button>
- {!!r.forms.length&&<><p className="muted">Morph selector: {r.definition.transformVarbit>=0?`varbit ${r.definition.transformVarbit}`:`varp ${r.definition.transformVarp}`}. Active form depends on account state.</p>{r.forms.filter((f:any)=>f.locId>=0).map((f:any,j:number)=><div className="object-form" key={j}><strong>{f.locId} · {f.name}</strong><p>{f.actions?.filter(Boolean).join(', ')||'No actions'} · {f.isFallback?'Fallback form':`Values ${(f.values??[]).join(', ')}`}</p><button onClick={()=>onUse(String(f.locId))}>Add form ID {f.locId}</button></div>)}</>}
- {objectGamevalNames(symbols,[r.id,...r.forms.map((f:any)=>f.locId)]).map((s:any)=><a className="gameval-name" key={s.name} href={s.source} target="_blank" rel="noreferrer">{s.file}.{s.name} = {s.id} ↗</a>)}
- </article>)}</div>{!rows.some(r=>!onlyEntrances||r.entrance)&&<p>No matching placed objects. Try all objects, another plane, or an adjacent region.</p>}<p className="muted">Named cache objects only. Missing results do not rule out an entrance. NPC spawn locations are excluded because the dumper marks them stale. Verify whether the plugin matches placed IDs or transformed IDs before export.</p></>}
- </section>;
-}
+import { useState, useEffect, useRef } from 'react';
+import { loadRegionObjects, regionObjectCandidates, objectGamevalNames, DUMPER } from './core/region-objects.mjs';
+import { loadGameval } from './core/gameval.mjs';
+import { Icon } from './Icons';
+import type { Boss } from './types';
 
+export default function RegionObjects({ boss, onUse, onError, selectedRegion, selectedPlane, selectedIds = [], autoLoad = false }: {
+  selectedRegion?: number; selectedPlane?: number; boss: Boss; onUse: (id: string) => void; onError: (message: string) => void; selectedIds?: string[]; autoLoad?: boolean;
+}) {
+  const entrances = boss.maps.filter((m, i, all) => m.role === 'entrance' && all.findIndex(p => p.role === 'entrance' && p.x === m.x && p.y === m.y && p.plane === m.plane) === i);
+  const [region, setRegion] = useState(String(selectedRegion ?? entrances[0]?.region ?? ''));
+  const [plane, setPlane] = useState(String(selectedPlane ?? entrances[0]?.plane ?? 'all'));
+  const [data, setData] = useState<any>(null), [rows, setRows] = useState<any[]>([]);
+  const [busy, setBusy] = useState(false), [error, setError] = useState(''), [searchedRegion, setSearchedRegion] = useState('');
+  const [onlyEntrances, setOnlyEntrances] = useState(true), [query, setQuery] = useState('');
+  const [symbols, setSymbols] = useState<any[]>([]), [symbolBusy, setSymbolBusy] = useState(false);
+  const request = useRef(0);
+  async function search(target = region, targetPlane = plane) {
+    const version = ++request.current; setBusy(true); setError(''); setRows([]); setSearchedRegion('');
+    try {
+      if (!/^\d+$/.test(target) || +target > 65535) throw new Error('Enter a region ID from 0 to 65535.');
+      const next = await loadRegionObjects();
+      if (version !== request.current) return;
+      const point = entrances.find(p => p.region === +target);
+      setData(next); setRows(regionObjectCandidates(next, +target, point ? { x: point.x, y: point.y } : null, targetPlane === 'all' ? null : +targetPlane)); setSearchedRegion(target);
+    } catch (e) { if (version === request.current) setError((e as Error).message); }
+    finally { if (version === request.current) setBusy(false); }
+  }
+  useEffect(() => {
+    const target = String(selectedRegion ?? entrances[0]?.region ?? '');
+    const targetPlane = String(selectedPlane ?? entrances[0]?.plane ?? 'all');
+    setRegion(target); setPlane(targetPlane); setRows([]); setSearchedRegion('');
+    if (autoLoad && target) void search(target, targetPlane);
+    return () => { request.current++; };
+  }, [selectedRegion, selectedPlane, autoLoad, boss.id]);
+  const filtered = rows.filter(r => (!onlyEntrances || r.entrance) && (!query || `${r.name} ${r.id} ${r.actions.join(' ')}`.toLowerCase().includes(query.toLowerCase())));
+  return <section className="region-objects"><form className="object-region-form" onSubmit={e => { e.preventDefault(); void search(); }}><label>Region<input aria-label="Object search region" value={region} onChange={e => setRegion(e.target.value)}/></label><label>Plane<select aria-label="Object search plane" value={plane} onChange={e => setPlane(e.target.value)}><option value="all">All</option>{[0, 1, 2, 3].map(n => <option key={n}>{n}</option>)}</select></label><button disabled={busy || !region}><Icon name="search" size={15}/>{busy ? 'Loading…' : 'Search'}</button></form>
+    {busy && <div className="object-loading" role="status"><span className="loading-spinner"/><strong>Finding nearby objects</strong><p>Loading the world-object snapshot. This may take a moment the first time.</p></div>}
+    {error && <div className="export-issue" role="alert"><strong>Couldn’t load nearby objects</strong><p>{error}</p><button onClick={() => void search()}>Try again</button></div>}
+    {!busy && !error && !searchedRegion && <p className="muted">Choose an entrance region on the map or enter a region above.</p>}
+    {searchedRegion && <><div className="object-filter"><label className="search"><Icon name="search" size={15}/><input aria-label="Filter nearby objects" value={query} onChange={e => setQuery(e.target.value)} placeholder="Filter by name, action or ID…"/></label><label className="quest-toggle"><input type="checkbox" checked={onlyEntrances} onChange={e => setOnlyEntrances(e.target.checked)}/> Entrances only</label></div><div className="object-results-meta"><span>{filtered.length} objects in region {searchedRegion}</span><small>Closest matches first</small></div>
+      <div className="object-results">{filtered.slice(0, 100).map((r, i) => <article className={`object-result ${r.distance === 0 ? 'exact-match' : ''}`} key={`${r.id}-${r.x}-${r.y}-${r.level}-${i}`}><div><strong>{r.name}</strong><span><code>{r.id}</code> · {r.distance === 0 ? 'Exact wiki tile' : r.distance !== null ? `${r.distance.toFixed(1)} tiles away` : `Tile ${r.x}, ${r.y}`} · plane {r.level}</span></div><button className={selectedIds.includes(String(r.id)) ? 'object-added' : ''} disabled={selectedIds.includes(String(r.id))} onClick={() => onUse(String(r.id))}>{selectedIds.includes(String(r.id)) ? '✓ Added' : '+ Add'}</button><p>{r.actions.join(' · ') || 'No actions on base object'}</p>
+        {!!r.forms.length && <details className="object-variants"><summary>{r.forms.filter((f: any) => f.locId >= 0).length} variants · inspect IDs</summary><p>Active form depends on account state. Selector: {r.definition.transformVarbit >= 0 ? `varbit ${r.definition.transformVarbit}` : `varp ${r.definition.transformVarp}`}.</p>{r.forms.filter((f: any) => f.locId >= 0).map((f: any, j: number) => <div className="object-form" key={j}><div><strong>{f.name || 'Unnamed variant'}</strong><span>{f.locId} · {f.actions?.filter(Boolean).join(', ') || 'No actions'}</span></div><button disabled={selectedIds.includes(String(f.locId))} onClick={() => onUse(String(f.locId))}>{selectedIds.includes(String(f.locId)) ? 'Added' : '+ Add'}</button></div>)}</details>}
+        {objectGamevalNames(symbols, [r.id, ...r.forms.map((f: any) => f.locId)]).map((s: any) => <a className="gameval-name" key={s.name} href={s.source} target="_blank" rel="noreferrer">{s.file}.{s.name} = {s.id} ↗</a>)}
+      </article>)}</div>{!filtered.length && <div className="object-empty"><p>No matching objects.</p><button onClick={() => { setOnlyEntrances(false); setQuery(''); }}>Show all region objects</button></div>}{filtered.length > 100 && <p className="muted">Showing the first 100 matches. Filter by name or ID to narrow the list.</p>}
+      <details className="inspector-disclosure"><summary>Source details & verification</summary><p className="muted">Cache {data.meta.cache} · generated {data.meta.generatedAt}. NPC spawn locations are excluded. Verify placed and transformed IDs in game.</p><a href={`https://github.com/${DUMPER}/tree/${data.sha}/data`} target="_blank" rel="noreferrer">View pinned object snapshot ↗</a><button className="wide" disabled={symbolBusy} onClick={async () => { setSymbolBusy(true); try { setSymbols(await loadGameval()); } catch (e) { onError((e as Error).message); } finally { setSymbolBusy(false); } }}>{symbolBusy ? 'Matching…' : 'Match RuneLite constant names'}</button></details>
+    </>}
+  </section>;
+}
