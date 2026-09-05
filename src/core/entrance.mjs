@@ -12,7 +12,6 @@ export function validateEntrance(e) {
   }
   if(!Array.isArray(e.chunks)||e.chunks.length>256)throw new Error('Invalid entrance chunks.');
   e.chunks.forEach(n=>integer(n,0,4194303,'Entrance chunk ID'));
-  if(e.reviewed!==true)throw new Error('Review entrance IDs, variants, direction, and plane before export.');
 }
 export function entranceJava(e) {
   validateEntrance(e);

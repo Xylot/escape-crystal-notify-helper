@@ -39,8 +39,8 @@ test('unrelated upstream edits revalidate but affected edits conflict',()=>{
   assert.doesNotThrow(()=>applyProposal(SOURCE.replace('1234','1235'),proposal([change()])));
   assert.throws(()=>applyProposal(SOURCE.replace('11851','11852'),proposal([change()])),/Conflict/);
 });
-test('unsafe proposal payloads and unreviewed drafts are rejected',()=>{
-  for(const patch of [{id:'BOSS_X); evil()'},{reviewed:false},{regions:[-1]},{baseRaw:undefined},{deathType:'UNSAFE);evil()'}])assert.throws(()=>validateProposal(proposal([{...change(),...patch}])));
+test('unsafe proposal payloads are rejected',()=>{
+  for(const patch of [{id:'BOSS_X); evil()'},{regions:[-1]},{baseRaw:undefined},{deathType:'UNSAFE);evil()'}])assert.throws(()=>validateProposal(proposal([{...change(),...patch}])));
   const evilName={...change(),name:'Boss "); throw new Error(); //'};const result=applyProposal(SOURCE,proposal([evilName]));assert.equal(parseJava(result).entries[0].name,evilName.name);
 });
 test('unsupported Java expressions fail closed',()=>{assert.throws(()=>parseJava(SOURCE.replace('11851, 11850','REGION_CONST')));assert.throws(()=>parseJava(SOURCE+'/*'));});

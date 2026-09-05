@@ -35,7 +35,7 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,kind,locations,a
     const next=chunks.includes(id)?chunks.filter(n=>n!==id):[...chunks,id].sort((a,b)=>a-b);
     if(isEntrance){
       if(!draft.entrance&&boss.optionalArgs.some(a=>a.includes('RegionEntrance('))){onError('Review the existing entrance configuration before replacing its chunk restrictions.');return;}
-      update({entrance:{overlay:'DEPRIORITIZED_WITH_HIGHLIGHT',direction:'',plane:'',objectType:'GAME_OBJECT',ids:[],...draft.entrance,chunks:next,reviewed:false}});
+      update({entrance:{overlay:'DEPRIORITIZED_WITH_HIGHLIGHT',direction:'',plane:'',objectType:'GAME_OBJECT',ids:[],...draft.entrance,chunks:next}});
     }else{
       const point=chunkOrigin(id),region=regionId(point.x,point.y);
       update({chunks:next,regions:[...new Set([...draft.regions,region])].sort((a,b)=>a-b)});

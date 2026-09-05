@@ -1,22 +1,19 @@
 import { applyProposal, PLUGIN_REPO } from './proposal.mjs';
 import { chunkOrigin, regionId } from './coordinates.mjs';
 
-// Reviewing an entrance must not erase a completed coverage review (or vice versa).
+export function defaultDraft(draft) {
+  return { ...draft, deathType: draft.deathType || 'UNSAFE' };
+}
+
+// Keep chunk restrictions within the selected coverage.
 export function mergeDraft(draft, change) {
-  const coverageChanged = ['name', 'regions', 'deathType', 'chunks'].some(key =>
-    key in change && JSON.stringify(change[key]) !== JSON.stringify(draft[key]));
-  const next = { ...draft, ...change, reviewed: change.reviewed ?? (coverageChanged ? false : draft.reviewed) };
+  const next = { ...draft, ...change };
   if ('regions' in change && !('chunks' in change) && next.chunks) {
     next.chunks = next.chunks.filter(id => {
       if (!Number.isInteger(id) || id < 0 || id > 4194303) return false;
       const point = chunkOrigin(id);
       return next.regions.includes(regionId(point.x, point.y));
     });
-  }
-  const entranceContextChanged = ['entranceRegion', 'entrancePlane'].some(key =>
-    key in change && change[key] !== draft[key]);
-  if (entranceContextChanged && next.entrance) {
-    next.entrance = { ...next.entrance, reviewed: false };
   }
   return next;
 }

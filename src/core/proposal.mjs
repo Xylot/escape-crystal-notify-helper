@@ -16,7 +16,6 @@ export function validateProposal(proposal) {
     if (!Array.isArray(c.regions) || !c.regions.length || c.regions.length > 256) throw new Error('Select 1–256 regions.');
     c.regions.forEach(n => integer(n, 0, 65535, 'Region ID'));
     if (new Set(c.regions).size !== c.regions.length) throw new Error('Duplicate region IDs.');
-    if (c.reviewed !== true) throw new Error(`Review coverage and classification for ${c.name}.`);
     if (c.baseRaw !== null && (typeof c.baseRaw !== 'string' || c.baseRaw.length > 20000)) throw new Error('Missing original source entry.');
     if(c.entrance)validateEntrance(c.entrance);
     if(c.chunks!==undefined) {
