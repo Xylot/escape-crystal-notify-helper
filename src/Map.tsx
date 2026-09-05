@@ -39,7 +39,7 @@ export function RegionMap(props:Props){
   const resize=new ResizeObserver(()=>m.invalidateSize({pan:true}));resize.observe(host.current);
   return()=>{cancelAnimationFrame(frame);resize.disconnect();worker?.terminate();jobs.clear();m.remove();map.current=null;};
  },[]);
- useEffect(()=>{map.current?.setView([props.center[1],props.center[0]],map.current.getZoom(),{animate:true});},[props.center]);
+ useEffect(()=>{map.current?.setView([props.center[1],props.center[0]],map.current.getZoom(),{animate:false});},[props.center]);
  useEffect(()=>{imagery.current?.redraw();},[props.tileSource,props.plane]);
  useEffect(()=>{grid.current?.redraw();imagery.current?.getContainer()?.querySelectorAll<HTMLElement>('[data-region]').forEach(tile=>shadeTerrain(tile,props));},[props.selected,props.existing,props.chunks,props.chunkMode,fine]);
  useEffect(()=>{
