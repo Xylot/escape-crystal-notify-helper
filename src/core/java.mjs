@@ -76,6 +76,15 @@ export function javaString(name) { return JSON.stringify(name).replace(/\u2028/g
 /** @param {any} change @param {any} existing */
 export function generateEntry(change, existing = null) {
   let optional = existing ? [...existing.optionalArgs] : [];
+  if (!change.entrance && change.entranceOverlay) {
+    if (!['PRIORITIZED_WITH_HIGHLIGHT','DEPRIORITIZED_WITH_HIGHLIGHT'].includes(change.entranceOverlay)) throw new Error('Unsupported entrance priority.');
+    optional = optional.map(a => {
+      if (!maskJava(a).trim().startsWith('new EscapeCrystalNotifyRegionEntrance(')) return a;
+      const masked = maskJava(a), match = /EscapeCrystalNotifyRegionEntranceOverlayType\.(?:PRIORITIZED_WITH_HIGHLIGHT|DEPRIORITIZED_WITH_HIGHLIGHT)/.exec(masked);
+      if (!match) throw new Error('Existing entrance priority requires manual Java review.');
+      return a.slice(0, match.index) + `EscapeCrystalNotifyRegionEntranceOverlayType.${change.entranceOverlay}` + a.slice(match.index + match[0].length);
+    });
+  }
   if (change.entrance) {
     const i = optional.findIndex(a => maskJava(a).trim().startsWith('new EscapeCrystalNotifyRegionEntrance('));
     if (i >= 0) optional[i] = entranceJava(change.entrance);

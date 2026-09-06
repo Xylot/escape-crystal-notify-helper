@@ -29,7 +29,7 @@ Entrance object thumbnails use MOID's first orientation. Missing images show an 
 
 ## Contribution flow
 
-The authoring steps are **Arena → Entrance area → Entrance object → Review & export**. Entrance area contains the map, region/plane selection, and chunk restrictions. Entrance object provides a dedicated visual candidate browser alongside detection IDs, interaction settings, and the independently chosen MOID reference image. Review provides separate shortcuts back to the area and object steps. Arena-only exports and preservation of existing plugin entrances remain available.
+The authoring steps are **Setup → Arena → Entrance area → Entrance object → Review & export**. Entrance area contains the map, region/plane selection, and chunk restrictions. Entrance object provides a dedicated visual candidate browser alongside detection IDs, interaction settings, and the independently chosen MOID reference image. Review provides separate shortcuts back to the area and object steps. Arena-only exports and preservation of existing plugin entrances remain available.
 
 1. Sync the plugin and select a boss, or import a wiki title/URL. If CORS blocks requests, paste the page's wikitext in the import dialog.
 2. Inspect wiki locations and linked caves; outside entrance pins are distinct from arena candidates. Select 64×64 regions, inspect 8×8 chunk IDs, and choose a death classification.
@@ -98,3 +98,5 @@ Shellbane's wiki tile matches placed ID 58439 (TT_LAIR_ENTRANCE), with forms 584
 The editor prioritizes the entrance and arena maps, with one scrolling inspector. Raster imagery is retained through zooming and selection updates. An OffscreenCanvas worker paints grid tiles; browsers without it use the same canvas renderer on the main thread. Leaflet handles pan/zoom and DOM imagery on the main thread. Grid selection uses world-coordinate hit testing rather than thousands of interactive shapes.
 
 Known entrance regions are selected as lookup context; optional chunks restrict an entrance once configured. A unique boss-specific cave/lair or explicit arena location preselects arena coverage for a new draft. Broad or ambiguous locations stay unselected. Saved drafts and existing plugin regions are preserved. New drafts default to Unsafe death; existing classifications are preserved. Export validates the configuration without requiring verification checkboxes. Entrance region context is not added to arena coverage or synthesized into an unsupported Java constructor argument.
+
+Encounter setup selects death classification and entrance priority, with examples from the plugin README. PRs use encounter-specific conventional titles (for example, `feat(boss): add Shellbane gryphon`) and include available first-orientation MOID images for the selected objects and their known transform variants. Visual references stay separate from detection IDs and exported Java.

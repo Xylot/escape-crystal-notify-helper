@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {moidImage,parseMoidSelection} from '../src/core/moid-images.mjs';
+import {moidImage,parseMoidSelection,modelVariants} from '../src/core/moid-images.mjs';
 import {cleanChanges} from '../src/core/pr-evidence.mjs';
 test('MOID always uses the first orientation and preserves exact ID source links',()=>{
   assert.deepEqual(moidImage('58440'),{id:'58440',url:'https://chisel.weirdgloop.org/static/img/osrs-object/58440_orient0.png',source:'https://chisel.weirdgloop.org/moid/object_id.html#58440'});
@@ -14,4 +14,12 @@ test('independent picture selection accepts bounded IDs, ranges, and the supplie
 test('reference pictures remain outside the exported entrance configuration',()=>{
   const change={id:'BOSS_TEST',name:'Test',regions:[12682],deathType:'UNSAFE',baseRaw:null,entranceImage:'58440',entrance:{ids:['58439'],objectType:'GAME_OBJECT',chunks:[],overlay:'DEPRIORITIZED_WITH_HIGHLIGHT',direction:'',plane:''}};
   const exported=cleanChanges([change])[0];assert.deepEqual(exported.entrance.ids,['58439']);assert.equal(exported.entranceImage,undefined);
+});
+
+test('parent collage finds all descendant variants without siblings, duplicates, sentinels, or cycles',()=>{
+  const types={100:{forms:[{locId:101},{locId:102},{locId:-1},{locId:101}]},101:{forms:[{locId:103}]},103:{forms:[{locId:100}]},999:{forms:[{locId:100},{locId:998}]}};
+  assert.deepEqual(modelVariants(types,'100'),['101','102','103']);
+  assert.deepEqual(modelVariants(types,'102'),[]);
+  assert.deepEqual(modelVariants(types,'555'),[]);
+  assert.throws(()=>modelVariants({1:{forms:Array.from({length:129},(_,i)=>({locId:i+2}))}},'1'),/128/);
 });

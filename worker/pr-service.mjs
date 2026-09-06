@@ -1,6 +1,8 @@
 import { applyProposal, validateProposal, fullPatch, PLUGIN_REPO, JAVA_PATH } from '../src/core/proposal.mjs';
 import { cleanChanges, evidencePlan, panelSize, stableJSON } from '../src/core/pr-evidence.mjs';
 import { digest, HttpError, validatePNG, validatePixels } from './security.mjs';
+import { cleanPresentation, defaultPRText } from '../src/core/pr-presentation.mjs';
+import { moidImage } from '../src/core/moid-images.mjs';
 
 export function target(env){
   const repo=env.DEPLOYMENT_MODE==='test'?env.TEST_TARGET_REPO:PLUGIN_REPO;
@@ -13,7 +15,12 @@ export function prBody(record,introduction,images){
   for(const c of record.changes){
     text+=`## ${md(c.name)}\n\n- Arena regions: ${c.regions.join(', ')}\n- Death classification: ${md(c.deathType)}\n- Arena chunks: ${c.chunks?.length?c.chunks.join(', '):'Whole selected regions'}\n`;
     if(c.entrance)text+=`- Entrance: ${md(c.entrance.objectType)}; IDs: ${c.entrance.ids.map(md).join(', ')}\n- Entrance options: ${md(c.entrance.overlay)}, direction ${md(c.entrance.direction||'default')}, plane ${md(c.entrance.plane||'default')}\n- Entrance chunks: ${c.entrance.chunks.join(', ')||'None'}\n`;
-    else text+='- Entrance: existing configuration preserved, if present.\n';
+    else text+=`- Entrance: ${c.entranceOverlay?`priority ${md(c.entranceOverlay)}; other settings preserved`:'existing configuration preserved, if present'}.\n`;
+    const models=record.presentation?.[c.id]?.images??[];
+    if(models.length) {
+      text+='\n### Entrance model references\n\nAvailable first-orientation images, including related model variants. These are visual references; detection uses only the IDs listed above. Images from MOID / Weird Gloop.\n\n';
+      for(const id of models){const image=moidImage(id);text+=`[![Object ${image.id}](${image.url})](${image.source})\n\n`;}
+    }
     text+='\n### Map selections\n\n';
     for(const p of record.evidence.panels.filter(p=>p.bossId===c.id))text+=`![${md(c.name)} ${p.kind}, plane ${p.context.plane}; regions ${p.regions.join(', ')}](${images[p.id]})\n\n`;
     text+='### Wiki sources\n\n'+record.evidence.sources[c.id].map((url,i)=>`- [${i===0?'Wiki source':'Additional wiki source'} ${i+1}](${url})`).join('\n')+'\n\n';
@@ -22,21 +29,21 @@ export function prBody(record,introduction,images){
 }
 export function publicRecord(r){
   const images=Object.fromEntries(r.evidence.panels.map(p=>[p.id,r.evidenceCommit?`https://raw.githubusercontent.com/${r.fork}/${r.evidenceCommit}/${p.id}.png`:`evidence://${p.id}`]));
-  return {id:r.id,revision:r.revision,repo:r.repo,branch:r.branch,baseSha:r.base.sha,patch:r.patch,changes:r.changes,evidence:r.evidence,title:r.title,introduction:r.introduction,body:prBody(r,r.introduction,images),status:r.status,pr:r.pr??null,error:r.error??null};
+  return {id:r.id,revision:r.revision,repo:r.repo,branch:r.branch,baseSha:r.base.sha,patch:r.patch,changes:r.changes,evidence:r.evidence,presentation:r.presentation,title:r.title,introduction:r.introduction,body:prBody(r,r.introduction,images),status:r.status,pr:r.pr??null,error:r.error??null};
 }
 
 export async function prepare(input,owner,gh,store,env){
   const {repo,branch}=target(env),changes=cleanChanges(input.changes);
   validateProposal({version:1,repository:PLUGIN_REPO,baseCommit:'0'.repeat(40),changes});
   const evidence=evidencePlan(changes,input.contexts,input.sources);
-  const revision=await digest(stableJSON({changes,evidence,repo,branch}));
+  const presentation=cleanPresentation(changes,input.presentation);
+  const revision=await digest(stableJSON({changes,evidence,presentation,repo,branch}));
   const completed=await store.completed(owner,revision);if(completed)return publicRecord(completed);
   const base=await gh.upstream(repo,branch),after=applyProposal(base.source,{version:1,repository:PLUGIN_REPO,baseCommit:base.sha,changes});
   if(after===base.source)throw new HttpError(409,'These settings already match the plugin. There are no changes to submit.');
   const fingerprint=await digest(revision+base.sha),existing=await store.byFingerprint(owner,fingerprint);
   if(existing)return publicRecord(existing);
-  const title=changes.length===1?`Update ${changes[0].name} boss coverage`:`Update coverage for ${changes.length} encounters`;
-  const record={id:crypto.randomUUID(),owner,revision,fingerprint,repo,branch,base,after,changes,evidence,patch:fullPatch(base.source,after),title,introduction:'Updates boss coverage from the Escape Crystal Content Editor.',status:'prepared'};
+  const record={id:crypto.randomUUID(),owner,revision,fingerprint,repo,branch,base,after,changes,evidence,presentation,patch:fullPatch(base.source,after),...defaultPRText(changes,presentation),status:'prepared'};
   return publicRecord(await store.create(record));
 }
 
@@ -69,7 +76,7 @@ export async function submit(id,input,owner,login,gh,store){
       const entries=[];
       r.imageBlobs??={};
       for(const panel of r.evidence.panels){if(!r.imageBlobs[panel.id]){r.imageBlobs[panel.id]=(await gh.blob(r.fork,images.get(panel.id),'base64')).sha;await store.save(r);}entries.push({path:`${panel.id}.png`,mode:'100644',type:'blob',sha:r.imageBlobs[panel.id]});}
-      const manifest=await gh.blob(r.fork,JSON.stringify({submission:r.id,revision:r.revision,base:r.base.sha,evidence:r.evidence},null,2));
+      const manifest=await gh.blob(r.fork,JSON.stringify({submission:r.id,revision:r.revision,base:r.base.sha,evidence:r.evidence,presentation:r.presentation},null,2));
       entries.push({path:'manifest.json',mode:'100644',type:'blob',sha:manifest.sha});
       const tree=await gh.tree(r.fork,entries);r.evidenceCommit=(await gh.commit(r.fork,tree.sha,[],`Map evidence for ${r.title}`)).sha;await store.save(r);
     }

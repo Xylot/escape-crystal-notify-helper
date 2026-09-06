@@ -1,16 +1,25 @@
 import {useEffect,useState} from 'react';
 import {loadGameval} from './core/gameval.mjs';
 import {moidImage,parseMoidSelection} from './core/moid-images.mjs';
+import {loadParentVariantImages} from './pr-models';
 
 export function MoidThumbnail({id,onSelect,selected=false,compact=false}:{id:string;onSelect?:(id:string)=>void;selected?:boolean;compact?:boolean}){
   const [failed,setFailed]=useState(false),[loaded,setLoaded]=useState(false);
-  useEffect(()=>{setFailed(false);setLoaded(false);},[id]);
+  const [variants,setVariants]=useState<string[]>([]),[resolving,setResolving]=useState(false);
+  useEffect(()=>{setFailed(false);setLoaded(false);setVariants([]);},[id]);
+  useEffect(()=>{
+    if(!failed)return;
+    let active=true;setResolving(true);
+    loadParentVariantImages(id).then(images=>{if(active)setVariants(images);}).catch(()=>{if(active)setVariants([]);}).finally(()=>{if(active)setResolving(false);});
+    return()=>{active=false;};
+  },[failed,id]);
   const image=moidImage(id);
+  const collage=failed&&variants.length>0;
   return <figure className={`moid-image${compact?' compact':''}${selected?' chosen':''}`}>
     <a href={image.source} target="_blank" rel="noreferrer" aria-label={`View object ${id} in MOID`}>
-      {failed?<span className="moid-missing">No image available</span>:<img src={image.url} alt={`Object ${id}, first orientation`} loading="lazy" decoding="async" onLoad={()=>setLoaded(true)} onError={()=>setFailed(true)}/>}
+      {collage?<span className="moid-collage" style={{gridTemplateColumns:`repeat(${Math.ceil(Math.sqrt(variants.length))},minmax(0,1fr))`}} aria-label={`Object ${id}: collage of ${variants.length} variants`}>{variants.map(variant=><span key={variant} className="moid-collage-cell"><img src={moidImage(variant).url} alt={`Variant ${variant}, first orientation`} title={`Variant ${variant}`} decoding="async" onError={()=>setVariants(current=>current.filter(value=>value!==variant))}/></span>)}</span>:failed?<span className="moid-missing" role="status">{resolving?'Finding variant images…':'No image available'}</span>:<img src={image.url} alt={`Object ${id}, first orientation`} loading="lazy" decoding="async" onLoad={()=>setLoaded(true)} onError={()=>setFailed(true)}/>}
     </a>
-    <figcaption>Object {id}{onSelect&&<button type="button" disabled={!loaded||failed} aria-pressed={selected} onClick={()=>onSelect(id)}>{selected?'Selected image':'Use image'}</button>}</figcaption>
+    <figcaption>Object {id}{collage&&<span>{variants.length} variants · collage</span>}{onSelect&&<button type="button" disabled={!(loaded&&!failed)&&!collage} aria-pressed={selected} onClick={()=>onSelect(id)}>{selected?'Selected image':'Use image'}</button>}</figcaption>
   </figure>;
 }
 

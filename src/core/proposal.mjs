@@ -1,6 +1,6 @@
 import { parseJava, generateEntry } from './java.mjs';
 import { integer, chunkOrigin, regionId } from './coordinates.mjs';
-import { validateEntrance } from './entrance.mjs';
+import { validateEntrance, OVERLAYS } from './entrance.mjs';
 export const PLUGIN_REPO = 'Xylot/escape-crystal-notify';
 export const JAVA_PATH = 'src/main/java/com/escapecrystalnotify/EscapeCrystalNotifyRegion.java';
 export function validateProposal(proposal) {
@@ -17,6 +17,7 @@ export function validateProposal(proposal) {
     c.regions.forEach(n => integer(n, 0, 65535, 'Region ID'));
     if (new Set(c.regions).size !== c.regions.length) throw new Error('Duplicate region IDs.');
     if (c.baseRaw !== null && (typeof c.baseRaw !== 'string' || c.baseRaw.length > 20000)) throw new Error('Missing original source entry.');
+    if(c.entranceOverlay !== undefined && !OVERLAYS.includes(c.entranceOverlay)) throw new Error('Unsupported entrance priority.');
     if(c.entrance)validateEntrance(c.entrance);
     if(c.chunks!==undefined) {
       if(!Array.isArray(c.chunks)||c.chunks.length>256)throw new Error('Invalid region chunk restrictions.');

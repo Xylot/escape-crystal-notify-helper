@@ -24,7 +24,7 @@ export default function App() {
   const [active,setActive]=useState('BOSS_SHELLBANE_GRYPHON'),[search,setSearch]=useState(''),[filter,setFilter]=useState('new');
   const [view,setView]=useState('discover');
   const [help,setHelp]=useState(false);
-  const [step,setStep]=useState<AuthoringStep>('coverage'),[category,setCategory]=useState('all');
+  const [step,setStep]=useState<AuthoringStep>('setup'),[category,setCategory]=useState('all');
   const [notice,setNotice]=useState(''),[busy,setBusy]=useState(''),[modal,setModal]=useState(false),[review,setReview]=useState(false);
   const [prIds,setPRIds]=useState<string[]|null>(null),[prEnabled,setPREnabled]=useState(false);
   const [evidenceContexts,setEvidenceContexts]=useState<EvidenceContexts>(()=>{try{return JSON.parse(localStorage.getItem('escape-crystal-evidence:v1')||'{}');}catch{return {};}});
@@ -66,7 +66,7 @@ export default function App() {
   const changes=Object.values(drafts), conflicts=changes.filter(c=>(snapshot.entries.find(b=>b.id===c.id)?.raw??null)!==c.baseRaw);
   function commit(next:Record<string,Draft>) {setPast(p=>[...p.slice(-49),drafts]);setFuture([]);setDrafts(next);}
   function update(partial:Partial<Draft>) {if(!draft||!boss)return;if(boss.raw&&boss.regionType!=='BOSSES'){setNotice('This entry belongs to another plugin category and is read-only here.');return;}if(!boss.raw&&boss.supportedBy?.length){setNotice('This boss is already covered by a grouped entry. Open that entry to edit coverage.');return;}commit({...drafts,[boss.id]:mergeDraft(draft,partial)});}
-  function select(b:Boss) {setView('editor');setActive(b.id);setStep('coverage');window.scrollTo({top:0});if(!b.maps.length&&!b.locationsLoaded&&!busy)void loadLocations(b);}
+  function select(b:Boss) {setView('editor');setActive(b.id);setStep('setup');window.scrollTo({top:0});if(!b.maps.length&&!b.locationsLoaded&&!busy)void loadLocations(b);}
   function openImport(){setInput('');setPaste('');setModal(true);}
   function navigateLibrary(nextFilter='new'){setView('discover');setFilter(nextFilter);setSearch('');setCategory('all');window.scrollTo({top:0});}
   async function run(label:string,fn:()=>Promise<void>){setBusy(label);setNotice('');try{await fn();}catch(e){setNotice((e as Error).message);}finally{setBusy('');}}
@@ -91,7 +91,7 @@ export default function App() {
     const result=paste.trim()?extractWiki(Parser,{title,text:paste,revision:null}):await importWiki(Parser,title);
     const existing=bosses.find(b=>b.wikiTitle.toLowerCase()===result.title.toLowerCase()||b.name.toLowerCase()===result.title.toLowerCase());
     const next:Boss={id:existing?.id??enumName(result.title),name:result.title,wikiTitle:result.title,regions:[],raw:null,deathType:'',optionalArgs:[],...result};
-    setImports(v=>[...v.filter(b=>b.id!==next.id),next]);setActive(next.id);setStep('coverage');setView('editor');setModal(false);setNotice(`Imported ${next.maps.length} map suggestions. Review entrance and arena locations separately.`);
+    setImports(v=>[...v.filter(b=>b.id!==next.id),next]);setActive(next.id);setStep('setup');setView('editor');setModal(false);setNotice(`Imported ${next.maps.length} map suggestions. Review entrance and arena locations separately.`);
   });}
   function proposal(ids?:string[]){const selected=ids?changes.filter(c=>ids.includes(c.id)):changes;const p={version:1,repository:PLUGIN_REPO,baseCommit:snapshot.baseCommit,changes:selected};validateProposal(p);if(conflicts.some(c=>selected.some(d=>d.id===c.id)))throw new Error('Resolve upstream conflicts before exporting.');return p;}
   function exportData(kind:string,ids?:string[]){try{

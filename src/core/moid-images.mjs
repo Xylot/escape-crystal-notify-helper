@@ -3,6 +3,39 @@ export function moidImage(id) {
   if(!/^\d{1,9}$/.test(value))throw new Error('Enter a numeric object ID.');
   return {id:String(Number(value)),url:`https://chisel.weirdgloop.org/static/img/osrs-object/${Number(value)}_orient0.png`,source:`https://chisel.weirdgloop.org/moid/object_id.html#${Number(value)}`};
 }
+
+// Walk both directions: selecting a child also includes its parent and siblings.
+export function modelFamily(types, ids) {
+  const found = new Set(ids.map(id => moidImage(id).id));
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const [parent, definition] of Object.entries(types)) {
+      const family = [parent, ...(definition.forms ?? []).filter(f => Number.isInteger(f.locId) && f.locId >= 0).map(f => String(f.locId))];
+      if (!family.some(id => found.has(id))) continue;
+      for (const id of family) if (!found.has(id)) {
+        found.add(id); changed = true;
+        if (found.size > 128) throw new Error('This selection has more than 128 related models. Split it into smaller contributions.');
+      }
+    }
+  }
+  return [...found];
+}
+
+// A missing parent's thumbnail can be represented by its descendants only.
+export function modelVariants(types, id) {
+  const parent=moidImage(id).id, found=new Set([parent]), pending=[parent];
+  while(pending.length) {
+    for(const form of types[pending.pop()]?.forms??[]) {
+      if(!Number.isInteger(form.locId)||form.locId<0)continue;
+      const next=moidImage(form.locId).id;
+      if(found.has(next))continue;
+      found.add(next);pending.push(next);
+      if(found.size>129)throw new Error('This object has more than 128 related variants.');
+    }
+  }
+  return [...found].filter(value=>value!==parent);
+}
 export function parseMoidSelection(input) {
   let text=input.trim();
   if(/^https?:/i.test(text)){

@@ -1,4 +1,5 @@
-import EntrancePortraits from './EntrancePortraits';
+import {MoidThumbnail} from './EntrancePortraits';
+import {prepareModels} from './pr-models';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Boss, Draft, EvidenceContexts } from './types';
 import { encounterLocations } from './core/encounter.mjs';
@@ -24,7 +25,7 @@ export default function PRComposer({drafts,bosses,contexts,onClose}:{drafts:Draf
     }
     return {changes:cleanChanges(drafts),contexts:evidence,sources};
   },[drafts,bosses,contexts]);
-  const signature=stableJSON(input);
+  const signature=stableJSON({input,imageSelections:drafts.map(d=>contexts[d.id]?.entranceImage),categories:bosses.filter(b=>drafts.some(d=>d.id===b.id)).map(b=>[b.id,b.categories])});
   useEffect(()=>{mounted.current=true;prJSON('/session').then(user=>{if(mounted.current)setLogin(user.login);}).catch(()=>{});return()=>{mounted.current=false;};},[]);
   useEffect(()=>{setPreview(null);setImages([]);setError('');},[signature]);
   const handleError=(e:unknown)=>{if(!mounted.current)return;setError((e as Error).message);if(e instanceof PRFailure&&e.status===401)setLogin('');};
@@ -32,7 +33,10 @@ export default function PRComposer({drafts,bosses,contexts,onClose}:{drafts:Draf
   async function prepare(){
     setBusy('Checking the latest plugin source…');setError('');setImages([]);
     try{
-      const result=await prJSON('/prepare',input);if(!mounted.current)return;
+      setBusy('Finding entrance model variants…');
+      const presentation=await prepareModels(drafts,bosses,contexts);
+      setBusy('Checking the latest plugin source…');
+      const result=await prJSON('/prepare',{...input,presentation});if(!mounted.current)return;
       setPreview(result);setTitle(result.title);setIntroduction(result.introduction);remember(signature,result);
       if(!result.pr){const next=await renderEvidence(result.evidence.panels,value=>{if(mounted.current)setBusy(value);});if(mounted.current)setImages(next);}
     }catch(e){handleError(e);}finally{if(mounted.current)setBusy('');}
@@ -62,7 +66,7 @@ export default function PRComposer({drafts,bosses,contexts,onClose}:{drafts:Draf
         <label className="field">PR title<input value={title} maxLength={200} disabled={!!busy} onChange={e=>setTitle(e.target.value)}/></label>
         <label className="field">Introduction<textarea rows={3} value={introduction} maxLength={6000} disabled={!!busy} onChange={e=>setIntroduction(e.target.value)}/></label>
       </>}
-      <h3>Boss changes</h3><div className="pr-summary">{preview.changes.map((c:any)=><article key={c.id}><h4>{c.name}</h4><p>Regions: {c.regions.join(', ')} · {c.deathType}</p><p>Arena chunks: {c.chunks?.join(', ')||'Whole regions'}</p><p>Entrance: {c.entrance?`${c.entrance.objectType} · ${c.entrance.ids.join(', ')} · chunks ${c.entrance.chunks.join(', ')||'none'}`:'Existing settings preserved, if present'}</p>{c.entrance&&<EntrancePortraits selection={contexts[c.id]?.entranceImage} name={c.name} ids={c.entrance.ids} objectType={c.entrance.objectType}/>}<div className="pr-sources">{preview.evidence.sources[c.id].map((source:string)=><a key={source} href={source} target="_blank" rel="noreferrer">{decodeURIComponent(new URL(source).pathname.slice(3)).replaceAll('_',' ')}{new URL(source).search?' · revision':''} ↗</a>)}</div></article>)}</div>
+      <h3>Boss changes</h3><div className="pr-summary">{preview.changes.map((c:any)=><article key={c.id}><h4>{c.name}</h4><p>Regions: {c.regions.join(', ')} · {c.deathType}</p><p>Arena chunks: {c.chunks?.join(', ')||'Whole regions'}</p><p>Entrance: {c.entrance?`${c.entrance.objectType} · ${c.entrance.ids.join(', ')} · chunks ${c.entrance.chunks.join(', ')||'none'}`:'Existing settings preserved, if present'}</p>{!!preview.presentation?.[c.id]?.images.length&&<><h5>Entrance model references & variants</h5><div className="entrance-portraits">{preview.presentation[c.id].images.map((id:string)=><MoidThumbnail key={id} id={id}/>)}</div><p className="muted">Related forms are shown for reference. Detection IDs are unchanged.</p></>}<div className="pr-sources">{preview.evidence.sources[c.id].map((source:string)=><a key={source} href={source} target="_blank" rel="noreferrer">{decodeURIComponent(new URL(source).pathname.slice(3)).replaceAll('_',' ')}{new URL(source).search?' · revision':''} ↗</a>)}</div></article>)}</div>
       <h3>Region & chunk screenshots</h3><p className="muted">Editor selections, not in-game verification. Images are stored on a separate evidence branch in your fork.</p>
       <div className="pr-images">{images.map(image=><figure key={image.id}><img src={image.url} alt={image.id.replaceAll('_',' ')}/><figcaption>{image.id.replaceAll('_',' ')}</figcaption></figure>)}</div>
       {!complete&&images.length!==preview.evidence.panels.length&&!busy&&<p className="export-issue">Screenshots are incomplete. Refresh the preview to retry before submitting.</p>}

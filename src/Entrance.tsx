@@ -1,3 +1,4 @@
+import {entranceOverlay} from './core/authoring.mjs';
 import EntrancePortraits, {MoidThumbnail} from './EntrancePortraits';
 import { useState, useEffect, useRef } from 'react';
 import { OVERLAYS, DIRECTIONS, PLANES, OBJECT_TYPES } from './core/entrance.mjs';
@@ -18,7 +19,7 @@ export default function EntranceEditor({ boss, draft, update, onError, guided = 
   const [busy, setBusy] = useState(false), [searched, setSearched] = useState(false);
   const [candidates, setCandidates] = useState<any[]>([]), [wikiBusy, setWikiBusy] = useState(false), [wikiSearched, setWikiSearched] = useState(false);
   useEffect(() => { if (document.activeElement !== idInput.current) setIds(draft.entrance?.ids.join(', ') ?? ''); }, [draft.entrance?.ids]);
-  const fresh: Config = { overlay: 'DEPRIORITIZED_WITH_HIGHLIGHT', direction: '', plane: '', objectType: 'GAME_OBJECT', ids: [], chunks: [] };
+  const fresh: Config = { overlay: entranceOverlay(draft), direction: '', plane: '', objectType: 'GAME_OBJECT', ids: [], chunks: [] };
   const config = draft.entrance ?? fresh;
   const edit = (part: Partial<Config>) => update({ entrance: { ...config, ...part } });
   const addIds = (values: string[], objectType = 'GAME_OBJECT') => {
