@@ -3,6 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {regionId,regionTileUrl,chunkId,wikiRegionTileUrl} from './core/coordinates.mjs';
 import {paintGrid} from './core/map-grid.mjs';
+import {sparseMapBounds} from './core/map-framing.mjs';
 import type {Location} from './types';
 type Props={selected:number[];existing:number[];locations:Location[];center:[number,number];plane:number;onToggle:(id:number)=>void;chunks:number[];chunkMode:boolean;onChunkToggle:(id:number)=>void;tileSource?:Location['tiles']};
 class MapTiles extends L.GridLayer {public createTile(_coords:L.Coords,_done:L.DoneCallback):HTMLElement{return document.createElement('div');}}
@@ -16,15 +17,32 @@ function shadeTerrain(tile:HTMLElement,state:Props){
 export function RegionMap(props:Props){
  const host=useRef<HTMLDivElement>(null),map=useRef<L.Map|null>(null),grid=useRef<L.GridLayer|null>(null),imagery=useRef<L.GridLayer|null>(null),pins=useRef<L.LayerGroup|null>(null);
  const latest=useRef(props);latest.current=props;
+ const framing=useRef({enabled:true,epoch:0,tiles:new Map<number,boolean>()});
  const [fine,setFine]=useState(false),[zoom,setZoom]=useState(2),[workerMode,setWorkerMode]=useState(false);
  const fineRef=useRef(false);fineRef.current=fine;const readout=useRef<HTMLElement>(null);
  useEffect(()=>{
   if(!host.current)return;
   const m=L.map(host.current,{crs:L.CRS.Simple,minZoom:0,maxZoom:5,zoomSnap:.25,zoomDelta:.5,wheelPxPerZoomLevel:100,wheelDebounceTime:30,zoomControl:false,attributionControl:true,preferCanvas:true}).setView([props.center[1],props.center[0]],2);
   map.current=m;L.control.zoom({position:'bottomright'}).addTo(m);m.attributionControl.addAttribution('<a href="https://maps.runescape.wiki/osrs/">OSRS Wiki</a> / <a href="https://github.com/Explv/osrs_map_tiles">Explv</a> · Jagex');
+  let fitFrame=0,active=true;
+  const fitSparseTerrain=()=>{
+   cancelAnimationFrame(fitFrame);fitFrame=requestAnimationFrame(()=>{
+    const state=framing.current,s=latest.current;if(!active||!state.enabled||!host.current?.clientHeight)return;
+    const bounds=sparseMapBounds(s.center,state.tiles,s.selected) as L.LatLngTuple[]|null;if(!bounds)return;
+    const target=L.latLngBounds(bounds),padding=L.point(48,104);
+    const nextZoom=Math.min(3.5,m.getBoundsZoom(target,false,padding));
+    state.enabled=false;
+    if(nextZoom>m.getZoom())m.fitBounds(target,{paddingTopLeft:[24,24],paddingBottomRight:[24,80],maxZoom:3.5,animate:false});
+   });
+  };
+  const manualNavigation=()=>{framing.current.enabled=false;};
+  const element=host.current;
+  element.addEventListener('pointerdown',manualNavigation,{capture:true});
+  element.addEventListener('wheel',manualNavigation,{capture:true,passive:true});
+  element.addEventListener('keydown',manualNavigation,{capture:true});
   const options={tileSize:256,minNativeZoom:2,maxNativeZoom:2,noWrap:true,keepBuffer:2,updateWhenZooming:false,bounds:L.latLngBounds([0,0],[16384,16384])};
   const images=new MapTiles({...options,pane:'tilePane'});
-  images.createTile=(coords,done)=>{const tile=document.createElement('div');tile.dataset.region=String((coords.x<<8)|(-coords.y-1));const img=document.createElement('img'),color=document.createElement('img');for(const element of [img,color]){element.alt='';element.style.cssText='position:absolute;inset:0;width:256px;height:256px;max-width:none;';tile.appendChild(element);}const id=Number(tile.dataset.region),s=latest.current;img.onload=()=>done(undefined,tile);img.onerror=()=>{tile.style.visibility='hidden';done(undefined,tile);};const url=s.tileSource?wikiRegionTileUrl(id,s.tileSource,s.plane):regionTileUrl(id,s.plane);img.src=url;color.src=url;shadeTerrain(tile,s);return tile;};
+  images.createTile=(coords,done)=>{const tile=document.createElement('div');tile.dataset.region=String((coords.x<<8)|(-coords.y-1));const img=document.createElement('img'),color=document.createElement('img');for(const element of [img,color]){element.alt='';element.style.cssText='position:absolute;inset:0;width:256px;height:256px;max-width:none;';tile.appendChild(element);}const id=Number(tile.dataset.region),s=latest.current,epoch=framing.current.epoch;const settled=(available:boolean)=>{if(epoch===framing.current.epoch){framing.current.tiles.set(id,available);fitSparseTerrain();}done(undefined,tile);};img.onload=()=>settled(true);img.onerror=()=>{tile.style.visibility='hidden';settled(false);};const url=s.tileSource?wikiRegionTileUrl(id,s.tileSource,s.plane):regionTileUrl(id,s.plane);img.src=url;color.src=url;shadeTerrain(tile,s);return tile;};
   images.addTo(m);imagery.current=images;
   let worker:Worker|null=null,sequence=0;const jobs=new Map<number,{tile:HTMLCanvasElement;state:any;done:L.DoneCallback}>();
   const fallback=()=>{worker?.terminate();worker=null;setWorkerMode(false);for(const job of jobs.values()){paintGrid(job.tile.getContext('2d'),job.state);job.done(undefined,job.tile);}jobs.clear();};
@@ -36,11 +54,10 @@ export function RegionMap(props:Props){
   m.on('click',(e:L.LeafletMouseEvent)=>{const x=Math.floor(e.latlng.lng),y=Math.floor(e.latlng.lat);if(x<0||y<0||x>16383||y>16383)return;const s=latest.current;if(s.chunkMode)s.onChunkToggle(chunkId(x,y));else s.onToggle(regionId(x,y));});
   let frame=0;
   m.on('mousemove',(e:L.LeafletMouseEvent)=>{cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{const x=Math.floor(e.latlng.lng),y=Math.floor(e.latlng.lat);if(readout.current&&x>=0&&y>=0&&x<16384&&y<16384)readout.current.textContent=`${x}, ${y} · Region ${regionId(x,y)} · Chunk ${chunkId(x,y)}`;});});
-  const resize=new ResizeObserver(()=>m.invalidateSize({pan:true}));resize.observe(host.current);
-  return()=>{cancelAnimationFrame(frame);resize.disconnect();worker?.terminate();jobs.clear();m.remove();map.current=null;};
+  const resize=new ResizeObserver(()=>{m.invalidateSize({pan:true});fitSparseTerrain();});resize.observe(host.current);
+  return()=>{active=false;framing.current.epoch++;cancelAnimationFrame(frame);cancelAnimationFrame(fitFrame);element.removeEventListener('pointerdown',manualNavigation,true);element.removeEventListener('wheel',manualNavigation,true);element.removeEventListener('keydown',manualNavigation,true);resize.disconnect();worker?.terminate();jobs.clear();m.remove();map.current=null;};
  },[]);
- useEffect(()=>{map.current?.setView([props.center[1],props.center[0]],map.current.getZoom(),{animate:false});},[props.center]);
- useEffect(()=>{imagery.current?.redraw();},[props.tileSource,props.plane]);
+ useEffect(()=>{framing.current={enabled:true,epoch:framing.current.epoch+1,tiles:new Map()};map.current?.setView([props.center[1],props.center[0]],2,{animate:false});imagery.current?.redraw();},[props.center,props.tileSource,props.plane]);
  useEffect(()=>{grid.current?.redraw();imagery.current?.getContainer()?.querySelectorAll<HTMLElement>('[data-region]').forEach(tile=>shadeTerrain(tile,props));},[props.selected,props.existing,props.chunks,props.chunkMode,fine]);
  useEffect(()=>{
   const group=pins.current;if(!group)return;group.clearLayers();
