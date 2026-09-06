@@ -6,7 +6,7 @@
 - D1: `escape-crystal-pr`, bound as `DB`; initial migration applied.
 - `TOKEN_ENCRYPTION_KEY`: generated securely and stored as a Worker secret.
 - Production target: `Xylot/escape-crystal-notify`, branch `master`.
-- OAuth secrets are configured. PR creation is enabled for the local editor origin only; `/config` reports `enabled: true`.
+- OAuth secrets are configured. PR creation is enabled for `http://127.0.0.1:5174` and `https://crystal.emmi.sh`; `/config` reports `enabled: true`.
 - Live OAuth sign-in was verified as Xylot. Same-tab sign-in is available when a popup is not visible.
 - Live preparation successfully reads upstream and produces the Java diff, wiki links, and Shellbane cave PNG evidence. The wiki tile host returns HTTP 403 to the Worker but explicitly permits anonymous browser CORS requests. Evidence now downloads public tiles directly in the browser, falling back to the authenticated Worker endpoint if necessary. No GitHub or editor credentials are sent to tile hosts. Failed downloads still block submission.
 
@@ -14,7 +14,15 @@
 
 The frontend domain is `crystal.emmi.sh`; the backend domain is `crystal-pr.emmi.sh`. Cloudflare DNS can point the frontend to GitHub Pages; the frontend does not need Cloudflare hosting.
 
-To configure the frontend, first set `crystal.emmi.sh` under the helper repository's Settings → Pages → Custom domain. Then create a Cloudflare DNS CNAME named `crystal` pointing to `xylot.github.io` (no repository path), using DNS-only during HTTPS setup. Remove any old Worker binding for this frontend hostname. Enable Enforce HTTPS in GitHub Pages when its certificate is ready. Set the repository Actions variable `VITE_PR_API_URL` to `https://crystal-pr.emmi.sh`. Add `https://crystal.emmi.sh` to the Worker's explicit origin allowlist before enabling PR creation from the public site. These account-level Pages/DNS settings have not been changed by this implementation.
+To configure the frontend:
+
+1. In `Xylot/escape-crystal-notify-helper`, set Settings → Pages → Source to **GitHub Actions**, then save **crystal.emmi.sh** as the custom domain.
+2. In Settings → Secrets and variables → Actions → Variables, add the repository variable `VITE_PR_API_URL` with value `https://crystal-pr.emmi.sh`.
+3. In Cloudflare DNS for `emmi.sh`, create a **CNAME** named **crystal**, targeting **xylot.github.io**, with **DNS only** (gray cloud). Remove any old Worker binding or conflicting DNS record for this frontend hostname. Keep the `crystal-pr.emmi.sh` Worker domain.
+4. Push `main`, or run **Validate, refresh and publish** under Actions if the latest code is already pushed. Wait for both build and deploy to succeed.
+5. Enable **Enforce HTTPS** in Pages when GitHub's certificate is ready.
+
+The Worker already allows `https://crystal.emmi.sh`. Account-level Pages, Actions-variable, and DNS settings still need configuring. This Actions deployment does not require a `CNAME` file. Local drafts and login sessions do not transfer to the new origin; keep any needed proposal downloads before switching.
 
 The OAuth homepage should then be `https://crystal.emmi.sh`, and its callback must be `https://crystal-pr.emmi.sh/auth/callback`.
 
