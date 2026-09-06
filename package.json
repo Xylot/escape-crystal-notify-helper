@@ -13,7 +13,12 @@
     "test": "node --test tests/*.test.mjs",
     "test:core": "node --test tests/core.test.mjs",
     "refresh": "node scripts/refresh.mjs",
-    "apply-proposal": "node scripts/apply-proposal.mjs"
+    "apply-proposal": "node scripts/apply-proposal.mjs",
+    "worker:dev": "wrangler dev --config worker/wrangler.jsonc --port 8787",
+    "worker:check": "wrangler deploy --dry-run --config worker/wrangler.jsonc --outdir work/worker-build",
+    "worker:migrate:local": "wrangler d1 migrations apply escape-crystal-pr --local --config worker/wrangler.jsonc",
+    "worker:deploy": "wrangler deploy --config worker/wrangler.jsonc",
+    "test:pr": "node --test tests/pr-*.test.mjs"
   },
   "dependencies": {
     "leaflet": "1.9.4",
@@ -27,6 +32,7 @@
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.1",
     "typescript": "5.8.3",
-    "vite": "6.4.3"
+    "vite": "6.4.3",
+    "wrangler": "4.129.0"
   }
 }

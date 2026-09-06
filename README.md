@@ -25,7 +25,11 @@ The snapshot contains 188 bosses from the wiki Boss page, with 109 unsupported b
 
 The light interface uses wiki boss portraits in the library and editor. Portraits come from the primary monster/NPC infobox, with file attribution in Sources. Image metadata is cached separately from drafts for seven days; four lookups run at most concurrently, and unavailable images fall back to category icons. Existing cached portraits remain available if a refresh fails. Location selectors include region IDs alongside coordinates.
 
+Entrance object thumbnails use MOID's first orientation. Missing images show an explicit fallback and do not block editing. The Entrance reference image selector accepts an object ID, a bounded range, or a MOID object-page URL. Contributors can select a different object's image, return to the entrance IDs, or hide the reference. This preference is saved separately in local evidence context, appears in authoring and review, and never changes exported object IDs. For example, object 58439 has no MOID image, while 58440 provides a cave entrance reference.
+
 ## Contribution flow
+
+The authoring steps are **Arena → Entrance area → Entrance object → Review & export**. Entrance area contains the map, region/plane selection, and chunk restrictions. Entrance object provides a dedicated visual candidate browser alongside detection IDs, interaction settings, and the independently chosen MOID reference image. Review provides separate shortcuts back to the area and object steps. Arena-only exports and preservation of existing plugin entrances remain available.
 
 1. Sync the plugin and select a boss, or import a wiki title/URL. If CORS blocks requests, paste the page's wikitext in the import dialog.
 2. Inspect wiki locations and linked caves; outside entrance pins are distinct from arena candidates. Select 64×64 regions, inspect 8×8 chunk IDs, and choose a death classification.
@@ -33,7 +37,7 @@ The light interface uses wiki boss portraits in the library and editor. Portrait
 4. Review in-game template coordinates, region overlaps, death behavior, and entrance variants.
 5. Download a patch or JSON proposal, or copy the proposal into the plugin's manually triggered workflow.
 
-The editor never sends proposals or creates PRs without that separate maintainer action. Existing source arguments are retained from the trusted current plugin source. Proposal text is parsed as data, never evaluated.
+When the optional backend is configured, single and batch reviews can prepare a GitHub PR with map screenshots and wiki links. Only the final Create pull request action writes branches, commits, and the PR. Downloads remain available without a backend. See [backend setup](docs/pr-backend-setup.md). Existing source arguments are retained from the trusted current plugin source. Proposal text is parsed as data, never evaluated.
 
 ## GitHub Pages
 
@@ -94,4 +98,3 @@ Shellbane's wiki tile matches placed ID 58439 (TT_LAIR_ENTRANCE), with forms 584
 The editor prioritizes the entrance and arena maps, with one scrolling inspector. Raster imagery is retained through zooming and selection updates. An OffscreenCanvas worker paints grid tiles; browsers without it use the same canvas renderer on the main thread. Leaflet handles pan/zoom and DOM imagery on the main thread. Grid selection uses world-coordinate hit testing rather than thousands of interactive shapes.
 
 Known entrance regions are selected as lookup context; optional chunks restrict an entrance once configured. A unique boss-specific cave/lair or explicit arena location preselects arena coverage for a new draft. Broad or ambiguous locations stay unselected. Saved drafts and existing plugin regions are preserved. New drafts default to Unsafe death; existing classifications are preserved. Export validates the configuration without requiring verification checkboxes. Entrance region context is not added to arena coverage or synthesized into an unsupported Java constructor argument.
-

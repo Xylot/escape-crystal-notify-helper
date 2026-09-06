@@ -1,10 +1,10 @@
-import { useMemo,useState } from 'react';
+import { useEffect,useMemo,useState } from 'react';
 import { RegionMap } from './Map';
 import { encounterLocations,originalEntranceChunks } from './core/encounter.mjs';
 import { chunkOrigin,regionId } from './core/coordinates.mjs';
 import type { Boss,Draft,Location } from './types';
 
-type Props={boss:Boss;draft:Draft;update:(change:Partial<Draft>)=>void;onError:(message:string)=>void;onLoad:()=>void;focus?:'arena'|'entrance';loading?:boolean};
+type Props={boss:Boss;draft:Draft;update:(change:Partial<Draft>)=>void;onError:(message:string)=>void;onLoad:()=>void;focus?:'arena'|'entrance';loading?:boolean;evidenceContext?:{arena?:Location;entrance?:Location};onEvidenceContext?:(kind:'arena'|'entrance',location:Location)=>void};
 const EMPTY_IDS:number[]=[];
 export default function EncounterMaps(props:Props){
   const {boss}=props;
@@ -19,11 +19,12 @@ export default function EncounterMaps(props:Props){
     </div>
   </div>;
 }
-function LocationPane({boss,draft,update,onError,onLoad,loading,kind,locations,alternatives,combined=false}:Props&{kind:'entrance'|'arena';locations:Location[];alternatives:Location[];combined?:boolean}){
+function LocationPane({boss,draft,update,onError,onLoad,loading,evidenceContext,onEvidenceContext,kind,locations,alternatives,combined=false}:Props&{kind:'entrance'|'arena';locations:Location[];alternatives:Location[];combined?:boolean}){
   const [choice,setChoice]=useState(''),[manual,setManual]=useState<Location|null>(null),[plane,setPlane]=useState<number|null>(null),[jump,setJump]=useState('');
   const [chunkMode,setChunkMode]=useState(false),[entranceMode,setEntranceMode]=useState(false),[recenter,setRecenter]=useState(0);
   const all=useMemo(()=>[...locations,...alternatives.filter(m=>!locations.some(l=>l.x===m.x&&l.y===m.y&&l.source===m.source))],[locations,alternatives]);
-  const selected=manual??(choice!==''?all[Number(choice)]:locations[0]);
+  const saved=evidenceContext?.[kind];
+  const selected=manual??(choice!==''?all[Number(choice)]:saved??locations[0]);
   const center=useMemo<[number,number]>(()=>selected?[selected.x,selected.y]:[0,0],[selected,recenter]);
   const isEntrance=kind==='entrance'||combined&&entranceMode;
   const shownPlane=(isEntrance?draft.entrancePlane:undefined)??plane??selected?.plane??0;
@@ -31,6 +32,7 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,kind,locations,a
   const chunks:number[]=isEntrance?(draft.entrance?.chunks??oldChunks):(draft.chunks??EMPTY_IDS);
   const entranceRegions=useMemo(()=>draft.entranceRegion!==undefined?[draft.entranceRegion]:selected?[selected.region]:[],[draft.entranceRegion,selected]);
   const mapLocations=useMemo(()=>combined?alternatives:selected?[selected]:[],[combined,alternatives,selected]);
+  useEffect(()=>{if(selected)onEvidenceContext?.(kind,{...selected,plane:shownPlane,...(isEntrance?{region:entranceRegions[0]??selected.region}:{})});},[selected,shownPlane,isEntrance,entranceRegions[0]]);
   function toggleChunk(id:number){
     const next=chunks.includes(id)?chunks.filter(n=>n!==id):[...chunks,id].sort((a,b)=>a-b);
     if(isEntrance){
@@ -44,7 +46,7 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,kind,locations,a
   const label=combined?'Arena & entrance':kind==='entrance'?'Boss entrance':'Boss arena';
   return <section className={`location-pane ${kind}`} aria-label={label}>
     <div className="location-heading"><div><span className="location-icon">{kind==='entrance'?'↳':'◇'}</span><h2>{label}</h2></div><span className="badge">{selected?(isEntrance?'Region selected':draft.regions.includes(selected.region)?'Selected · review coverage':'Choose coverage'):'Needs location'}</span></div>
-    <div className="location-choice"><label><span className="sr-only">{label} location</span><select value={manual?'manual':choice||(locations.length?'0':'')} onChange={e=>{setChoice(e.target.value);setManual(null);setPlane(null);if(isEntrance&&e.target.value!==''&&all[Number(e.target.value)])update({entranceRegion:all[Number(e.target.value)].region,entrancePlane:all[Number(e.target.value)].plane??0});}}><option value="manual" disabled>Manual coordinates</option>{!locations.length&&<option value="">Choose a location to review</option>}{all.map((p,i)=><option key={i} value={String(i)}>{p.title} · Region {p.region} · {p.x}, {p.y}{p.role==='entrance'?' · entrance':''}</option>)}</select></label><label className="plane-control">Plane <select aria-label={`${label} plane`} value={shownPlane} onChange={e=>{setPlane(+e.target.value);if(isEntrance)update({entrancePlane:+e.target.value});}}>{[0,1,2,3].map(p=><option key={p}>{p}</option>)}</select></label></div>
+    <div className="location-choice"><label><span className="sr-only">{label} location</span><select value={manual?'manual':choice||(saved?String(all.findIndex(l=>l.x===saved.x&&l.y===saved.y&&l.source===saved.source)):locations.length?'0':'')} onChange={e=>{setChoice(e.target.value);setManual(null);setPlane(null);if(isEntrance&&e.target.value!==''&&all[Number(e.target.value)])update({entranceRegion:all[Number(e.target.value)].region,entrancePlane:all[Number(e.target.value)].plane??0});}}><option value="manual" disabled>Manual coordinates</option>{saved&&!all.some(l=>l.x===saved.x&&l.y===saved.y&&l.source===saved.source)&&<option value="-1" disabled>{saved.title} · Region {saved.region} · {saved.x}, {saved.y}</option>}{!locations.length&&<option value="">Choose a location to review</option>}{all.map((p,i)=><option key={i} value={String(i)}>{p.title} · Region {p.region} · {p.x}, {p.y}{p.role==='entrance'?' · entrance':''}</option>)}</select></label><label className="plane-control">Plane <select aria-label={`${label} plane`} value={shownPlane} onChange={e=>{setPlane(+e.target.value);if(isEntrance)update({entrancePlane:+e.target.value});}}>{[0,1,2,3].map(p=><option key={p}>{p}</option>)}</select></label></div>
     <div className="pane-tools">
       {combined&&<button className={entranceMode?'chosen':''} onClick={()=>setEntranceMode(v=>!v)}>{entranceMode?'Entrance chunks':'Arena coverage'}</button>}
       {!isEntrance&&<><button aria-pressed={!chunkMode} className={!chunkMode?'chosen':''} onClick={()=>setChunkMode(false)}>Regions</button><button aria-pressed={chunkMode} className={chunkMode?'chosen':''} onClick={()=>setChunkMode(true)}>Chunks</button></>}

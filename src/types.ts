@@ -3,3 +3,5 @@ export type Boss = { id:string; name:string; regions:number[]; deathType:string;
 export type Entrance = {overlay:string;direction:string;plane:string;objectType:string;ids:string[];chunks:number[];reviewed?:boolean};
 export type Draft = { id:string; name:string; regions:number[]; deathType:string; baseRaw:string|null; reviewed?:boolean; entrance?:Entrance; chunks?:number[]; entranceRegion?:number; entrancePlane?:number };
 export type Snapshot = { version:number; generatedAt:string|null; baseCommit:string|null; source:string; entries:Boss[]; candidates:Boss[]; warnings:string[];catalog?:{source:string;revision:number;count:number;fetchedAt:string} };
+
+export type EvidenceContexts = Record<string, { arena?: Location; entrance?: Location; entranceImage?: string|null }>;

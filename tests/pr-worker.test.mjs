@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { runtime } from './pr-runtime.mjs';
+import { digest } from '../worker/security.mjs';
+import { input, png } from './pr-fixtures.mjs';
+import { panelSize } from '../src/core/pr-evidence.mjs';
+
+test('real Worker runtime and D1: OAuth, encrypted sessions, preparation, evidence, PR and logout',async()=>{
+  const {mf,db,calls,refs}=await runtime();
+  try{
+    const origin='http://editor.test',verifier='local-client-verifier',challenge=await digest(verifier);
+    const start=await mf.dispatchFetch(`http://api.test/auth/start?${new URLSearchParams({returnTo:origin+'/',challenge})}`,{redirect:'manual'});
+    assert.equal(start.status,302);const githubURL=new URL(start.headers.get('location'));assert.equal(githubURL.searchParams.get('code_challenge_method'),'S256');
+    const state=githubURL.searchParams.get('state');
+    const callback=await mf.dispatchFetch(`http://api.test/auth/callback?state=${state}&code=fixture-code`);assert.equal(callback.status,200,await callback.clone().text());
+    const html=await callback.text(),ticket=html.match(/"ticket":"([A-Za-z0-9_-]+)"/)[1];assert.ok(!html.includes('fixture-github-token'));
+    const exchange=await mf.dispatchFetch('http://api.test/auth/exchange',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({ticket,verifier})});assert.equal(exchange.status,200);
+    const session=(await exchange.json()).session;
+    const headers={Origin:origin,'Content-Type':'application/json',Authorization:`Bearer ${session}`};
+    const rows=await db.prepare('SELECT data FROM sessions').all();assert.ok(!JSON.stringify(rows).includes('fixture-github-token'));
+    assert.equal((await mf.dispatchFetch('http://api.test/auth/exchange',{method:'POST',headers,body:JSON.stringify({ticket,verifier})})).status,401);
+    const pResponse=await mf.dispatchFetch('http://api.test/prepare',{method:'POST',headers,body:JSON.stringify(input)});assert.equal(pResponse.status,200);const p=await pResponse.json();
+    assert.ok(!calls.some(c=>c.method==='POST'&&c.host==='api.github.com'));
+    const tile=await mf.dispatchFetch('http://api.test/tiles',{method:'POST',headers,body:JSON.stringify({region:12682,context:input.contexts.BOSS_PR_TEST.arena})});assert.equal(tile.status,200,await tile.clone().text());
+    const data={title:p.title,introduction:p.introduction,images:p.evidence.panels.map(panel=>({id:panel.id,png:png(panelSize(panel).width,panelSize(panel).height)}))};
+    const submitted=await mf.dispatchFetch(`http://api.test/submissions/${p.id}/submit`,{method:'POST',headers,body:JSON.stringify(data)});const result=await submitted.json();assert.equal(submitted.status,200,JSON.stringify(result));assert.equal(result.pr.number,123);
+    assert.equal(refs.size,2);assert.ok(!refs.has('master'));
+    const retry=await mf.dispatchFetch(`http://api.test/submissions/${p.id}/submit`,{method:'POST',headers,body:JSON.stringify(data)});assert.equal((await retry.json()).pr.number,123);assert.equal(calls.filter(c=>c.path.endsWith('/pulls')&&c.method==='POST').length,1);
+    assert.equal((await mf.dispatchFetch('http://api.test/session',{method:'DELETE',headers})).status,200);
+    assert.equal((await mf.dispatchFetch('http://api.test/session',{headers})).status,401);
+  }finally{await mf.dispose();}
+});

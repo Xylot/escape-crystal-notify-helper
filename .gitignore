@@ -4,3 +4,6 @@ public/vendor/
 work/
 *.log
 .env*
+
+.wrangler/
+worker/.dev.vars

@@ -38,6 +38,8 @@ jobs:
         if: steps.refresh.outcome == 'failure'
         run: echo '::warning::Refresh failed. Publishing the previous snapshot with its original timestamp.'
       - run: npm run build
+        env:
+          VITE_PR_API_URL: ${{ vars.VITE_PR_API_URL }}
       - name: Save successful data snapshot
         if: github.event_name != 'pull_request' && steps.refresh.outcome == 'success'
         env:

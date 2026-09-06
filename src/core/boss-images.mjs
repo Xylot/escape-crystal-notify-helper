@@ -1,9 +1,9 @@
 import { api, fetchPage, wikiTitle, wikiUrl } from './wiki.mjs';
 
-export function primaryBossImage(Parser, text) {
+export function primaryBossImage(Parser, text, object = false) {
   const root = Parser.parse(text);
   for (const token of root.querySelectorAll('template')) {
-    if (!/^infobox (monster|npc)$/i.test(String(token.name).replace(/^Template:/i, '').replaceAll('_', ' ').trim())) continue;
+    if (!(object ? /^infobox (scenery|object|npc)$/i : /^infobox (monster|npc)$/i).test(String(token.name).replace(/^Template:/i, '').replaceAll('_', ' ').trim())) continue;
     const args = Object.fromEntries(token.getAllArgs().map(arg => [arg.name.trim().toLowerCase(), String(arg.lastChild).trim()]));
     const key = ['image', ...Object.keys(args).filter(k => /^image\d+$/.test(k)).sort((a, b) => Number(a.slice(5)) - Number(b.slice(5)))].find(k => args[k]);
     if (!key) continue;
@@ -15,18 +15,19 @@ export function primaryBossImage(Parser, text) {
   return null;
 }
 
-export async function resolveBossImage(Parser, title, request = api, read = fetchPage) {
+export async function resolveBossImage(Parser, title, request = api, read = fetchPage, object = false) {
   const page = await read(title);
-  const file = primaryBossImage(Parser, page.text);
+  const file = primaryBossImage(Parser, page.text, object);
   if (!file) return null;
-  const data = await request({ action: 'query', titles: file, prop: 'imageinfo', iiprop: 'url|size', iiurlwidth: '320', redirects: '1', formatversion: '2' });
+  const data = await request({ action: 'query', titles: file, prop: 'imageinfo', iiprop: 'url|size', iiurlwidth: '960', redirects: '1', formatversion: '2' });
   const info = data.query?.pages?.[0]?.imageinfo?.[0];
   if (!info?.url || !info.descriptionurl) return null;
-  return { url: info.thumburl || info.url, width: info.thumbwidth || info.width, height: info.thumbheight || info.height, source: wikiUrl(page.title), filePage: info.descriptionurl };
+  const original=Number.isFinite(info.width)&&info.width<=960;
+  return { url: original?info.url:info.thumburl || info.url, width: original?info.width:info.thumbwidth || info.width, height: original?info.height:info.thumbheight || info.height, source: wikiUrl(page.title), filePage: info.descriptionurl };
 }
 
 const WEEK = 7 * 24 * 60 * 60 * 1000;
-export const IMAGE_STORAGE = 'escape-crystal-images:v1';
+export const IMAGE_STORAGE = 'escape-crystal-images:v2';
 export function createImageCache({ resolve, storage, now = Date.now, concurrency = 4 }) {
   let cached = {};
   try { cached = JSON.parse(storage?.getItem(IMAGE_STORAGE) || '{}'); } catch { /* Private browsing or a damaged cache must not affect editing. */ }
