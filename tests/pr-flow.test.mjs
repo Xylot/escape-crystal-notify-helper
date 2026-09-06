@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {prepare,submit,target} from '../worker/pr-service.mjs';
+import {prepare,submit,target,submissionStatus} from '../worker/pr-service.mjs';
 import {evidencePlan,regionGroups,panelSize,mapContext} from '../src/core/pr-evidence.mjs';
 import {validatePNG,encrypt,decrypt,readJSON} from '../worker/security.mjs';
 import {GitHub} from '../worker/github.mjs';
@@ -21,6 +21,47 @@ test('single PR creates only Java changes, separate evidence branch, embedded im
   assert.ok([...gh.refs.keys()].some(k=>k.startsWith('codex/evidence-')));assert.ok(!gh.refs.has('master'));
   await submit(p.id,submission(p),'1','contributor',gh,store);assert.equal(gh.prs.length,1);
   gh.sha='a'.repeat(40);assert.equal((await prepare(input,'1',gh,store,env)).pr.number,1);
+});
+test('closed unmerged PRs allow one fresh submission while preserving history and retry safety',async()=>{
+  const gh=new FakeGitHub(),store=new MemoryStore(),first=await prepare(input,'1',gh,store,env);
+  await submit(first.id,submission(first),'1','contributor',gh,store);
+  // Older stored records do not have state fields; fetch their status from GitHub.
+  const legacy=await store.get(first.id,'1');delete legacy.pr.state;delete legacy.pr.merged;await store.save(legacy);
+  gh.prs[0].state='closed';
+  const status=await submissionStatus(first.id,'1',gh,store);
+  assert.equal(status.status,'closed');assert.equal(status.pr.merged,false);
+  const mutations=gh.calls.length;
+  const [next,duplicate]=await Promise.all([prepare(input,'1',gh,store,env),prepare(input,'1',gh,store,env)]);
+  assert.notEqual(next.id,first.id);assert.equal(next.id,duplicate.id);assert.equal(next.pr,null);assert.equal(gh.calls.length,mutations);
+  assert.equal((await store.get(first.id,'1')).pr.number,1);
+  const result=await submit(next.id,submission(next),'1','contributor',gh,store);
+  assert.equal(result.pr.number,2);assert.notEqual(gh.prs[0].head,gh.prs[1].head);
+  await submit(next.id,submission(next),'1','contributor',gh,store);assert.equal(gh.prs.length,2);
+  assert.equal((await prepare(input,'1',gh,store,env)).id,next.id);
+  gh.prs[1].state='closed';
+  const third=await prepare(input,'1',gh,store,env);assert.notEqual(third.id,next.id);assert.notEqual(third.id,first.id);
+});
+test('a PR reopened after preparation blocks the replacement before remote writes',async()=>{
+  const gh=new FakeGitHub(),store=new MemoryStore(),first=await prepare(input,'1',gh,store,env);
+  await submit(first.id,submission(first),'1','contributor',gh,store);gh.prs[0].state='closed';
+  const next=await prepare(input,'1',gh,store,env);gh.prs[0].state='open';const mutations=gh.calls.length;
+  await assert.rejects(submit(next.id,submission(next),'1','contributor',gh,store),/Pull request #1 is open/);
+  assert.equal(gh.calls.length,mutations);assert.equal((await prepare(input,'1',gh,store,env)).id,first.id);
+});
+test('merged PRs keep duplicate protection and status checks enforce ownership',async()=>{
+  const gh=new FakeGitHub(),store=new MemoryStore(),first=await prepare(input,'1',gh,store,env);
+  await submit(first.id,submission(first),'1','contributor',gh,store);
+  gh.prs[0].state='closed';gh.prs[0].merged_at='2026-09-06T00:00:00Z';
+  const result=await prepare(input,'1',gh,store,env);assert.equal(result.id,first.id);assert.equal(result.status,'merged');assert.equal(result.pr.merged,true);
+  await assert.rejects(submissionStatus(first.id,'2',gh,store),/not found/);
+});
+test('unavailable GitHub status never permits an unverified replacement',async()=>{
+  const gh=new FakeGitHub(),store=new MemoryStore(),first=await prepare(input,'1',gh,store,env);
+  await submit(first.id,submission(first),'1','contributor',gh,store);const mutations=gh.calls.length;
+  gh.pullRequest=async()=>{throw Error('GitHub unavailable');};
+  await assert.rejects(prepare(input,'1',gh,store,env),/GitHub unavailable/);
+  await assert.rejects(submissionStatus(first.id,'1',gh,store),/GitHub unavailable/);
+  assert.equal(store.rows.size,1);assert.equal(gh.calls.length,mutations);
 });
 test('batch preview includes every boss, arena group, changed entrance and selected chunks',async()=>{
   const second={...change,id:'BOSS_PR_SECOND',name:'Second boss',regions:[12938],entrance:{overlay:'DEPRIORITIZED_WITH_HIGHLIGHT',direction:'',plane:'',objectType:'GAME_OBJECT',ids:['58439'],chunks:[]}};

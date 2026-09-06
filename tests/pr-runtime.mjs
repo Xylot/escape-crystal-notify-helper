@@ -21,7 +21,8 @@ export async function runtime({port=0,origin='http://editor.test',interactive=fa
     if(path.includes('/contents/'))return response({encoding:'base64',content:Buffer.from(snapshot.source).toString('base64')});
     if(path==='/repos/test/plugin')return response({id:1,name:'plugin',owner:{login:'test'}});
     if(path==='/repos/local-contributor/plugin')return response({id:2,name:'plugin',full_name:'local-contributor/plugin',fork:true,parent:{id:1},private:false});
-    if(path.endsWith('/pulls')){if(method==='GET')return response(pr?[pr]:[]);const body=await request.json();pr={...body,number:123,html_url:'https://github.com/test/plugin/pull/123'};return response(pr,201);}
+    if(path==='/repos/test/plugin/pulls/123')return response(pr);
+    if(path.endsWith('/pulls')){if(method==='GET')return response(pr?[pr]:[]);const body=await request.json();pr={...body,number:123,html_url:'https://github.com/test/plugin/pull/123',state:'open',merged_at:null};return response(pr,201);}
     if(path.includes('/git/ref/heads/')){const branch=path.split('/git/ref/heads/')[1];return refs.has(branch)?response({object:{sha:refs.get(branch)}}):response({},404);}
     if(path.endsWith('/git/refs')){const b=await request.json();refs.set(b.ref.replace('refs/heads/',''),b.sha);return response(b,201);}
     if(path.includes('/git/commits/')&&method==='GET')return response({sha:snapshot.baseCommit});
@@ -36,5 +37,5 @@ export async function runtime({port=0,origin='http://editor.test',interactive=fa
     const {digest,encrypt}=await import('../worker/security.mjs');const token='T'.repeat(43);
     await db.prepare('INSERT INTO sessions (id,data,expires) VALUES (?,?,?)').bind(await digest(token),JSON.stringify({origin,encrypted:await encrypt({token:'fixture-github-token',login:'local-contributor',userId:'42'},'local-fixture-encryption-key-not-for-production')}),Date.now()+3600000).run();
   }
-  return {mf,db,calls,refs};
+  return {mf,db,calls,refs,setPRState:(state,merged_at=null)=>{pr={...pr,state,merged_at};}};
 }

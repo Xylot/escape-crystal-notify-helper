@@ -7,7 +7,7 @@ export class Store {
   async flow(state,data,expires){await this.db.prepare('INSERT INTO oauth_flows (state,data,expires) VALUES (?,?,?)').bind(state,JSON.stringify(data),expires).run();}
   async consumeFlow(state){const r=await this.db.prepare('DELETE FROM oauth_flows WHERE state=? AND expires>? RETURNING data').bind(state,Date.now()).first();return r?JSON.parse(r.data):null;}
   async create(record){await this.db.prepare('INSERT OR IGNORE INTO submissions (id,owner,fingerprint,revision,data,expires) VALUES (?,?,?,?,?,?)').bind(record.id,record.owner,record.fingerprint,record.revision,JSON.stringify(record),Date.now()+30*86400000).run();return this.byFingerprint(record.owner,record.fingerprint);}
-  async completed(owner,revision){const rows=await this.db.prepare('SELECT data FROM submissions WHERE owner=? AND revision=?').bind(owner,revision).all();return rows.results.map(r=>JSON.parse(r.data)).find(r=>r.pr)??null;}
+  async submitted(owner,revision){const rows=await this.db.prepare('SELECT data FROM submissions WHERE owner=? AND revision=?').bind(owner,revision).all();return rows.results.map(r=>JSON.parse(r.data)).filter(r=>r.pr);}
   async byFingerprint(owner,fingerprint){const r=await this.db.prepare('SELECT data FROM submissions WHERE owner=? AND fingerprint=?').bind(owner,fingerprint).first();return r?JSON.parse(r.data):null;}
   async get(id,owner){const r=await this.db.prepare('SELECT data FROM submissions WHERE id=? AND owner=?').bind(id,owner).first();return r?JSON.parse(r.data):null;}
   async save(record){await this.db.prepare('UPDATE submissions SET data=?,expires=?,lease=CASE WHEN lease>0 THEN ? ELSE 0 END WHERE id=? AND owner=?').bind(JSON.stringify(record),Date.now()+30*86400000,Date.now()+120000,record.id,record.owner).run();}

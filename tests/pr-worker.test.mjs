@@ -6,7 +6,7 @@ import { input, png } from './pr-fixtures.mjs';
 import { panelSize } from '../src/core/pr-evidence.mjs';
 
 test('real Worker runtime and D1: OAuth, encrypted sessions, preparation, evidence, PR and logout',async()=>{
-  const {mf,db,calls,refs}=await runtime();
+  const {mf,db,calls,refs,setPRState}=await runtime();
   try{
     const origin='http://editor.test',verifier='local-client-verifier',challenge=await digest(verifier);
     const start=await mf.dispatchFetch(`http://api.test/auth/start?${new URLSearchParams({returnTo:origin+'/',challenge})}`,{redirect:'manual'});
@@ -26,6 +26,14 @@ test('real Worker runtime and D1: OAuth, encrypted sessions, preparation, eviden
     const submitted=await mf.dispatchFetch(`http://api.test/submissions/${p.id}/submit`,{method:'POST',headers,body:JSON.stringify(data)});const result=await submitted.json();assert.equal(submitted.status,200,JSON.stringify(result));assert.equal(result.pr.number,123);
     assert.equal(refs.size,2);assert.ok(!refs.has('master'));
     const retry=await mf.dispatchFetch(`http://api.test/submissions/${p.id}/submit`,{method:'POST',headers,body:JSON.stringify(data)});assert.equal((await retry.json()).pr.number,123);assert.equal(calls.filter(c=>c.path.endsWith('/pulls')&&c.method==='POST').length,1);
+    setPRState('closed');
+    const closed=await mf.dispatchFetch(`http://api.test/submissions/${p.id}`,{headers});assert.equal((await closed.json()).status,'closed');
+    const replacement=await mf.dispatchFetch('http://api.test/prepare',{method:'POST',headers,body:JSON.stringify(input)});assert.equal(replacement.status,200);
+    const next=await replacement.json();assert.notEqual(next.id,p.id);assert.equal(next.pr,null);
+    const repeated=await mf.dispatchFetch('http://api.test/prepare',{method:'POST',headers,body:JSON.stringify(input)});assert.equal((await repeated.json()).id,next.id);
+    assert.equal((await db.prepare('SELECT COUNT(*) AS count FROM submissions').first()).count,2);assert.equal(refs.size,2);
+    setPRState('open');
+    const reopened=await mf.dispatchFetch('http://api.test/prepare',{method:'POST',headers,body:JSON.stringify(input)});assert.equal((await reopened.json()).pr.state,'open');
     assert.equal((await mf.dispatchFetch('http://api.test/session',{method:'DELETE',headers})).status,200);
     assert.equal((await mf.dispatchFetch('http://api.test/session',{headers})).status,401);
   }finally{await mf.dispose();}

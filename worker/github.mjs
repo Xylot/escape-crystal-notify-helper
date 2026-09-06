@@ -35,5 +35,6 @@ export class GitHub {
   async tree(repo,entries,base_tree){return this.request(`/repos/${repo}/git/trees`,'POST',{...(base_tree?{base_tree}:{}),tree:entries});}
   async blob(repo,content,encoding='utf-8'){return this.request(`/repos/${repo}/git/blobs`,'POST',{content,encoding});}
   async findPR(repo,head,base){const rows=await this.request(`/repos/${repo}/pulls?state=all&head=${encodeURIComponent(head)}&base=${encodeURIComponent(base)}`);return rows[0]??null;}
+  async pullRequest(repo,number){return this.request(`/repos/${repo}/pulls/${number}`);}
   async createPR(repo,data){return this.request(`/repos/${repo}/pulls`,'POST',data);}
 }

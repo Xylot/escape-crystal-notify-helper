@@ -10,7 +10,7 @@ import { renderEvidence, type EvidenceImage } from './pr-screenshots';
 import { Icon } from './Icons';
 
 const HISTORY='escape-crystal-pr-history:v1';
-const statusText:Record<string,string>={prepared:'Ready to create',working:'Finishing submission…','creating-fork':'Creating your fork…','uploading-screenshots':'Uploading screenshots…','committing-code':'Committing boss changes…','creating-pr':'Creating your pull request…',complete:'Pull request created',retry:'Submission needs a retry'};
+const statusText:Record<string,string>={prepared:'Ready to create',working:'Finishing submission…','creating-fork':'Creating your fork…','uploading-screenshots':'Uploading screenshots…','committing-code':'Committing boss changes…','creating-pr':'Creating your pull request…',complete:'Pull request created',closed:'Pull request closed',merged:'Pull request merged',retry:'Submission needs a retry'};
 function remember(signature:string,record:any){try{const saved=JSON.parse(localStorage.getItem(HISTORY)||'{}');saved[signature]={id:record.id,revision:record.revision,pr:record.pr,status:record.status};localStorage.setItem(HISTORY,JSON.stringify(saved));}catch{/* Server status remains authoritative. */}}
 
 export default function PRComposer({drafts,bosses,contexts,onClose}:{drafts:Draft[];bosses:Boss[];contexts:EvidenceContexts;onClose:()=>void}){
@@ -50,19 +50,20 @@ export default function PRComposer({drafts,bosses,contexts,onClose}:{drafts:Draf
       if(mounted.current){setPreview(result);remember(signature,result);if(result.status==='working')setError('This submission is still running. Use Check status before retrying.');}
     }catch(e){handleError(e);}finally{clearInterval(poll);if(mounted.current)setBusy('');}
   }
-  async function check(){setError('');try{const result=await prJSON(`/submissions/${preview.id}`);setPreview(result);remember(signature,result);if(!result.pr)setError(result.error||statusText[result.status]||'You can retry this submission.');}catch(e){handleError(e);}}
+  async function check(){setError('');setBusy('Checking GitHub status…');try{const result=await prJSON(`/submissions/${preview.id}`);if(!mounted.current)return;setPreview(result);remember(signature,result);if(!result.pr)setError(result.error||statusText[result.status]||'You can retry this submission.');}catch(e){handleError(e);}finally{if(mounted.current)setBusy('');}}
   const complete=!!preview?.pr;
+  const closed=preview?.pr?.state==='closed'&&!preview?.pr?.merged,merged=!!preview?.pr?.merged;
   return <div className="modal-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="pr-title" className="modal pr-composer">
     <button className="close" onClick={onClose} aria-label="Close pull request preview">×</button>
-    <div className="eyebrow">CONTRIBUTE ON GITHUB</div><h2 id="pr-title">{complete?'Your pull request is ready':'Create a pull request'}</h2>
+    <div className="eyebrow">CONTRIBUTE ON GITHUB</div><h2 id="pr-title">{closed?'Your pull request was closed':merged?'Your pull request was merged':complete?'Your pull request is ready':'Create a pull request'}</h2>
     <p>{drafts.length===1?drafts[0].name:`${drafts.length} encounters`} · Your local drafts stay saved.</p>
     {!login?<div className="pr-connect"><h3>Connect your GitHub account</h3><p>Authorize public-repository access to create a branch in your fork and open a PR. GitHub credentials stay on the backend.</p><button className="primary" disabled={!!busy} onClick={()=>connect()}>Sign in with GitHub</button><button onClick={()=>connect(true)}>Continue in this tab</button></div>:<div className="pr-account"><span>Signed in as <strong>{login}</strong></span><button disabled={!!busy} onClick={async()=>{await signOut();setLogin('');}}>Sign out</button></div>}
     {error&&<div role="alert" className="export-issue"><strong>Needs attention</strong><p>{error}</p></div>}
     {busy&&<p role="status" className="pr-progress"><span className="loading-spinner"/>{busy}</p>}
-    {login&&!complete&&<button disabled={!!busy} onClick={prepare}>{preview?'Refresh preview & screenshots':'Prepare PR preview'}</button>}
+    {login&&(!complete||closed)&&<button disabled={!!busy} onClick={prepare}>{closed?'Prepare a new PR':preview?'Refresh preview & screenshots':'Prepare PR preview'}</button>}
     {preview&&<>
       <div className="pr-target"><strong>{preview.repo}</strong><span>Base: {preview.branch} · {preview.baseSha.slice(0,7)}</span></div>
-      {complete?<div className="pr-success"><Icon name="check" size={28}/><h3>Pull request #{preview.pr.number}</h3><a className="primary" href={preview.pr.url} target="_blank" rel="noreferrer">Open pull request ↗</a><p>This draft revision has already been submitted. Edit the encounter to prepare another revision.</p></div>:<>
+      {complete?<div className="pr-success"><Icon name="check" size={28}/><h3>Pull request #{preview.pr.number} · {closed?'Closed':merged?'Merged':'Open'}</h3><a className="primary" href={preview.pr.url} target="_blank" rel="noreferrer">Open pull request ↗</a><p>{closed?'This PR was closed without merging. You can prepare a new PR from the same saved draft.':merged?'This draft revision has been merged. Edit the encounter to prepare another revision.':'This draft revision already has an open PR. If you closed it on GitHub, check its status to prepare another.'}</p><button disabled={!!busy||!login} onClick={check}>Check GitHub status</button></div>:<>
         <label className="field">PR title<input value={title} maxLength={200} disabled={!!busy} onChange={e=>setTitle(e.target.value)}/></label>
         <label className="field">Introduction<textarea rows={3} value={introduction} maxLength={6000} disabled={!!busy} onChange={e=>setIntroduction(e.target.value)}/></label>
       </>}

@@ -19,7 +19,8 @@ export function prBody(record,introduction,images){
     const models=record.presentation?.[c.id]?.images??[];
     if(models.length) {
       text+='\n### Entrance model references\n\nAvailable first-orientation images, including related model variants. These are visual references; detection uses only the IDs listed above. Images from MOID / Weird Gloop.\n\n';
-      for(const id of models){const image=moidImage(id);text+=`[![Object ${image.id}](${image.url})](${image.source})\n\n`;}
+      for(const id of models){const image=moidImage(id);text+=`<a href="${image.url}"><img src="${image.url}" alt="Object ${image.id}" width="180" /></a>\n`;}
+      text+='\nModel sources: '+models.map(id=>{const image=moidImage(id);return `[Object ${image.id}](${image.source})`;}).join(' · ')+'\n\n';
     }
     text+='\n### Map selections\n\n';
     for(const p of record.evidence.panels.filter(p=>p.bossId===c.id))text+=`![${md(c.name)} ${p.kind}, plane ${p.context.plane}; regions ${p.regions.join(', ')}](${images[p.id]})\n\n`;
@@ -32,31 +33,58 @@ export function publicRecord(r){
   return {id:r.id,revision:r.revision,repo:r.repo,branch:r.branch,baseSha:r.base.sha,patch:r.patch,changes:r.changes,evidence:r.evidence,presentation:r.presentation,title:r.title,introduction:r.introduction,body:prBody(r,r.introduction,images),status:r.status,pr:r.pr??null,error:r.error??null};
 }
 
+function prReference(pr){
+  if(!['open','closed'].includes(pr.state))throw new HttpError(502,'Could not confirm the pull request status. Check GitHub and try again.');
+  return {url:pr.html_url,number:pr.number,state:pr.state,merged:!!(pr.merged||pr.merged_at)};
+}
+const prStatus=pr=>pr.merged?'merged':pr.state==='closed'?'closed':'complete';
+const canReplace=pr=>pr.state==='closed'&&!pr.merged;
+export async function refreshPR(record,gh,store){
+  if(!record.pr)return record;
+  const pr=prReference(await gh.pullRequest(record.repo,record.pr.number)),status=prStatus(pr);
+  if(JSON.stringify(record.pr)!==JSON.stringify(pr)||record.status!==status){record.pr=pr;record.status=status;record.error=null;await store.save(record);}
+  return record;
+}
+export async function submissionStatus(id,owner,gh,store){
+  const record=await store.get(id,owner);if(!record)throw new HttpError(404,'Submission not found.');
+  return publicRecord(await refreshPR(record,gh,store));
+}
+async function submittedRecords(owner,revision,gh,store){
+  const records=await store.submitted(owner,revision);
+  for(const record of records)await refreshPR(record,gh,store);
+  return records;
+}
+
 export async function prepare(input,owner,gh,store,env){
   const {repo,branch}=target(env),changes=cleanChanges(input.changes);
   validateProposal({version:1,repository:PLUGIN_REPO,baseCommit:'0'.repeat(40),changes});
   const evidence=evidencePlan(changes,input.contexts,input.sources);
   const presentation=cleanPresentation(changes,input.presentation);
   const revision=await digest(stableJSON({changes,evidence,presentation,repo,branch}));
-  const completed=await store.completed(owner,revision);if(completed)return publicRecord(completed);
+  const submitted=await submittedRecords(owner,revision,gh,store);
+  const blocking=submitted.find(r=>!canReplace(r.pr));if(blocking)return publicRecord(blocking);
   const base=await gh.upstream(repo,branch),after=applyProposal(base.source,{version:1,repository:PLUGIN_REPO,baseCommit:base.sha,changes});
   if(after===base.source)throw new HttpError(409,'These settings already match the plugin. There are no changes to submit.');
-  const fingerprint=await digest(revision+base.sha),existing=await store.byFingerprint(owner,fingerprint);
-  if(existing)return publicRecord(existing);
+  // Closed attempts keep their evidence and history. A deterministic new fingerprint
+  // gives concurrent preparations one fresh submission, with separate branch names.
+  const fingerprint=await digest(revision+base.sha+submitted.map(r=>r.id).sort().join(',')),existing=await store.byFingerprint(owner,fingerprint);
+  if(existing)return publicRecord(await refreshPR(existing,gh,store));
   const record={id:crypto.randomUUID(),owner,revision,fingerprint,repo,branch,base,after,changes,evidence,presentation,patch:fullPatch(base.source,after),...defaultPRText(changes,presentation),status:'prepared'};
   return publicRecord(await store.create(record));
 }
 
 export async function submit(id,input,owner,login,gh,store){
   let r=await store.get(id,owner);if(!r)throw new HttpError(404,'Preview not found. Prepare your PR again.');
-  if(r.pr)return publicRecord(r);
+  if(r.pr)return publicRecord(await refreshPR(r,gh,store));
   if(!await store.lock(id))return {...publicRecord(r),status:'working'};
   const save=async status=>{r.status=status;r.error=null;await store.save(r);};
   try{
     r=await store.get(id,owner);
-    if(r.pr)return publicRecord(r);
+    if(r.pr)return publicRecord(await refreshPR(r,gh,store));
     // Reconcile uncertain PR responses before rejecting a now-stale upstream preview.
-    if(r.fork){const found=await gh.findPR(r.repo,`${login}:codex/encounters-${r.id}`,r.branch);if(found){r.pr={url:found.html_url,number:found.number};await save('complete');return publicRecord(r);}}
+    if(r.fork){const found=await gh.findPR(r.repo,`${login}:codex/encounters-${r.id}`,r.branch);if(found){r.pr=prReference(found);await save(prStatus(r.pr));return publicRecord(r);}}
+    const blocking=(await submittedRecords(owner,r.revision,gh,store)).find(other=>other.id!==r.id&&!canReplace(other.pr));
+    if(blocking)throw new HttpError(409,`Pull request #${blocking.pr.number} is ${blocking.pr.merged?'merged':'open'} for this draft revision. Refresh the preview to view it.`);
     const current=await gh.upstream(r.repo,r.branch);
     if(current.sha!==r.base.sha)throw new HttpError(409,'Upstream changed. Prepare and review a fresh preview before creating the PR.');
     if(typeof input.title!=='string'||!input.title.trim()||input.title.length>200||/[\r\n\x00-\x1f]/.test(input.title))throw new HttpError(400,'Enter a PR title of 1–200 characters.');
@@ -88,6 +116,6 @@ export async function submit(id,input,owner,login,gh,store){
     const head=`${login}:codex/encounters-${r.id}`;
     let pr=await gh.findPR(r.repo,head,r.branch);
     if(!pr){try{pr=await gh.createPR(r.repo,{title:r.title,body:publicRecord(r).body,head,base:r.branch,draft:false});}catch(e){pr=await gh.findPR(r.repo,head,r.branch);if(!pr)throw e;}}
-    r.pr={url:pr.html_url,number:pr.number};await save('complete');return publicRecord(r);
+    r.pr=prReference(pr);await save(prStatus(r.pr));return publicRecord(r);
   }catch(e){r.status='retry';r.error=e.message;await store.save(r);throw e;}finally{await store.unlock(id);}
 }

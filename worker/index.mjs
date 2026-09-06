@@ -1,6 +1,6 @@
 import { Store } from './store.mjs';
 import { GitHub } from './github.mjs';
-import { target, prepare, submit, publicRecord } from './pr-service.mjs';
+import { target, prepare, submit, submissionStatus } from './pr-service.mjs';
 import { HttpError, digest, random, encrypt, decrypt, readJSON } from './security.mjs';
 import { regionTileUrl, wikiRegionTileUrl } from '../src/core/coordinates.mjs';
 import { mapContext } from '../src/core/pr-evidence.mjs';
@@ -62,7 +62,7 @@ export async function handle(request,env){
   }
   if(url.pathname==='/prepare'&&request.method==='POST')return json(await prepare(await readJSON(request,2500000),user.userId,gh,store,env));
   const match=url.pathname.match(/^\/submissions\/([a-f0-9-]{36})(\/submit)?$/);
-  if(match&&request.method==='GET'&&!match[2]){const r=await store.get(match[1],user.userId);if(!r)throw new HttpError(404,'Submission not found.');return json(publicRecord(r));}
+  if(match&&request.method==='GET'&&!match[2])return json(await submissionStatus(match[1],user.userId,gh,store));
   if(match&&match[2]&&request.method==='POST')return json(await submit(match[1],await readJSON(request,23000000),user.userId,user.login,gh,store));
   throw new HttpError(404,'Endpoint not found.');
 }

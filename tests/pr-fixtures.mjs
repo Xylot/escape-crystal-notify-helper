@@ -8,7 +8,7 @@ export class MemoryStore{
   rows=new Map();locks=new Set();
   async create(r){const old=await this.byFingerprint(r.owner,r.fingerprint);if(old)return old;this.rows.set(r.id,structuredClone(r));return structuredClone(r);}
   async byFingerprint(owner,fingerprint){return structuredClone([...this.rows.values()].find(r=>r.owner===owner&&r.fingerprint===fingerprint)??null);}
-  async completed(owner,revision){return structuredClone([...this.rows.values()].find(r=>r.owner===owner&&r.revision===revision&&r.pr)??null);}
+  async submitted(owner,revision){return structuredClone([...this.rows.values()].filter(r=>r.owner===owner&&r.revision===revision&&r.pr));}
   async get(id,owner){const r=this.rows.get(id);return r?.owner===owner?structuredClone(r):null;}
   async save(r){this.rows.set(r.id,structuredClone(r));}
   async lock(id){if(this.locks.has(id))return false;this.locks.add(id);return true;}
@@ -24,7 +24,8 @@ export class FakeGitHub{
   async commit(repo,tree,parents,message){this.calls.push(['commit',parents,message]);return {sha:`commit-${++this.counter}`};}
   async ensureRef(repo,branch,sha){this.calls.push(['ref',branch,sha]);if(this.refs.has(branch)&&this.refs.get(branch)!==sha)throw Error('Branch changed');this.refs.set(branch,sha);}
   async findPR(repo,head){return this.prs.find(p=>p.head===head)??null;}
-  async createPR(repo,data){this.calls.push(['pr',data]);const pr={...data,number:this.prs.length+1,html_url:'https://github.com/test/plugin/pull/1'};this.prs.push(pr);if(this.losePRResponse){this.losePRResponse=false;throw Error('Response lost');}return pr;}
+  async pullRequest(repo,number){const pr=this.prs.find(p=>p.number===number);if(!pr)throw Error('PR not found');return pr;}
+  async createPR(repo,data){this.calls.push(['pr',data]);const pr={...data,number:this.prs.length+1,html_url:`https://github.com/test/plugin/pull/${this.prs.length+1}`,state:'open',merged_at:null};this.prs.push(pr);if(this.losePRResponse){this.losePRResponse=false;throw Error('Response lost');}return pr;}
 }
 export function png(width,height){
   const crc=data=>{let c=0xffffffff;for(const b of data){c^=b;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0);}return(c^0xffffffff)>>>0;};
