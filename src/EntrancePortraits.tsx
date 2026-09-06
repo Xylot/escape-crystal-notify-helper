@@ -35,7 +35,7 @@ export default function EntrancePortraits({ids,objectType,selection,onSelect,com
   },[key]);
   const displayed=selection===null?[]:selection?[selection]:numeric;
   return <section className="entrance-reference">
-    {onSelect&&<><h3>Entrance reference image</h3><p className="muted">Choose an image independently of the entrance IDs. MOID’s first orientation is used when available.</p></>}
+    {onSelect&&<><h3>Entrance reference image</h3><p className="muted">Choose a visual reference without changing detection IDs.</p></>}
     <div className="entrance-portraits">{displayed.map(id=><MoidThumbnail key={id} id={id}/>)}</div>
     {!!displayed.length&&<p className="muted">{selection?'Custom visual reference · entrance IDs are unchanged':'Images for selected object IDs'} · <a href="https://chisel.weirdgloop.org/moid/index.html" target="_blank" rel="noreferrer">MOID / Weird Gloop ↗</a></p>}
     {onSelect&&<>
