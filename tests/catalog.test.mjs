@@ -2,8 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import Parser from 'wikiparser-node';
 import {extractBossCatalog,reconcileCatalog,supportFor} from '../src/core/catalog.mjs';
-import {buildLibrary} from '../src/core/library.mjs';
+import {buildLibrary,encounterExclusion} from '../src/core/library.mjs';
 const page=text=>({text,title:'Boss',revision:123});
+test('unneeded encounters stay excluded across catalog refreshes, imports, entries and saved drafts',()=>{
+  const names=['Callisto','Chaos Elemental','Chaos Fanatic','Scorpia','Venenatis',"Vet'ion",'Revenant maledictus','Gemstone Crab','Tempoross',"Phosani's Nightmare"];
+  const excluded=names.map((name,i)=>({id:`TEST_${i}`,name,wikiTitle:name,regionType:'BOSSES'}));
+  const keep=['Artio','Spindel','Calvar’ion','The Nightmare','Maggot King'].map(name=>({id:name,name,wikiTitle:name}));
+  const drafts=Object.fromEntries(excluded.map(b=>[b.id,{...b,baseRaw:null}]));
+  const before=JSON.stringify(drafts);
+  for(const rows of [buildLibrary([...excluded,...keep],[],[],{}),buildLibrary(keep,excluded,[],{}),buildLibrary(keep,[],excluded,{}),buildLibrary(keep,[],[],drafts)])assert.deepEqual(new Set(rows.map(b=>b.name)),new Set(keep.map(b=>b.name)));
+  assert.equal(JSON.stringify(drafts),before);
+  assert.ok(encounterExclusion({name:'PHOSANI’S_NIGHTMARE'}));
+  assert.ok(encounterExclusion({name:'A renamed import',wikiTitle:'Revenant_maledictus'}));
+  assert.ok(encounterExclusion({id:'BOSS_CHAOS_ELEMENTAL',name:'Old label'}));
+});
 test('Boss column with colspan, multiple bosses, raid sections and missing locations',()=>{
   const data=extractBossCatalog(Parser,page(`==List of bosses==
 ===World bosses===

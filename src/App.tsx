@@ -7,7 +7,7 @@ import { mergeDraft, defaultDraft } from './core/authoring.mjs';
 import Discovery from './Discovery';
 import { Crystal, Icon, type IconName } from './Icons';
 import {suggestedArenaRegions,encounterLocations} from './core/encounter.mjs';
-import { buildLibrary } from './core/library.mjs';
+import { buildLibrary, encounterExclusion } from './core/library.mjs';
 import { fetchBossCatalog } from './core/catalog.mjs';
 import { loadParser } from './parser';
 import { parseJava, enumName, generateEntry } from './core/java.mjs';
@@ -70,7 +70,7 @@ export default function App() {
   const unsupportedCount=bosses.filter(b=>!supported(b)).length;
   const categories=[...new Set(snapshot.candidates.flatMap(b=>b.categories??[]))].sort();
   const filtered=bosses.filter(b=>(filter==='drafts'||category!=='all'||!b.categories?.some(c=>/quest|event/i.test(c)))&&b.name.toLowerCase().includes(search.toLowerCase())&&(category==='all'||b.categories?.includes(category))&&(filter==='all'||filter==='supported'&&supported(b)||filter==='new'&&!supported(b)||filter==='drafts'&&drafts[b.id]||filter==='unresolved'&&!b.maps.length&&!b.raw));
-  const changes=Object.values(drafts), conflicts=changes.filter(c=>(snapshot.entries.find(b=>b.id===c.id)?.raw??null)!==c.baseRaw);
+  const changes=Object.values(drafts).filter(d=>!encounterExclusion(d)), conflicts=changes.filter(c=>(snapshot.entries.find(b=>b.id===c.id)?.raw??null)!==c.baseRaw);
   function commit(next:Record<string,Draft>) {setPast(p=>[...p.slice(-49),drafts]);setFuture([]);setDrafts(next);}
   function update(partial:Partial<Draft>) {if(!draft||!boss)return;if(boss.raw&&boss.regionType!=='BOSSES'){setNotice('This entry belongs to another plugin category and is read-only here.');return;}if(!boss.raw&&boss.supportedBy?.length){setNotice('This boss is already covered by a grouped entry. Open that entry to edit coverage.');return;}commit({...drafts,[boss.id]:mergeDraft(draft,partial)});}
   function select(b:Boss) {setView('editor');setActive(b.id);setStep('setup');window.scrollTo({top:0});if(!b.maps.length&&!b.locationsLoaded&&!busy)void loadLocations(b);}
@@ -94,8 +94,9 @@ export default function App() {
     setImports(v=>[...v.filter(b=>b.id!==target.id),next]);setNotice(`Found ${result.maps.length} location suggestions for ${target.name}.`);
   });}
   async function doImport(){await run('Reading wiki',async()=>{
-    const title=wikiTitle(input);const Parser=await loadParser();
+    const title=wikiTitle(input),excluded=encounterExclusion({name:title});if(excluded)throw new Error(`${title} does not need a separate encounter: ${excluded}`);const Parser=await loadParser();
     const result=paste.trim()?extractWiki(Parser,{title,text:paste,revision:null}):await importWiki(Parser,title);
+    const resolvedExclusion=encounterExclusion({name:result.title});if(resolvedExclusion)throw new Error(`${result.title} does not need a separate encounter: ${resolvedExclusion}`);
     const existing=bosses.find(b=>b.wikiTitle.toLowerCase()===result.title.toLowerCase()||b.name.toLowerCase()===result.title.toLowerCase());
     const next:Boss={id:existing?.id??enumName(result.title),name:result.title,wikiTitle:result.title,regions:[],raw:null,deathType:'',optionalArgs:[],...result};
     setImports(v=>[...v.filter(b=>b.id!==next.id),next]);setActive(next.id);setStep('setup');setView('editor');setModal(false);setNotice(`Imported ${next.maps.length} map suggestions. Review entrance and arena locations separately.`);
