@@ -1,7 +1,8 @@
+import {isDungeon} from './core/encounter-kind.mjs';
 import { useEffect,useMemo,useState } from 'react';
 import { RegionMap } from './Map';
 import { encounterLocations,originalEntranceChunks } from './core/encounter.mjs';
-import { chunkOrigin,regionId } from './core/coordinates.mjs';
+import { chunkOrigin,regionId,regionOrigin } from './core/coordinates.mjs';
 import type { Boss,Draft,Location } from './types';
 
 type Props={boss:Boss;draft:Draft;update:(change:Partial<Draft>)=>void;onError:(message:string)=>void;onLoad:()=>void;focus?:'arena'|'entrance';loading?:boolean;evidenceContext?:{arena?:Location;entrance?:Location};onEvidenceContext?:(kind:'arena'|'entrance',location:Location)=>void};
@@ -14,7 +15,7 @@ export default function EncounterMaps(props:Props){
   return <div className="encounter-workspace">
     {!props.focus&&<div className="encounter-intro"><span>ENCOUNTER LOCATIONS</span><p>{shared?'Entrance and arena share a map region.':'Compare the approach and the fight without losing your place.'}</p>{locations.shared&&<button onClick={()=>setSplit(v=>!v)}>{split?'Combine maps':'Separate maps'}</button>}</div>}
     <div className={`encounter-grid ${shared||props.focus?'shared-map':''}`}>
-      {!shared&&<div hidden={props.focus==='arena'}><LocationPane {...props} kind="entrance" locations={locations.entrance} alternatives={boss.maps} /></div>}
+      {!shared&&!isDungeon(boss)&&<div hidden={props.focus==='arena'}><LocationPane {...props} kind="entrance" locations={locations.entrance} alternatives={boss.maps} /></div>}
       <div hidden={props.focus==='entrance'}><LocationPane {...props} kind="arena" locations={locations.arena} alternatives={boss.maps} combined={shared}/></div>
     </div>
   </div>;
@@ -24,7 +25,8 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,evidenceContext,
   const [chunkMode,setChunkMode]=useState(false),[entranceMode,setEntranceMode]=useState(false),[recenter,setRecenter]=useState(0);
   const all=useMemo(()=>[...locations,...alternatives.filter(m=>!locations.some(l=>l.x===m.x&&l.y===m.y&&l.source===m.source))],[locations,alternatives]);
   const saved=evidenceContext?.[kind];
-  const selected=manual??(choice!==''?all[Number(choice)]:saved??locations[0]);
+  const regionFallback=useMemo<Location|null>(()=>{if(kind!=='arena'||!draft.regions.length)return null;const p=regionOrigin(draft.regions[0]);return {x:p.x+32,y:p.y+32,region:draft.regions[0],plane:null,mapId:null,role:'location',caption:'Selected coverage · verify this location in game',source:'',title:'Selected region',revision:null,verified:false};},[kind,draft.regions[0]]);
+  const selected=manual??(choice!==''?all[Number(choice)]:saved??locations[0]??regionFallback);
   const center=useMemo<[number,number]>(()=>selected?[selected.x,selected.y]:[0,0],[selected,recenter]);
   const isEntrance=kind==='entrance'||combined&&entranceMode;
   const shownPlane=(isEntrance?draft.entrancePlane:undefined)??plane??selected?.plane??0;
@@ -43,7 +45,7 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,evidenceContext,
       update({chunks:next,regions:[...new Set([...draft.regions,region])].sort((a,b)=>a-b)});
     }
   }
-  const label=combined?'Arena & entrance':kind==='entrance'?'Boss entrance':'Boss arena';
+  const label=combined?'Arena & entrance':kind==='entrance'?'Boss entrance':isDungeon(boss)?'Dungeon coverage':'Boss arena';
   return <section className={`location-pane ${kind}`} aria-label={label}>
     <div className="location-heading"><div><span className="location-icon">{kind==='entrance'?'↳':'◇'}</span><h2>{label}</h2></div><span className="badge">{selected?(isEntrance?'Region selected':draft.regions.includes(selected.region)?'Selected · review coverage':'Choose coverage'):'Needs location'}</span></div>
     <div className="location-choice"><label><span className="sr-only">{label} location</span><select value={manual?'manual':choice||(saved?String(all.findIndex(l=>l.x===saved.x&&l.y===saved.y&&l.source===saved.source)):locations.length?'0':'')} onChange={e=>{setChoice(e.target.value);setManual(null);setPlane(null);if(isEntrance&&e.target.value!==''&&all[Number(e.target.value)])update({entranceRegion:all[Number(e.target.value)].region,entrancePlane:all[Number(e.target.value)].plane??0});}}><option value="manual" disabled>Manual coordinates</option>{saved&&!all.some(l=>l.x===saved.x&&l.y===saved.y&&l.source===saved.source)&&<option value="-1" disabled>{saved.title} · Region {saved.region} · {saved.x}, {saved.y}</option>}{!locations.length&&<option value="">Choose a location to review</option>}{all.map((p,i)=><option key={i} value={String(i)}>{p.title} · Region {p.region} · {p.x}, {p.y}{p.role==='entrance'?' · entrance':''}</option>)}</select></label><label className="plane-control">Plane <select aria-label={`${label} plane`} value={shownPlane} onChange={e=>{setPlane(+e.target.value);if(isEntrance)update({entrancePlane:+e.target.value});}}>{[0,1,2,3].map(p=><option key={p}>{p}</option>)}</select></label></div>
@@ -54,7 +56,7 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,evidenceContext,
       <button className="recenter" onClick={()=>setRecenter(n=>n+1)}>⌖ Recenter</button>
     <form className="pane-jump" onSubmit={e=>{e.preventDefault();try{const parts=jump.trim().split(/[\s,]+/);if(parts.length!==2)throw new Error('Enter X, Y coordinates.');const[x,y]=parts.map(Number);const r=regionId(x,y);if(isEntrance)update({entranceRegion:r});setManual({x,y,region:r,plane:shownPlane,mapId:null,role:kind==='entrance'?'entrance':'location',caption:'Manual location',source:'',title:'Manual coordinates',revision:null,verified:false});}catch(error){onError((error as Error).message);}}}><input aria-label={`${label} coordinates`} value={jump} onChange={e=>setJump(e.target.value)} placeholder="Jump to X, Y"/><button>Go →</button>{selected&&<code>Region {selected.region}</code>}</form>
     </div>
-    {selected?<RegionMap tileSource={selected.tiles} selected={isEntrance?entranceRegions:draft.regions} existing={isEntrance?EMPTY_IDS:boss.regions} locations={mapLocations} center={center} plane={shownPlane} chunks={chunks} chunkMode={chunkMode} onChunkToggle={toggleChunk} onToggle={id=>isEntrance?update({entranceRegion:id}):update({regions:draft.regions.includes(id)?draft.regions.filter(n=>n!==id):[...draft.regions,id].sort((a,b)=>a-b)})}/>:<div className="missing-location"><span>{kind==='entrance'?'↳':'◇'}</span><h3>{loading?'Finding wiki locations…':kind==='entrance'?'Entrance not located':'Arena not located'}</h3><p>Load suggested locations from the wiki, or jump to known coordinates below.</p><button disabled={loading} onClick={onLoad}>{loading?'Loading…':'Load wiki locations'}</button></div>}
+    {selected?<RegionMap tileSource={selected.tiles} selected={isEntrance?entranceRegions:draft.regions} existing={isEntrance?EMPTY_IDS:boss.regions} locations={mapLocations} center={center} plane={shownPlane} chunks={chunks} chunkMode={chunkMode} onChunkToggle={toggleChunk} onToggle={id=>isEntrance?update({entranceRegion:id}):update({regions:draft.regions.includes(id)?draft.regions.filter(n=>n!==id):[...draft.regions,id].sort((a,b)=>a-b)})}/>:<div className="missing-location"><span>{kind==='entrance'?'↳':'◇'}</span><h3>{loading?'Finding wiki locations…':kind==='entrance'?'Entrance not located':isDungeon(boss)?'Dungeon not located':'Arena not located'}</h3><p>Load suggested locations from the wiki, or jump to known coordinates above.</p><button disabled={loading} onClick={onLoad}>{loading?'Loading…':'Load wiki locations'}</button></div>}
 
     <div className="pane-caption"><span className={`dot ${kind==='entrance'?'coral':'gold'}`}/>{selected?selected.caption||'Wiki map · verify this location in game':'No coordinates assumed'}{selected?.source&&<a href={selected.source} target="_blank" rel="noreferrer">Source ↗</a>}</div>
     {selected&&<div className="map-provenance">{selected.tiles?`Wiki rendered tiles · ${selected.tiles.version}`:'Legacy map tiles · visual alignment not verified'}{selected.pinX!==undefined&&<span>Pointer {selected.pinX}, {selected.pinY} · {selected.icon}</span>}</div>}

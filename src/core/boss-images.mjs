@@ -15,9 +15,9 @@ export function primaryBossImage(Parser, text, object = false) {
   return null;
 }
 
-export async function resolveBossImage(Parser, title, request = api, read = fetchPage, object = false) {
+export async function resolveBossImage(Parser, title, request = api, read = fetchPage, object = false, extract = primaryBossImage) {
   const page = await read(title);
-  const file = primaryBossImage(Parser, page.text, object);
+  const file = extract(Parser, page.text, object);
   if (!file) return null;
   const data = await request({ action: 'query', titles: file, prop: 'imageinfo', iiprop: 'url|size', iiurlwidth: '960', redirects: '1', formatversion: '2' });
   const info = data.query?.pages?.[0]?.imageinfo?.[0];
@@ -28,9 +28,9 @@ export async function resolveBossImage(Parser, title, request = api, read = fetc
 
 const WEEK = 7 * 24 * 60 * 60 * 1000;
 export const IMAGE_STORAGE = 'escape-crystal-images:v2';
-export function createImageCache({ resolve, storage, now = Date.now, concurrency = 4 }) {
+export function createImageCache({ resolve, storage, now = Date.now, concurrency = 4, storageKey = IMAGE_STORAGE }) {
   let cached = {};
-  try { cached = JSON.parse(storage?.getItem(IMAGE_STORAGE) || '{}'); } catch { /* Private browsing or a damaged cache must not affect editing. */ }
+  try { cached = JSON.parse(storage?.getItem(storageKey) || '{}'); } catch { /* Private browsing or a damaged cache must not affect editing. */ }
   if (!cached || typeof cached !== 'object' || Array.isArray(cached)) cached = {};
   const pending = new Map(), attempted = new Set(), queue = [];
   let active = 0;
@@ -48,7 +48,7 @@ export function createImageCache({ resolve, storage, now = Date.now, concurrency
         if (image) {
           refreshed = true;
           cached[key] = { ...image, fetchedAt: now() };
-          try { storage?.setItem(IMAGE_STORAGE, JSON.stringify(cached)); } catch { /* Memory cache remains available. */ }
+          try { storage?.setItem(storageKey, JSON.stringify(cached)); } catch { /* Memory cache remains available. */ }
         }
         return peek(title);
       }).catch(() => peek(title)).then(image => {

@@ -15,11 +15,11 @@ async function tile(region:number,context:any){
 export async function renderEvidence(panels:any[],progress:(value:string)=>void){
   const images:EvidenceImage[]=[];
   for(const [index,p] of panels.entries()){
-    progress(`Rendering screenshot ${index+1} of ${panels.length}: ${p.name} ${p.kind}`);
+    progress(`Rendering screenshot ${index+1} of ${panels.length}: ${p.name} ${p.label??p.kind}`);
     const canvas=document.createElement('canvas'),size=panelSize(p);canvas.width=size.width;canvas.height=size.height;
     const scale=p.renderScale===2?2:1,width=canvas.width/scale,height=canvas.height/scale;
     const ctx=canvas.getContext('2d')!;ctx.scale(scale,scale);ctx.imageSmoothingEnabled=false;ctx.fillStyle='#f7f7f4';ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle='#263244';ctx.font='bold 18px sans-serif';ctx.fillText(`${p.name} · ${p.kind} · Plane ${p.context.plane}`,16,28,width-32);
+    ctx.fillStyle='#263244';ctx.font='bold 18px sans-serif';ctx.fillText(`${p.name} · ${p.label??p.kind} · Plane ${p.context.plane}`,16,28,width-32);
     ctx.font='12px sans-serif';ctx.fillText('North ↑ · Purple outlines: selected regions / chunks · Editor selections, not in-game verification',16,51,width-32);
     const overlay=document.createElement('canvas');overlay.width=overlay.height=256*scale;overlay.getContext('2d')!.scale(scale,scale);
     // Fetch in groups of four, including when a large selection spans many panels.

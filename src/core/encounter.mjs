@@ -1,3 +1,4 @@
+import {isDungeon} from './encounter-kind.mjs';
 import { regionId,regionOrigin,chunkOrigin } from './coordinates.mjs';
 import { splitArgs,maskJava } from './java.mjs';
 
@@ -28,7 +29,7 @@ export function encounterLocations(boss){
 }
 export function suggestedArenaRegions(boss){
  if(boss.raw||boss.regions.length)return [...boss.regions];
- if(boss.supportedBy?.length)return [];
+ if(isDungeon(boss)||boss.supportedBy?.length)return [];
  const {arena}=encounterLocations(boss);
  const words=boss.name.toLowerCase().split(/[^a-z]+/).filter(w=>w.length>3);
  const confident=arena.filter(m=>m.role==='arena'||(/cave|lair|chamber|dungeon/i.test(m.title)&&words.some(w=>m.title.toLowerCase().includes(w))));

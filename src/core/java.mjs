@@ -1,4 +1,5 @@
 import { entranceJava } from './entrance.mjs';
+import { encounterType, isDungeon } from './encounter-kind.mjs';
 // A deliberately narrow Java scanner. It preserves opaque optional constructor
 // arguments; it never evaluates source and fails closed on unsupported syntax.
 export function maskJava(source, strings = false) {
@@ -71,10 +72,13 @@ export function parseJava(source) {
   if (!entries.length) throw new Error('No enum entries found.');
   return { entries, insertAt: entries[0].start, terminator: end };
 }
-export function enumName(name) { return 'BOSS_' + name.normalize('NFKD').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').toUpperCase(); }
+export function enumName(name, type = 'BOSSES') { return (type === 'DUNGEONS' ? 'DUNGEON_' : 'BOSS_') + name.normalize('NFKD').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').toUpperCase(); }
 export function javaString(name) { return JSON.stringify(name).replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029'); }
 /** @param {any} change @param {any} existing */
 export function generateEntry(change, existing = null) {
+  const type=encounterType(change);
+  if(!['BOSSES','DUNGEONS'].includes(type))throw new Error('Unsupported encounter category.');
+  if(isDungeon(change)&&(change.entrance||change.entranceOverlay))throw new Error('Dungeons do not have entrance settings.');
   let optional = existing ? [...existing.optionalArgs] : [];
   if (!change.entrance && change.entranceOverlay) {
     if (!['PRIORITIZED_WITH_HIGHLIGHT','DEPRIORITIZED_WITH_HIGHLIGHT'].includes(change.entranceOverlay)) throw new Error('Unsupported entrance priority.');
@@ -94,10 +98,10 @@ export function generateEntry(change, existing = null) {
     const i = optional.findIndex(a => /^List\.of\([\d,\s]*\)$/.test(maskJava(a).trim()));
     if(i>=0) optional.splice(i,1);
     if(change.chunks.length) {
-      if(!optional.some(a=>a.includes('EscapeCrystalNotifyRegionEntrance('))&&!optional.includes('null'))optional.unshift('null');
+      if(!isDungeon(change)&&!optional.some(a=>a.includes('EscapeCrystalNotifyRegionEntrance('))&&!optional.includes('null'))optional.unshift('null');
       optional.push(`List.of(${change.chunks.join(', ')})`);
     }
   }
-  const args = [javaString(change.name), `EscapeCrystalNotifyRegionType.BOSSES`, `EscapeCrystalNotifyRegionDeathType.${change.deathType}`, ...optional, ...change.regions];
+  const args = [javaString(change.name), `EscapeCrystalNotifyRegionType.${type}`, `EscapeCrystalNotifyRegionDeathType.${change.deathType}`, ...optional, ...change.regions];
   return `${change.id}(${args.join(', ')})`;
 }

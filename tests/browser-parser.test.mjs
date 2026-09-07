@@ -33,3 +33,7 @@ test('entrance search runs against the shipped browser bundle',async t=>{
   assert.equal(results[1].objectType,'NPC');
   assert.equal(results[1].revision,42);
 });
+import {extractDungeonCatalog,primaryDungeonMap} from '../src/core/dungeons.mjs';
+test('shipped browser parser recognizes dungeon list targets and map infobox fields',()=>{
+ const result=extractDungeonCatalog(Parser,{title:'List of dungeons',revision:1,text:'== Asgarnia ==\n* [[Taverley Dungeon|Taverley]]\n* [[Dwarven Mine]]'});assert.equal(result.dungeons.length,2);assert.equal(primaryDungeonMap(Parser,'{{Infobox Location|image=[[File:Scenic.png]]|map=[[File:Map.png]]}}'),'File:Map.png');
+});

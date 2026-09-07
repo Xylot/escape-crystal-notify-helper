@@ -1,3 +1,4 @@
+import {isDungeon} from './encounter-kind.mjs';
 import { integer, regionOrigin, regionId, chunkOrigin } from './coordinates.mjs';
 import {splitArgs} from './java.mjs';
 import {originalEntranceChunks} from './encounter.mjs';
@@ -68,7 +69,7 @@ export function evidencePlan(changes, contexts, sources) {
       for (const [index, group] of regionGroups(regions).entries()) {
         const xs = group.map(id=>id>>8), ys = group.map(id=>id&255);
         const selectedChunks = chunks.filter(id=>{ const p=chunkOrigin(id);return group.includes(regionId(p.x,p.y)); });
-        panels.push({ id: `${change.id}-${kind}-${index+1}`, bossId: change.id, name: change.name, kind, context, regions: group, chunks: selectedChunks, restrictChunks: chunks.length > 0, renderScale: 2,
+        panels.push({ id: `${change.id}-${kind}-${index+1}`, bossId: change.id, name: change.name, kind, ...(isDungeon(change)?{label:'Dungeon coverage'}:{}), context, regions: group, chunks: selectedChunks, restrictChunks: chunks.length > 0, renderScale: 2,
           minX: Math.min(...xs), maxY: Math.max(...ys), columns: Math.max(...xs)-Math.min(...xs)+1, rows: Math.max(...ys)-Math.min(...ys)+1 });
       }
     }
@@ -80,7 +81,7 @@ export function evidencePlan(changes, contexts, sources) {
 export function cleanChanges(changes) {
   if (!Array.isArray(changes) || changes.length > 100) throw new Error('Choose 1–100 encounters.');
   return changes.map(c => {
-    const result = Object.fromEntries(['id','name','regions','deathType','baseRaw','chunks','entranceOverlay'].filter(key=>c[key]!==undefined).map(key=>[key,c[key]]));
+    const result = Object.fromEntries(['id','name','regionType','regions','deathType','baseRaw','chunks','entranceOverlay'].filter(key=>c[key]!==undefined).map(key=>[key,c[key]]));
     if (c.entrance) result.entrance = Object.fromEntries(['overlay','direction','plane','objectType','ids','chunks'].map(key=>[key,c.entrance[key]]));
     return result;
   }).sort((a,b)=>a.id.localeCompare(b.id));

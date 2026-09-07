@@ -1,3 +1,4 @@
+import {isDungeon} from './core/encounter-kind.mjs';
 import {loadRegionObjects} from './core/region-objects.mjs';
 import {loadGameval} from './core/gameval.mjs';
 import {modelFamily, modelVariants, moidImage} from './core/moid-images.mjs';
@@ -56,7 +57,7 @@ export async function prepareModels(drafts:Draft[],bosses:Boss[],contexts:Eviden
   const result:Record<string,{scope:string;images:string[]}> = {};
   for (const draft of drafts) {
     const selected = contexts[draft.id]?.entranceImage;
-    const images = await loadEntranceModels(draft.entrance?.ids??[],draft.entrance?.objectType??'GAME_OBJECT',selected);
+    const images = isDungeon(draft)?[]:await loadEntranceModels(draft.entrance?.ids??[],draft.entrance?.objectType??'GAME_OBJECT',selected);
     result[draft.id] = {scope:encounterScope(bosses.find(b=>b.id===draft.id)??draft),images};
   }
   return result;

@@ -1,3 +1,4 @@
+import {isDungeon} from '../src/core/encounter-kind.mjs';
 import { applyProposal, validateProposal, fullPatch, PLUGIN_REPO, JAVA_PATH } from '../src/core/proposal.mjs';
 import { cleanChanges, evidencePlan, panelSize, stableJSON } from '../src/core/pr-evidence.mjs';
 import { digest, HttpError, validatePNG, validatePixels } from './security.mjs';
@@ -13,9 +14,9 @@ const md = value => String(value).replace(/[\\`*_{}[\]<>()!#|]/g,'\\$&').replace
 export function prBody(record,introduction,images){
   let text=`${introduction.trim()}\n\n`;
   for(const c of record.changes){
-    text+=`## ${md(c.name)}\n\n- Arena regions: ${c.regions.join(', ')}\n- Death classification: ${md(c.deathType)}\n- Arena chunks: ${c.chunks?.length?c.chunks.join(', '):'Whole selected regions'}\n`;
+    text+=`## ${md(c.name)}\n\n- ${isDungeon(c)?'Dungeon':'Arena'} regions: ${c.regions.join(', ')}\n- Death classification: ${md(c.deathType)}\n- ${isDungeon(c)?'Dungeon':'Arena'} chunks: ${c.chunks?.length?c.chunks.join(', '):'Whole selected regions'}\n`;
     if(c.entrance)text+=`- Entrance: ${md(c.entrance.objectType)}; IDs: ${c.entrance.ids.map(md).join(', ')}\n- Entrance options: ${md(c.entrance.overlay)}, direction ${md(c.entrance.direction||'default')}, plane ${md(c.entrance.plane||'default')}\n- Entrance chunks: ${c.entrance.chunks.join(', ')||'None'}\n`;
-    else text+=`- Entrance: ${c.entranceOverlay?`priority ${md(c.entranceOverlay)}; other settings preserved`:'existing configuration preserved, if present'}.\n`;
+    else if(!isDungeon(c))text+=`- Entrance: ${c.entranceOverlay?`priority ${md(c.entranceOverlay)}; other settings preserved`:'existing configuration preserved, if present'}.\n`;
     const models=record.presentation?.[c.id]?.images??[];
     if(models.length) {
       text+='\n### Entrance model references\n\nAvailable first-orientation images, including related model variants. These are visual references; detection uses only the IDs listed above. Images from MOID / Weird Gloop.\n\n';
@@ -23,7 +24,7 @@ export function prBody(record,introduction,images){
       text+='\nModel sources: '+models.map(id=>{const image=moidImage(id);return `[Object ${image.id}](${image.source})`;}).join(' · ')+'\n\n';
     }
     text+='\n### Map selections\n\n';
-    for(const p of record.evidence.panels.filter(p=>p.bossId===c.id))text+=`![${md(c.name)} ${p.kind}, plane ${p.context.plane}; regions ${p.regions.join(', ')}](${images[p.id]})\n\n`;
+    for(const p of record.evidence.panels.filter(p=>p.bossId===c.id))text+=`![${md(c.name)} ${p.label??p.kind}, plane ${p.context.plane}; regions ${p.regions.join(', ')}](${images[p.id]})\n\n`;
     text+='### Wiki sources\n\n'+record.evidence.sources[c.id].map((url,i)=>`- [${i===0?'Wiki source':'Additional wiki source'} ${i+1}](${url})`).join('\n')+'\n\n';
   }
   return text+`## Validation\n\nStructured proposal validation and edited-entry conflict checks passed against \`${record.base.sha}\`. Screenshots show editor selections, not in-game verification. Plugin compilation and repository checks are left to the normal PR checks.\n\n<!-- escape-crystal-submission:${record.id} -->`;

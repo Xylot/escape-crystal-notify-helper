@@ -1,3 +1,4 @@
+import {fetchDungeonCatalog,retainDungeonLocations} from '../src/core/dungeons.mjs';
 import Parser from 'wikiparser-node';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { parseJava } from '../src/core/java.mjs';
@@ -12,7 +13,8 @@ const source = await (await get(`https://raw.githubusercontent.com/${PLUGIN_REPO
 const parsed = parseJava(source), warnings = [];
 const aliases = JSON.parse(await readFile('config/aliases.json','utf8'));
 const entries = parsed.entries.map(e=>({...e,maps:[],warnings:[],links:[],wikiTitle:aliases[e.id]??e.name}));
-const catalog = await fetchBossCatalog(Parser);
+const [catalog,dungeonCatalog] = await Promise.all([fetchBossCatalog(Parser),fetchDungeonCatalog(Parser)]);
+const dungeons=retainDungeonLocations(dungeonCatalog.dungeons,old.dungeons);
 // Retain every discovered boss, even when no location is available.
 const candidates = reconcileCatalog(catalog.bosses,entries).map(b=>{
   const prior=old.candidates.find(c=>c.wikiTitle===b.wikiTitle);
@@ -24,7 +26,7 @@ for(const boss of candidates.filter(b=>b.wikiTitle==='Shellbane gryphon'||proces
   catch(error){boss.warnings.push(`Location refresh failed: ${error.message}`);}
 }
 const now=new Date().toISOString();
-const snapshot = { version:1,generatedAt:now,baseCommit:commit.sha,source,entries,candidates,warnings,catalog:{source:catalog.source,revision:catalog.revision,count:candidates.length,fetchedAt:now} };
+const snapshot = { version:1,generatedAt:now,baseCommit:commit.sha,source,entries,candidates,dungeons,warnings,catalog:{source:catalog.source,revision:catalog.revision,count:candidates.length,fetchedAt:now} };
 await mkdir('public/data',{recursive:true});
 await writeFile('public/data/snapshot.json',JSON.stringify(snapshot,null,2)+'\n');
 console.log(`Boss page revision ${catalog.revision}: ${candidates.length} bosses; ${candidates.filter(b=>!b.supportedBy.length).length} unsupported. Plugin ${commit.sha}.`);

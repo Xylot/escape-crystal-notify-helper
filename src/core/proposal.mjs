@@ -1,6 +1,7 @@
 import { parseJava, generateEntry } from './java.mjs';
 import { integer, chunkOrigin, regionId } from './coordinates.mjs';
 import { validateEntrance, OVERLAYS } from './entrance.mjs';
+import { encounterType } from './encounter-kind.mjs';
 export const PLUGIN_REPO = 'Xylot/escape-crystal-notify';
 export const JAVA_PATH = 'src/main/java/com/escapecrystalnotify/EscapeCrystalNotifyRegion.java';
 export function validateProposal(proposal) {
@@ -9,9 +10,11 @@ export function validateProposal(proposal) {
   if (!Array.isArray(proposal.changes) || !proposal.changes.length || proposal.changes.length > 100) throw new Error('Proposal must contain 1–100 changes.');
   const ids = new Set();
   for (const c of proposal.changes) {
-    if (!/^BOSS_[A-Z0-9_]+$/.test(c.id) || ids.has(c.id)) throw new Error('Invalid or duplicate enum identifier.');
+    const type=encounterType(c);
+    if (!['BOSSES','DUNGEONS'].includes(type)||!(type==='DUNGEONS'?/^DUNGEON_[A-Z0-9_]+$/:/^BOSS_[A-Z0-9_]+$/).test(c.id) || ids.has(c.id)) throw new Error('Invalid or duplicate enum identifier or category.');
+    if(type==='DUNGEONS'&&(c.entrance!==undefined||c.entranceOverlay!==undefined))throw new Error('Dungeons do not have entrance settings.');
     ids.add(c.id);
-    if (typeof c.name !== 'string' || !c.name.trim() || c.name.length > 160 || /[\x00-\x1f]/.test(c.name)) throw new Error('Invalid boss name.');
+    if (typeof c.name !== 'string' || !c.name.trim() || c.name.length > 160 || /[\x00-\x1f]/.test(c.name)) throw new Error('Invalid encounter name.');
     if (!['UNSAFE', 'UNSAFE_HCGIM', 'SAFE'].includes(c.deathType)) throw new Error('Select a supported death classification.');
     if (!Array.isArray(c.regions) || !c.regions.length || c.regions.length > 256) throw new Error('Select 1–256 regions.');
     c.regions.forEach(n => integer(n, 0, 65535, 'Region ID'));
@@ -35,7 +38,7 @@ export function applyProposal(source, proposal) {
     if (!availableDeaths.has(c.deathType)) throw new Error(`Death classification ${c.deathType} is not present in current source.`);
     const existing = parsed.entries.find(e => e.id === c.id);
     if ((existing?.raw ?? null) !== c.baseRaw) throw new Error(`Conflict: ${c.id} changed upstream. Refresh and review the original, current, and draft values.`);
-    if (existing && existing.regionType !== 'BOSSES') throw new Error('Only boss entries may be changed.');
+    if (existing && existing.regionType !== encounterType(c)) throw new Error('An existing encounter cannot change category.');
     if ((c.entrance || c.chunks !== undefined) && existing?.optionalArgs.some(a=>a.includes('Quest.'))) throw new Error('Quest-gated entrance or chunk edits require manual Java review.');
     // Optional arguments are always read from trusted current source, never proposal text.
     const entry = generateEntry({ ...c, regions: [...c.regions].sort((a,b) => a-b) }, existing);
@@ -55,7 +58,7 @@ export function overlapWarnings(changes, entries) {
   for (const change of changes) for (const other of final.values()) {
     if (other.id === change.id) continue;
     const shared = change.regions.filter(id => other.regions.includes(id));
-    if (shared.length) warnings.push(`${change.name} overlaps ${other.name}: ${shared.join(', ')}. Check chunk restrictions and entrance lookup order.`);
+    if (shared.length) warnings.push(`${change.name} overlaps ${other.name}: ${shared.join(', ')}. Check chunk restrictions and overlapping coverage.`);
   }
   return [...new Set(warnings)];
 }

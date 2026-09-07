@@ -7781,5 +7781,3807 @@
     "revision": 15323824,
     "count": 188,
     "fetchedAt": "2026-09-06T07:35:18.058Z"
-  }
+  },
+  "dungeons": [
+    {
+      "id": "DUNGEON_ABANDONED_MINE",
+      "name": "Abandoned Mine",
+      "wikiTitle": "Abandoned Mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_AH_ZA_RHOON",
+      "name": "Ah Za Rhoon",
+      "wikiTitle": "Ah Za Rhoon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ANCIENT_CAVERN",
+      "name": "Ancient Cavern",
+      "wikiTitle": "Ancient Cavern",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ANCIENT_VAULT",
+      "name": "Ancient Vault",
+      "wikiTitle": "Ancient Vault",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_APE_ATOLL_DUNGEON",
+      "name": "Ape Atoll Dungeon",
+      "wikiTitle": "Ape Atoll Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ARDOUGNE_SEWERS",
+      "name": "Ardougne Sewers",
+      "wikiTitle": "Ardougne Sewers",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ASGARNIAN_ICE_DUNGEON",
+      "name": "Asgarnian Ice Dungeon",
+      "wikiTitle": "Asgarnian Ice Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_BARBARIAN_CAMP",
+      "name": "Barbarian Camp",
+      "wikiTitle": "Barbarian Camp",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_BARROWS",
+      "name": "Barrows",
+      "wikiTitle": "Barrows",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_BRIMHAVEN_AGILITY_ARENA",
+      "name": "Brimhaven Agility Arena",
+      "wikiTitle": "Brimhaven Agility Arena",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Karamja",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_BRIMHAVEN_DUNGEON",
+      "name": "Brimhaven Dungeon",
+      "wikiTitle": "Brimhaven Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Karamja",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_BRIMSTAIL_S_CAVE",
+      "name": "Brimstail's cave",
+      "wikiTitle": "Brimstail's cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_BRINE_RAT_CAVERN",
+      "name": "Brine Rat Cavern",
+      "wikiTitle": "Brine Rat Cavern",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_BUCCANEERS_LABORATORY",
+      "name": "Buccaneers' Laboratory",
+      "wikiTitle": "Buccaneers' Laboratory",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CALLISTO_S_DEN",
+      "name": "Callisto's Den",
+      "wikiTitle": "Callisto's Den",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CAM_TORUM",
+      "name": "Cam Torum",
+      "wikiTitle": "Cam Torum",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Varlamore",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CATACOMBS_OF_KOUREND",
+      "name": "Catacombs of Kourend",
+      "wikiTitle": "Catacombs of Kourend",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CHAMBERS_OF_XERIC",
+      "name": "Chambers of Xeric",
+      "wikiTitle": "Chambers of Xeric",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kebos Lowlands",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CHAOS_DRUID_TOWER",
+      "name": "Chaos Druid Tower",
+      "wikiTitle": "Chaos Druid Tower",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CHARRED_DUNGEON",
+      "name": "Charred Dungeon",
+      "wikiTitle": "Charred Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CHASM_OF_FIRE",
+      "name": "Chasm of Fire",
+      "wikiTitle": "Chasm of Fire",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CHASM_OF_TEARS",
+      "name": "Chasm of Tears",
+      "wikiTitle": "Chasm of Tears",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CLOCK_TOWER_DUNGEON",
+      "name": "Clock Tower Dungeon",
+      "wikiTitle": "Clock Tower Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CORPOREAL_BEAST_S_LAIR",
+      "name": "Corporeal Beast's Lair",
+      "wikiTitle": "Corporeal Beast's Lair",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CORSAIR_COVE_DUNGEON",
+      "name": "Corsair Cove Dungeon",
+      "wikiTitle": "Corsair Cove Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Feldip Hills",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CRABCLAW_CAVES",
+      "name": "Crabclaw Caves",
+      "wikiTitle": "Crabclaw Caves",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CRANDOR_AND_KARAMJA_DUNGEON",
+      "name": "Crandor and Karamja Dungeon",
+      "wikiTitle": "Crandor and Karamja Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Karamja",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CRASH_ISLAND_DUNGEON",
+      "name": "Crash Island Dungeon",
+      "wikiTitle": "Crash Island Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CREATURE_CREATION",
+      "name": "Creature Creation",
+      "wikiTitle": "Creature Creation",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CRUMBLING_TOWER",
+      "name": "Crumbling Tower",
+      "wikiTitle": "Crumbling Tower",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_CRYPT_WHITE_KNIGHTS_CASTLE",
+      "name": "Crypt (White Knights' Castle)",
+      "wikiTitle": "Crypt (White Knights' Castle)",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_DAEYALT_ESSENCE_MINE",
+      "name": "Daeyalt essence mine",
+      "wikiTitle": "Daeyalt essence mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_DEEP_WILDERNESS_DUNGEON",
+      "name": "Deep Wilderness Dungeon",
+      "wikiTitle": "Deep Wilderness Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_DEEPFIN_MINE",
+      "name": "Deepfin Mine",
+      "wikiTitle": "Deepfin Mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_DESERT_MINING_CAMP",
+      "name": "Desert Mining Camp",
+      "wikiTitle": "Desert Mining Camp",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_DIGSITE_DUNGEON",
+      "name": "Digsite Dungeon",
+      "wikiTitle": "Digsite Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_DORGESH_KAAN_MINE",
+      "name": "Dorgesh-Kaan mine",
+      "wikiTitle": "Dorgesh-Kaan mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_DORGESH_KAAN_SOUTH_DUNGEON",
+      "name": "Dorgesh-Kaan South Dungeon",
+      "wikiTitle": "Dorgesh-Kaan South Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_DRAYNOR_SEWERS",
+      "name": "Draynor Sewers",
+      "wikiTitle": "Draynor Sewers",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_DUNGEON_CONSTRUCTION",
+      "name": "Dungeon (Construction)",
+      "wikiTitle": "Dungeon (Construction)",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_DWARVEN_MINE",
+      "name": "Dwarven Mine",
+      "wikiTitle": "Dwarven Mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_EAGLES_PEAK_DUNGEON",
+      "name": "Eagles' Peak Dungeon",
+      "wikiTitle": "Eagles' Peak Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ECTOFUNTUS",
+      "name": "Ectofuntus",
+      "wikiTitle": "Ectofuntus",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_EDGEVILLE_DUNGEON",
+      "name": "Edgeville Dungeon",
+      "wikiTitle": "Edgeville Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ELEMENTAL_WORKSHOP_DUNGEON",
+      "name": "Elemental Workshop (dungeon)",
+      "wikiTitle": "Elemental Workshop (dungeon)",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ELVEN_RABBIT_CAVE",
+      "name": "Elven rabbit cave",
+      "wikiTitle": "Elven rabbit cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Tirannwn",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ENAKHRA_S_TEMPLE",
+      "name": "Enakhra's Temple",
+      "wikiTitle": "Enakhra's Temple",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ENTRANA_DUNGEON",
+      "name": "Entrana Dungeon",
+      "wikiTitle": "Entrana Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ESCAPE_CAVES",
+      "name": "Escape Caves",
+      "wikiTitle": "Escape Caves",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_EVIL_CHICKEN_S_LAIR",
+      "name": "Evil Chicken's Lair",
+      "wikiTitle": "Evil Chicken's Lair",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_EXPERIMENT_CAVE",
+      "name": "Experiment cave",
+      "wikiTitle": "Experiment cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_FEROX_ENCLAVE_DUNGEON",
+      "name": "Ferox Enclave Dungeon",
+      "wikiTitle": "Ferox Enclave Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_FORTHOS_DUNGEON",
+      "name": "Forthos Dungeon",
+      "wikiTitle": "Forthos Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_FREMENNIK_SLAYER_DUNGEON",
+      "name": "Fremennik Slayer Dungeon",
+      "wikiTitle": "Fremennik Slayer Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Fremennik Province",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_GHORROCK_DUNGEON",
+      "name": "Ghorrock Dungeon",
+      "wikiTitle": "Ghorrock Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_GIANTS_DEN",
+      "name": "Giants' Den",
+      "wikiTitle": "Giants' Den",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_GIANTS_FOUNDRY",
+      "name": "Giants' Foundry",
+      "wikiTitle": "Giants' Foundry",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_GLARIAL_S_TOMB",
+      "name": "Glarial's Tomb",
+      "wikiTitle": "Glarial's Tomb",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_GOBLIN_CAVE",
+      "name": "Goblin Cave",
+      "wikiTitle": "Goblin Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_GOD_WARS_DUNGEON",
+      "name": "God Wars Dungeon",
+      "wikiTitle": "God Wars Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_GRAND_TREE_TUNNELS",
+      "name": "Grand Tree Tunnels",
+      "wikiTitle": "Grand Tree Tunnels",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_GRIMSTONE_DUNGEON",
+      "name": "Grimstone Dungeon",
+      "wikiTitle": "Grimstone Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_GRYPHONS_DUNGEON",
+      "name": "Gryphons (dungeon)",
+      "wikiTitle": "Gryphons (dungeon)",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_H_A_M_HIDEOUT",
+      "name": "H.A.M. Hideout",
+      "wikiTitle": "H.A.M. Hideout",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_HEADLESS_BEAST_S_LAIR",
+      "name": "Headless Beast's Lair",
+      "wikiTitle": "Headless Beast's Lair",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kebos Lowlands",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_HERE_BE_MINOTAURS",
+      "name": "Here be minotaurs",
+      "wikiTitle": "Here be minotaurs",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_HEROES_GUILD_MINE",
+      "name": "Heroes' Guild mine",
+      "wikiTitle": "Heroes' Guild mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_HESPORI_PATCH",
+      "name": "Hespori patch",
+      "wikiTitle": "Hespori patch",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kebos Lowlands",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_HUNTER_S_END",
+      "name": "Hunter's End",
+      "wikiTitle": "Hunter's End",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ICE_QUEEN_S_LAIR",
+      "name": "Ice Queen's Lair",
+      "wikiTitle": "Ice Queen's Lair",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ICE_TROLL_CAVES",
+      "name": "Ice Troll Caves",
+      "wikiTitle": "Ice Troll Caves",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Fremennik Province",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_IORWERTH_CAMP_CAVE",
+      "name": "Iorwerth Camp cave",
+      "wikiTitle": "Iorwerth Camp cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Tirannwn",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_IORWERTH_DUNGEON",
+      "name": "Iorwerth Dungeon",
+      "wikiTitle": "Iorwerth Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Tirannwn",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ISLE_OF_SOULS_DUNGEON",
+      "name": "Isle of Souls Dungeon",
+      "wikiTitle": "Isle of Souls Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_JATIZSO_MINE",
+      "name": "Jatizso mine",
+      "wikiTitle": "Jatizso mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_JIGGIG_DUNGEON",
+      "name": "Jiggig Dungeon",
+      "wikiTitle": "Jiggig Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Feldip Hills",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_JORMUNGAND_S_PRISON",
+      "name": "Jormungand's Prison",
+      "wikiTitle": "Jormungand's Prison",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Fremennik Province",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_KALPHITE_CAVE",
+      "name": "Kalphite Cave",
+      "wikiTitle": "Kalphite Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_KALPHITE_LAIR",
+      "name": "Kalphite Lair",
+      "wikiTitle": "Kalphite Lair",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_KARAMJAN_TEMPLE",
+      "name": "Karamjan Temple",
+      "wikiTitle": "Karamjan Temple",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_KARUULM_SLAYER_DUNGEON",
+      "name": "Karuulm Slayer Dungeon",
+      "wikiTitle": "Karuulm Slayer Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kebos Lowlands",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_KENDAL_S_LAIR",
+      "name": "Kendal's Lair",
+      "wikiTitle": "Kendal's Lair",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Fremennik Province",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_KING_BLACK_DRAGON_LAIR",
+      "name": "King Black Dragon Lair",
+      "wikiTitle": "King Black Dragon Lair",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_KRAKEN_COVE",
+      "name": "Kraken Cove",
+      "wikiTitle": "Kraken Cove",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_KUALTI_HEADQUARTERS_BARRACKS",
+      "name": "Kualti Headquarters Barracks",
+      "wikiTitle": "Kualti Headquarters Barracks",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Varlamore",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_KURASK_LAIR",
+      "name": "Kurask Lair",
+      "wikiTitle": "Kurask Lair",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_LAVA_MAZE_DUNGEON",
+      "name": "Lava Maze Dungeon",
+      "wikiTitle": "Lava Maze Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_LIGHTHOUSE",
+      "name": "Lighthouse",
+      "wikiTitle": "Lighthouse",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Fremennik Province",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_LIZARDMAN_CAVES",
+      "name": "Lizardman Caves",
+      "wikiTitle": "Lizardman Caves",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kebos Lowlands",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_LIZARDMAN_TEMPLE",
+      "name": "Lizardman Temple",
+      "wikiTitle": "Lizardman Temple",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kebos Lowlands",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_LUMBRIDGE_CASTLE",
+      "name": "Lumbridge Castle",
+      "wikiTitle": "Lumbridge Castle",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_LUMBRIDGE_SWAMP_CAVES",
+      "name": "Lumbridge Swamp Caves",
+      "wikiTitle": "Lumbridge Swamp Caves",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_LUNAR_ISLE_MINE",
+      "name": "Lunar Isle mine",
+      "wikiTitle": "Lunar Isle mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Fremennik Province",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MAGE_ARENA_BANK",
+      "name": "Mage Arena Bank",
+      "wikiTitle": "Mage Arena Bank",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MELZAR_S_MAZE",
+      "name": "Melzar's Maze",
+      "wikiTitle": "Melzar's Maze",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MINING_GUILD",
+      "name": "Mining Guild",
+      "wikiTitle": "Mining Guild",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MISCELLANIA_AND_ETCETERIA_DUNGEON",
+      "name": "Miscellania and Etceteria Dungeon",
+      "wikiTitle": "Miscellania and Etceteria Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Fremennik Province",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MOLE_HOLE",
+      "name": "Mole Hole",
+      "wikiTitle": "Mole Hole",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MOR_UL_REK",
+      "name": "Mor Ul Rek",
+      "wikiTitle": "Mor Ul Rek",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Karamja",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MORYTANIA_SPIDER_CAVE",
+      "name": "Morytania Spider Cave",
+      "wikiTitle": "Morytania Spider Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MOS_LE_HARMLESS_CAVE",
+      "name": "Mos Le'Harmless Cave",
+      "wikiTitle": "Mos Le'Harmless Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MOTHERLODE_MINE",
+      "name": "Motherlode Mine",
+      "wikiTitle": "Motherlode Mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MOUSE_HOLE",
+      "name": "Mouse hole",
+      "wikiTitle": "Mouse hole",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_MYREQUE_HIDEOUT",
+      "name": "Myreque Hideout",
+      "wikiTitle": "Myreque Hideout",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_NEYPOTZLI",
+      "name": "Neypotzli",
+      "wikiTitle": "Neypotzli",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Varlamore",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_OBSERVATORY_DUNGEON",
+      "name": "Observatory Dungeon",
+      "wikiTitle": "Observatory Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_OGRE_ENCLAVE",
+      "name": "Ogre Enclave",
+      "wikiTitle": "Ogre Enclave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Feldip Hills",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_OURANIA_CAVE",
+      "name": "Ourania Cave",
+      "wikiTitle": "Ourania Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_PANDEMONIUM_CAVE",
+      "name": "Pandemonium Cave",
+      "wikiTitle": "Pandemonium Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_PATERDOMUS",
+      "name": "Paterdomus",
+      "wikiTitle": "Paterdomus",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_POISON_WASTE_DUNGEON",
+      "name": "Poison Waste Dungeon",
+      "wikiTitle": "Poison Waste Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Tirannwn",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_POTHOLE_DUNGEON",
+      "name": "Pothole Dungeon",
+      "wikiTitle": "Pothole Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Karamja",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_QUIDAMORTEM_CAVE",
+      "name": "Quidamortem Cave",
+      "wikiTitle": "Quidamortem Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kebos Lowlands",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_RASHILIYIA_S_TOMB",
+      "name": "Rashiliyia's Tomb",
+      "wikiTitle": "Rashiliyia's Tomb",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_RED_CHINCHOMPA_HUNTING_GROUND",
+      "name": "Red chinchompa hunting ground",
+      "wikiTitle": "Red chinchompa hunting ground",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Feldip Hills",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_REVENANT_CAVES",
+      "name": "Revenant Caves",
+      "wikiTitle": "Revenant Caves",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_RUINS_OF_CAMDOZAAL",
+      "name": "Ruins of Camdozaal",
+      "wikiTitle": "Ruins of Camdozaal",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_RUINS_OF_TAPOYAUIK",
+      "name": "Ruins of Tapoyauik",
+      "wikiTitle": "Ruins of Tapoyauik",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Varlamore",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SALT_MINE",
+      "name": "Salt Mine",
+      "wikiTitle": "Salt Mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SCABARAS_DUNGEON",
+      "name": "Scabaras Dungeon",
+      "wikiTitle": "Scabaras Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SCRUBFOOT_S_CAVE",
+      "name": "Scrubfoot's cave",
+      "wikiTitle": "Scrubfoot's cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SHADE_CATACOMBS",
+      "name": "Shade Catacombs",
+      "wikiTitle": "Shade Catacombs",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SHAMAN_CAVES",
+      "name": "Shaman Caves",
+      "wikiTitle": "Shaman Caves",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SHAYZIEN_CRYPTS",
+      "name": "Shayzien Crypts",
+      "wikiTitle": "Shayzien Crypts",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SHAYZIEN_PRISON",
+      "name": "Shayzien Prison",
+      "wikiTitle": "Shayzien Prison",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SHELLBANE_GRYPHON_CAVE",
+      "name": "Shellbane Gryphon Cave",
+      "wikiTitle": "Shellbane Gryphon Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SHILO_VILLAGE_MINE",
+      "name": "Shilo Village mine",
+      "wikiTitle": "Shilo Village mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Karamja",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SILK_CHASM",
+      "name": "Silk Chasm",
+      "wikiTitle": "Silk Chasm",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SISTERHOOD_SANCTUARY",
+      "name": "Sisterhood Sanctuary",
+      "wikiTitle": "Sisterhood Sanctuary",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SKAVID_CAVES",
+      "name": "Skavid caves",
+      "wikiTitle": "Skavid caves",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Feldip Hills",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SKELETAL_TOMB",
+      "name": "Skeletal Tomb",
+      "wikiTitle": "Skeletal Tomb",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SLAYER_TOWER",
+      "name": "Slayer Tower",
+      "wikiTitle": "Slayer Tower",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SMOKE_DEVIL_DUNGEON",
+      "name": "Smoke Devil Dungeon",
+      "wikiTitle": "Smoke Devil Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SMOKE_DUNGEON",
+      "name": "Smoke Dungeon",
+      "wikiTitle": "Smoke Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SOPHANEM_DUNGEON",
+      "name": "Sophanem Dungeon",
+      "wikiTitle": "Sophanem Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SOURHOG_CAVE",
+      "name": "Sourhog Cave",
+      "wikiTitle": "Sourhog Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_STALKER_DEN",
+      "name": "Stalker Den",
+      "wikiTitle": "Stalker Den",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Varlamore",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_STRONGHOLD_OF_SECURITY",
+      "name": "Stronghold of Security",
+      "wikiTitle": "Stronghold of Security",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_STRONGHOLD_SLAYER_CAVE",
+      "name": "Stronghold Slayer Cave",
+      "wikiTitle": "Stronghold Slayer Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_SUNBLEAK_CAVE",
+      "name": "Sunbleak Cave",
+      "wikiTitle": "Sunbleak Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TARN_S_LAIR",
+      "name": "Tarn's Lair",
+      "wikiTitle": "Tarn's Lair",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TAVERLEY_DUNGEON",
+      "name": "Taverley Dungeon",
+      "wikiTitle": "Taverley Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TEMPLE_CIVITAS_ILLA_FORTIS",
+      "name": "Temple (Civitas illa Fortis)",
+      "wikiTitle": "Temple (Civitas illa Fortis)",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Varlamore",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TEMPLE_OF_IKOV_DUNGEON",
+      "name": "Temple of Ikov (dungeon)",
+      "wikiTitle": "Temple of Ikov (dungeon)",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TEMPLE_OF_MARIMBO_DUNGEON",
+      "name": "Temple of Marimbo Dungeon",
+      "wikiTitle": "Temple of Marimbo Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_THE_BURROW",
+      "name": "The Burrow",
+      "wikiTitle": "The Burrow",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Varlamore",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_THE_FORSAKEN_TOWER_LOCATION",
+      "name": "The Forsaken Tower (location)",
+      "wikiTitle": "The Forsaken Tower (location)",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_THE_GAUNTLET",
+      "name": "The Gauntlet",
+      "wikiTitle": "The Gauntlet",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Tirannwn",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_THE_WARRENS",
+      "name": "The Warrens",
+      "wikiTitle": "The Warrens",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_THEATRE_OF_BLOOD",
+      "name": "Theatre of Blood",
+      "wikiTitle": "Theatre of Blood",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TOLNA_S_RIFT",
+      "name": "Tolna's rift",
+      "wikiTitle": "Tolna's rift",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TOMBS_OF_AMASCUT",
+      "name": "Tombs of Amascut",
+      "wikiTitle": "Tombs of Amascut",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TRAHAEARN_MINE",
+      "name": "Trahaearn mine",
+      "wikiTitle": "Trahaearn mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Tirannwn",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TREE_GNOME_VILLAGE_DUNGEON",
+      "name": "Tree Gnome Village Dungeon",
+      "wikiTitle": "Tree Gnome Village Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TROLL_STRONGHOLD_LOCATION",
+      "name": "Troll Stronghold (location)",
+      "wikiTitle": "Troll Stronghold (location)",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TUNNEL_OF_CHAOS",
+      "name": "Tunnel of Chaos",
+      "wikiTitle": "Tunnel of Chaos",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_TUTORIAL_ISLAND_MINE",
+      "name": "Tutorial Island mine",
+      "wikiTitle": "Tutorial Island mine",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_UNDERGROUND_PASS_DUNGEON",
+      "name": "Underground Pass (dungeon)",
+      "wikiTitle": "Underground Pass (dungeon)",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_UNDERWATER",
+      "name": "Underwater",
+      "wikiTitle": "Underwater",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_UNDERWATER_TUNNEL",
+      "name": "Underwater Tunnel",
+      "wikiTitle": "Underwater Tunnel",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_UZER",
+      "name": "Uzer",
+      "wikiTitle": "Uzer",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_UZER_MASTABA",
+      "name": "Uzer Mastaba",
+      "wikiTitle": "Uzer Mastaba",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_VARROCK_SEWERS",
+      "name": "Varrock Sewers",
+      "wikiTitle": "Varrock Sewers",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_VET_ION_S_REST",
+      "name": "Vet'ion's Rest",
+      "wikiTitle": "Vet'ion's Rest",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_VILLA_LUCENS",
+      "name": "Villa Lucens",
+      "wikiTitle": "Villa Lucens",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Varlamore",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_VIYELDI_CAVES",
+      "name": "Viyeldi caves",
+      "wikiTitle": "Viyeldi caves",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WARRIORS_GUILD",
+      "name": "Warriors' Guild",
+      "wikiTitle": "Warriors' Guild",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WATER_MILL_CELLAR",
+      "name": "Water mill cellar",
+      "wikiTitle": "Water mill cellar",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WATER_RAVINE_DUNGEON",
+      "name": "Water Ravine Dungeon",
+      "wikiTitle": "Water Ravine Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kharidian Desert",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WATERBIRTH_ISLAND_DUNGEON",
+      "name": "Waterbirth Island Dungeon",
+      "wikiTitle": "Waterbirth Island Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Fremennik Province",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WATERFALL_DUNGEON",
+      "name": "Waterfall Dungeon",
+      "wikiTitle": "Waterfall Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Dungeons lacking map icon",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WEB_CHASM",
+      "name": "Web Chasm",
+      "wikiTitle": "Web Chasm",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WEREWOLF_AGILITY_COURSE",
+      "name": "Werewolf Agility Course",
+      "wikiTitle": "Werewolf Agility Course",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Morytania",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WHITE_WOLF_TUNNEL",
+      "name": "White Wolf Tunnel",
+      "wikiTitle": "White Wolf Tunnel",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Asgarnia",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WILDERNESS_AGILITY_COURSE_DUNGEON",
+      "name": "Wilderness Agility Course Dungeon",
+      "wikiTitle": "Wilderness Agility Course Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WILDERNESS_GOD_WARS_DUNGEON",
+      "name": "Wilderness God Wars Dungeon",
+      "wikiTitle": "Wilderness God Wars Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WILDERNESS_SLAYER_CAVE",
+      "name": "Wilderness Slayer Cave",
+      "wikiTitle": "Wilderness Slayer Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Wilderness",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WITCHAVEN_DUNGEON",
+      "name": "Witchaven Dungeon",
+      "wikiTitle": "Witchaven Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WIZARDS_GUILD",
+      "name": "Wizards' Guild",
+      "wikiTitle": "Wizards' Guild",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WIZARDS_TOWER",
+      "name": "Wizards' Tower",
+      "wikiTitle": "Wizards' Tower",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Misthalin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WOLF_DEN",
+      "name": "Wolf Den",
+      "wikiTitle": "Wolf Den",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Varlamore",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WOODCUTTING_GUILD_DUNGEON",
+      "name": "Woodcutting guild dungeon",
+      "wikiTitle": "Woodcutting guild dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WYRMSCRAIG_CAVERN",
+      "name": "Wyrmscraig Cavern",
+      "wikiTitle": "Wyrmscraig Cavern",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_WYVERN_CAVE",
+      "name": "Wyvern Cave",
+      "wikiTitle": "Wyvern Cave",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_XERIC_S_LOOKOUT",
+      "name": "Xeric's Lookout",
+      "wikiTitle": "Xeric's Lookout",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Great Kourend",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_YANILLE_AGILITY_DUNGEON",
+      "name": "Yanille Agility Dungeon",
+      "wikiTitle": "Yanille Agility Dungeon",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Kandarin",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_YNYSDAIL_CAVERN",
+      "name": "Ynysdail Cavern",
+      "wikiTitle": "Ynysdail Cavern",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Oceans",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ZALCANO",
+      "name": "Zalcano",
+      "wikiTitle": "Zalcano",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Tirannwn",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ZEMOUREGAL_S_BASE",
+      "name": "Zemouregal's Base",
+      "wikiTitle": "Zemouregal's Base",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    },
+    {
+      "id": "DUNGEON_ZEMOUREGAL_S_FORT",
+      "name": "Zemouregal's Fort",
+      "wikiTitle": "Zemouregal's Fort",
+      "regionType": "DUNGEONS",
+      "categories": [
+        "Dungeons"
+      ],
+      "area": "Other",
+      "catalogSource": "https://oldschool.runescape.wiki/w/List_of_dungeons",
+      "catalogRevision": 15320196,
+      "regions": [],
+      "raw": null,
+      "deathType": "UNSAFE",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "locationTitles": []
+    }
+  ]
 }

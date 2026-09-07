@@ -1,6 +1,6 @@
 # Escape Crystal Content Editor
 
-A GitHub Pages workspace for discovering OSRS bosses, reviewing map coverage, and preparing Escape Crystal Notify contributions. This is a separate utility repository targeting `Xylot/escape-crystal-notify`.
+A GitHub Pages workspace for discovering OSRS bosses and dungeons, reviewing map coverage, and preparing Escape Crystal Notify contributions. This is a separate utility repository targeting `Xylot/escape-crystal-notify`.
 
 ## Run locally
 
@@ -21,7 +21,7 @@ npm run build     # typecheck + production bundle
 npm run preview
 ```
 
-The snapshot contains 188 bosses from the wiki Boss page, with 109 unsupported by the captured plugin source. Support is recalculated on sync. Shellbane includes enriched entrance and arena maps; load other locations on demand. Missing tiles leave a usable coordinate grid.
+The snapshot contains the wiki Boss catalog and 190 entries from the wiki List of dungeons. Support is recalculated on sync. Shellbane includes enriched entrance and arena maps; load other locations on demand. Missing tiles leave a usable coordinate grid.
 
 The light interface uses wiki boss portraits in the library and editor. Portraits come from the primary monster/NPC infobox, with file attribution in Sources. Image metadata is cached separately from drafts for seven days; four lookups run at most concurrently, and unavailable images fall back to category icons. Existing cached portraits remain available if a refresh fails. Location selectors include region IDs alongside coordinates.
 
@@ -39,6 +39,14 @@ The authoring steps are **Setup → Arena → Entrance area → Entrance object 
 
 When the optional backend is configured, single and batch reviews can prepare a GitHub PR with map screenshots and wiki links. Only the final Create pull request action writes branches, commits, and the PR. Downloads remain available without a backend. See [backend setup](docs/pr-backend-setup.md). Existing source arguments are retained from the trusted current plugin source. Proposal text is parsed as data, never evaluated.
 
+## Dungeons
+
+Choose **Dungeons** in Collections, or select Dungeon when importing a wiki page. Dungeon authoring has only **Coverage → Review & export**: select regions and optionally restrict them to chunks. New dungeons default to Unsafe; existing entries retain their death classification. There are no entrance settings or model references. Dungeon entries export using DUNGEON_ identifiers and the plugin's DUNGEONS category, including in mixed boss/dungeon PRs.
+
+Library cards use the location infobox's wiki map when available, with a full map reference in the coverage inspector. When no static map image is available, the library renders the wiki page's interactive map preview using its exact tile URLs, layer, plane, and framing. The map reference opens the source wiki page. Scenic infobox images are not substituted for missing maps. Map images have a separate seven-day cache and wiki attribution. Existing plugin regions are preserved; new coverage requires explicit selection because wiki coordinates may identify the outside entrance. Dungeons stay in their own collection rather than the default boss landing page.
+
+Deploy the updated Worker alongside the frontend to enable dungeon PR submissions. Downloads use the local validator and remain available independently. If using the optional maintainer workflow, reinstall its bundled validator with the installation command below.
+
 ## GitHub Pages
 
 Create a separate repository on branch `main`, push this directory's contents, and choose **GitHub Actions** as the Pages source. The supplied workflow tests, refreshes data daily at 09:23 UTC, builds, and deploys. Relative asset paths support project Pages URLs.
@@ -55,7 +63,7 @@ node scripts/install-plugin-workflow.mjs /path/to/escape-crystal-notify
 
 Review and commit the installed `.github/content-editor/` validator and `.github/workflows/content-proposal.yml` in the plugin. Enable **Allow GitHub Actions to create and approve pull requests** in repository Actions settings. The workflow targets `master`, matching the source URL in the supplied reference. It runs Java 11 and `./gradlew build`; verify these against the plugin's build configuration before enabling it.
 
-Run **Create content proposal PR** manually with the copied JSON. Only structured boss edits are accepted. An unrelated upstream change is allowed after revalidation; changes to an edited entry require review. The workflow generates the diff, runs the plugin build, and opens a PR. `GITHUB_TOKEN` PRs do not generally trigger follow-on workflows; branch protection may require additional maintainer checks.
+Run **Create content proposal PR** manually with the copied JSON. Only structured boss and dungeon edits are accepted. An unrelated upstream change is allowed after revalidation; changes to an edited entry require review. The workflow generates the diff, runs the plugin build, and opens a PR. `GITHUB_TOKEN` PRs do not generally trigger follow-on workflows; branch protection may require additional maintainer checks.
 
 ## Architecture
 

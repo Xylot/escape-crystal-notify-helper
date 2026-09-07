@@ -54,7 +54,7 @@ export function extractWiki(Parser, page) {
   const links = [...new Set(root.querySelectorAll('link').map(t => String(t.target ?? t.name ?? '').replaceAll('_',' ')).filter(t=>t && !t.includes(':') && !t.startsWith('#')))];
   return { title:page.title, revision:page.revision, maps, links, warnings };
 }
-export async function importWiki(Parser, title, knownLocations = []) {
+export async function importWiki(Parser, title, knownLocations = [], followLinks = true) {
   async function read(title){
     const page=await fetchPage(title),result=extractWiki(Parser,page);
     try{
@@ -66,7 +66,7 @@ export async function importWiki(Parser, title, knownLocations = []) {
   }
   const result = await read(title);
   // Bounded follow-up: surface other links for the user instead of crawling the wiki.
-  const locations = [...new Set([...knownLocations,...result.links.filter(t => /cave|lair|dungeon|chamber|island|conch/i.test(t))])].filter(t=>t!==result.title).slice(0,4);
+  const locations = [...new Set([...knownLocations,...(followLinks?result.links:[]).filter(t => /cave|lair|dungeon|chamber|island|conch/i.test(t))])].filter(t=>t!==result.title).slice(0,4);
   for (const linked of locations) {
     try { const next = await read(linked); result.maps.push(...next.maps); result.warnings.push(...next.warnings); }
     catch (error) { result.warnings.push(`Could not inspect ${linked}: ${error.message}`); }

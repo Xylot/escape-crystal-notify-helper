@@ -1,6 +1,8 @@
 import {moidImage} from './moid-images.mjs';
+import {isDungeon} from './encounter-kind.mjs';
 
 export function encounterScope(boss) {
+  if(isDungeon(boss))return 'dungeon';
   const category = `${boss.regionType ?? ''} ${(boss.categories ?? []).join(' ')}`;
   if (/raid|Chambers of Xeric|Theatre of Blood|Tombs of Amascut/i.test(category) || /^(Chambers of Xeric|Theatre of Blood|Tombs of Amascut)$/i.test(boss.name)) return 'raid';
   if (/minigame/i.test(category)) return 'minigame';
@@ -20,7 +22,8 @@ export function cleanPresentation(changes, input = {}) {
     if (!Array.isArray(ids) || ids.length > 128 || ids.some(id => typeof id !== 'string' || !/^\d{1,9}$/.test(id))) throw new Error('Invalid entrance model references.');
     count += ids.length;
     if (count > 256) throw new Error('Split contributions with more than 256 model images into smaller PRs.');
-    output[c.id] = {scope, images: [...new Set(ids.map(id => moidImage(id).id))]};
+    if(isDungeon(c)&&ids.length)throw new Error('Dungeons do not have entrance model references.');
+    output[c.id] = {scope:isDungeon(c)?'dungeon':scope, images: [...new Set(ids.map(id => moidImage(id).id))]};
   }
   return output;
 }
@@ -34,6 +37,6 @@ export function defaultPRText(changes, presentation) {
   const title = `feat(${scope}): ${action} ${names}`;
   return {
     title: title.length <= 200 ? title : `feat(${scope}): ${action} ${changes.length} encounters`,
-    introduction: `${allNew ? 'Adds' : allExisting ? 'Updates' : 'Adds and updates'} Escape Crystal coverage for ${names}. Includes death classification, arena coverage, and entrance settings where configured.`,
+    introduction: `${allNew ? 'Adds' : allExisting ? 'Updates' : 'Adds and updates'} Escape Crystal coverage for ${names}. ${changes.every(isDungeon)?'Includes dungeon regions and optional chunk restrictions.':'Includes death classification, region coverage, and entrance settings where configured.'}`,
   };
 }

@@ -287,9 +287,12 @@ button {
   background: #eef0f5;
   color: var(--muted)
 }
+.dungeon-map-reference { margin:0 16px 16px; }
+.dungeon-map-reference img,.dungeon-map-reference .wiki-map-image { display:block; width:100%; height:auto; margin:12px 0; border-radius:8px; }
+.dungeon-authoring { --authoring-step-count:2; }
 .authoring-steps {
   display: grid;
-  grid-template-columns: repeat(5,minmax(0,1fr));
+  grid-template-columns: repeat(var(--authoring-step-count,5),minmax(0,1fr));
   background: #fff;
   border: 0;
   border-radius: var(--radius-surface);
@@ -1674,7 +1677,7 @@ to {
   overflow: hidden;
   margin-bottom: var(--space-4)
 }
-.boss-portrait img {
+.boss-portrait img,.boss-portrait .wiki-map-image {
   display: block;
   width: 100%;
   height: 100%;
@@ -1695,7 +1698,7 @@ to {
   margin: 0;
   background: var(--selected)
 }
-.boss-portrait.compact img {
+.boss-portrait.compact img,.boss-portrait.compact .wiki-map-image {
   padding: var(--space-1)
 }
 .list-layout .boss-portrait {
@@ -1704,7 +1707,7 @@ to {
   grid-row: 1;
   margin: 0
 }
-.list-layout .boss-portrait img {
+.list-layout .boss-portrait img,.list-layout .boss-portrait .wiki-map-image {
   padding: var(--space-1)
 }
 .list-layout .card-copy {
@@ -2179,7 +2182,7 @@ button,input:not([type=checkbox]),select,summary {
   .authoring-view .authoring-utilities button[aria-label="Undo edit"]::before { content:'↶'; font-size:20px; }
   .authoring-view .authoring-utilities button[aria-label="Redo edit"]::before { content:'↷'; font-size:20px; }
   .authoring-view .authoring-utilities .count { display:none; }
-  .authoring-view .authoring-steps { grid-template-columns:repeat(5,minmax(0,1fr)); margin-bottom:8px; }
+  .authoring-view .authoring-steps { grid-template-columns:repeat(var(--authoring-step-count,5),minmax(0,1fr)); margin-bottom:8px; }
   .authoring-view .authoring-steps button { grid-column:auto; border:0; padding:8px 4px; min-height:60px; gap:4px; align-items:center; justify-content:center; flex-direction:column; text-align:center; }
   .authoring-view .authoring-steps strong { font-size:12px; line-height:1.2; }
   .authoring-view .authoring-steps .step-number { width:20px; height:20px; }
