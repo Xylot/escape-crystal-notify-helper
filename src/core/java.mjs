@@ -1,5 +1,6 @@
 import { entranceJava } from './entrance.mjs';
 import { encounterType, isDungeon } from './encounter-kind.mjs';
+import { integer, chunkOrigin, regionId } from './coordinates.mjs';
 // A deliberately narrow Java scanner. It preserves opaque optional constructor
 // arguments; it never evaluates source and fails closed on unsupported syntax.
 export function maskJava(source, strings = false) {
@@ -74,11 +75,56 @@ export function parseJava(source) {
 }
 export function enumName(name, type = 'BOSSES') { return (type === 'DUNGEONS' ? 'DUNGEON_' : 'BOSS_') + name.normalize('NFKD').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').toUpperCase(); }
 export function javaString(name) { return JSON.stringify(name).replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029'); }
+function literalChunks(expression) {
+  if (!expression) return [];
+  if (!/^List\.of\([\d,\s]*\)$/.test(expression)) throw new Error('Existing chunk restrictions need manual Java review.');
+  const values = expression.slice(expression.indexOf('(') + 1, -1).trim();
+  return values ? values.split(',').map(value => integer(Number(value.trim()), 0, 4194303, 'Chunk ID')) : [];
+}
+
+// Draft regions remain arena selections. Only the generated entry combines arena and entrance coverage.
+/** @param {any} change @param {any} existing */
+export function exportCoverage(change, existing = null) {
+  const optional = existing?.optionalArgs?.map(arg => maskJava(arg).trim()) ?? [];
+  const preserved = optional.find(arg => arg.startsWith('new EscapeCrystalNotifyRegionEntrance('));
+  const hasEntrance = !isDungeon(change) && !!(change.entrance || preserved);
+  const preservedChunks = preserved ? splitArgs(preserved.slice(preserved.indexOf('(') + 1, -1)).find(arg => arg.startsWith('List.')) : undefined;
+  const entranceChunks = change.entrance?.chunks ?? literalChunks(preservedChunks);
+  entranceChunks.forEach(id => integer(id, 0, 4194303, 'Entrance chunk ID'));
+  if (change.entranceRegion !== undefined) integer(change.entranceRegion, 0, 65535, 'Entrance region');
+  if (change.entrance && !entranceChunks.length && change.entranceRegion === undefined) {
+    throw new Error('Choose an entrance region or entrance chunks before exporting entrance detection.');
+  }
+  const chunkRegion = id => { const p = chunkOrigin(id); return regionId(p.x, p.y); };
+  const sorted = ids => [...new Set(ids)].sort((a, b) => a - b);
+  const entranceRegions = hasEntrance ? sorted([
+    ...(change.entranceRegion === undefined ? [] : [change.entranceRegion]), ...entranceChunks.map(chunkRegion),
+  ]) : [];
+  if (hasEntrance && entranceChunks.length && change.entranceRegion !== undefined
+      && !entranceChunks.some(id => chunkRegion(id) === change.entranceRegion)) {
+    throw new Error('The selected entrance region has no entrance chunks. Update its chunks or choose the matching entrance region.');
+  }
+  const regions = sorted([...change.regions, ...entranceRegions]);
+  if (regions.length > 256) throw new Error('Combined arena and entrance coverage exceeds 256 regions.');
+  const originalChunks = optional.find(arg => arg.startsWith('List.'));
+  let chunks = change.chunks ?? (originalChunks ? literalChunks(originalChunks) : undefined);
+  if (chunks?.length) {
+    chunks.forEach(id => integer(id, 0, 4194303, 'Region chunk ID'));
+    if (chunks.some(id => !change.regions.includes(chunkRegion(id)))) throw new Error('Region-restriction chunks must lie inside selected arena regions.');
+    if (hasEntrance && !entranceChunks.length) throw new Error('Select entrance chunks or remove arena chunk restrictions so the entrance can trigger warnings.');
+    chunks = sorted([...chunks, ...entranceChunks]);
+    if (regions.some(id => !chunks.some(chunk => chunkRegion(chunk) === id))) throw new Error('Select chunks in every covered region or remove arena chunk restrictions.');
+    if (chunks.length > 256) throw new Error('Combined arena and entrance coverage exceeds 256 chunks.');
+  }
+  return { regions, entranceRegions, chunks };
+}
+
 /** @param {any} change @param {any} existing */
 export function generateEntry(change, existing = null) {
   const type=encounterType(change);
   if(!['BOSSES','DUNGEONS'].includes(type))throw new Error('Unsupported encounter category.');
   if(isDungeon(change)&&(change.entrance||change.entranceOverlay))throw new Error('Dungeons do not have entrance settings.');
+  const coverage = exportCoverage(change, existing);
   let optional = existing ? [...existing.optionalArgs] : [];
   if (!change.entrance && change.entranceOverlay) {
     if (!['PRIORITIZED_WITH_HIGHLIGHT','DEPRIORITIZED_WITH_HIGHLIGHT'].includes(change.entranceOverlay)) throw new Error('Unsupported entrance priority.');
@@ -94,14 +140,14 @@ export function generateEntry(change, existing = null) {
     if (i >= 0) optional[i] = entranceJava(change.entrance);
     else optional.unshift(entranceJava(change.entrance));
   }
-  if (change.chunks !== undefined) {
+  if (coverage.chunks !== undefined) {
     const i = optional.findIndex(a => /^List\.of\([\d,\s]*\)$/.test(maskJava(a).trim()));
     if(i>=0) optional.splice(i,1);
-    if(change.chunks.length) {
+    if(coverage.chunks.length) {
       if(!isDungeon(change)&&!optional.some(a=>a.includes('EscapeCrystalNotifyRegionEntrance('))&&!optional.includes('null'))optional.unshift('null');
-      optional.push(`List.of(${change.chunks.join(', ')})`);
+      optional.push(`List.of(${coverage.chunks.join(', ')})`);
     }
   }
-  const args = [javaString(change.name), `EscapeCrystalNotifyRegionType.${type}`, `EscapeCrystalNotifyRegionDeathType.${change.deathType}`, ...optional, ...change.regions];
+  const args = [javaString(change.name), `EscapeCrystalNotifyRegionType.${type}`, `EscapeCrystalNotifyRegionDeathType.${change.deathType}`, ...optional, ...coverage.regions];
   return `${change.id}(${args.join(', ')})`;
 }

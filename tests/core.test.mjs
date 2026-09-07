@@ -9,12 +9,12 @@ const SOURCE=`package com.escapecrystalnotify;
 public enum EscapeCrystalNotifyRegion {
     // BOSS_FAKE("ignore", OTHER, OTHER, 12),
     BOSS_TEST("Test, \\"boss\\"", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE,
-       new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.PRIORITIZED_WITH_HIGHLIGHT, List.of(774740, 774742), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.NEXUS_EYE_YELLOW_MIDDLE), List.of(774740), 11851, 11850),
+       new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.PRIORITIZED_WITH_HIGHLIGHT, List.of(774740, 774742), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.NEXUS_EYE_YELLOW_MIDDLE), List.of(774740, 774742), 11851, 11850),
     QUEST_TEST("Quest", EscapeCrystalNotifyRegionType.QUESTS, EscapeCrystalNotifyRegionDeathType.UNSAFE_HCGIM, Quest.DRAGON_SLAYER_I, 1234);
     void ignored() { int x = 5; }
 }`.replaceAll('\\\\"','\\"');
 const proposal=(changes)=>({version:1,repository:PLUGIN_REPO,baseCommit:'a'.repeat(40),changes});
-function change() {const e=parseJava(SOURCE).entries[0];return {id:e.id,name:e.name,deathType:e.deathType,regions:[12682],baseRaw:e.raw,reviewed:true};}
+function change() {const e=parseJava(SOURCE).entries[0];return {id:e.id,name:e.name,deathType:e.deathType,regions:[12106],baseRaw:e.raw,reviewed:true};}
 test('Shellbane outside and cave region IDs remain distinct',()=>{assert.equal(regionId(3176,2477),12582);assert.equal(regionId(3179,8876),12682);});
 test('region and chunk round trips, including boundaries',()=>{
   for(const x of [0,7,8,63,64,3179,16383])for(const y of [0,8,64,8876,16383]) {
@@ -29,7 +29,7 @@ test('Java parser ignores comments and nested lists and retains optional args',(
 });
 test('existing edits preserve entrances, chunks and unrelated entries',()=>{
   const result=applyProposal(SOURCE,proposal([change()]));const before=parseJava(SOURCE),after=parseJava(result);
-  assert.deepEqual(after.entries[0].optionalArgs,before.entries[0].optionalArgs);assert.equal(after.entries[1].raw,before.entries[1].raw);assert.deepEqual(after.entries[0].regions,[12682]);
+  assert.deepEqual(after.entries[0].optionalArgs,before.entries[0].optionalArgs);assert.equal(after.entries[1].raw,before.entries[1].raw);assert.deepEqual(after.entries[0].regions,[12106]);
 });
 test('new entry insertion and first-entry replacement can be combined',()=>{
   const newEntry={...change(),id:'BOSS_NEW',name:'New',baseRaw:null};

@@ -64,7 +64,7 @@ test('unavailable GitHub status never permits an unverified replacement',async()
   assert.equal(store.rows.size,1);assert.equal(gh.calls.length,mutations);
 });
 test('batch preview includes every boss, arena group, changed entrance and selected chunks',async()=>{
-  const second={...change,id:'BOSS_PR_SECOND',name:'Second boss',regions:[12938],entrance:{overlay:'DEPRIORITIZED_WITH_HIGHLIGHT',direction:'',plane:'',objectType:'GAME_OBJECT',ids:['58439'],chunks:[]}};
+  const second={...change,id:'BOSS_PR_SECOND',name:'Second boss',regions:[12938],entranceRegion:12582,entrance:{overlay:'DEPRIORITIZED_WITH_HIGHLIGHT',direction:'',plane:'',objectType:'GAME_OBJECT',ids:['58439'],chunks:[]}};
   const data={changes:[change,second],contexts:{...input.contexts,[second.id]:{arena:{x:3200,y:8876,plane:1},entrance:{x:3176,y:2477,plane:2,region:12582}}},sources:{...input.sources,[second.id]:input.sources[change.id]}};
   const p=await prepare(data,'1',new FakeGitHub(),new MemoryStore(),env);assert.equal(p.changes.length,2);assert.equal(p.evidence.panels.length,3);assert.equal(p.evidence.panels.find(p=>p.kind==='entrance').context.plane,2);
 });

@@ -1,4 +1,4 @@
-import { parseJava, generateEntry } from './java.mjs';
+import { parseJava, generateEntry, exportCoverage } from './java.mjs';
 import { integer, chunkOrigin, regionId } from './coordinates.mjs';
 import { validateEntrance, OVERLAYS } from './entrance.mjs';
 import { encounterType } from './encounter-kind.mjs';
@@ -27,6 +27,7 @@ export function validateProposal(proposal) {
       c.chunks.forEach(n=>integer(n,0,4194303,'Chunk ID'));
       if(c.chunks.some(n=>{const p=chunkOrigin(n);return !c.regions.includes(regionId(p.x,p.y));}))throw new Error('Each region-restriction chunk must lie inside a selected region.');
     }
+    exportCoverage(c);
   }
   return proposal;
 }
@@ -52,10 +53,14 @@ export function applyProposal(source, proposal) {
   parseJava(result); return result;
 }
 export function overlapWarnings(changes, entries) {
+  const covered = changes.map(c => {
+    try { return {...c, regions: exportCoverage(c, entries.find(e => e.id === c.id)).regions}; }
+    catch { return c; } // Incomplete drafts show their export validation error separately.
+  });
   const final = new Map(entries.map(e => [e.id, e]));
-  changes.forEach(c => final.set(c.id, c));
+  covered.forEach(c => final.set(c.id, c));
   const warnings = [];
-  for (const change of changes) for (const other of final.values()) {
+  for (const change of covered) for (const other of final.values()) {
     if (other.id === change.id) continue;
     const shared = change.regions.filter(id => other.regions.includes(id));
     if (shared.length) warnings.push(`${change.name} overlaps ${other.name}: ${shared.join(', ')}. Check chunk restrictions and overlapping coverage.`);

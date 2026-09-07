@@ -16,7 +16,7 @@ test('new and saved blank drafts default to Unsafe without overwriting explicit 
 });
 test('coverage and entrances export without verification flags, including older unreviewed drafts', () => {
   for (const reviewed of [undefined, false, true]) {
-    const current = { ...draft, reviewed, entrance: { ...entrance, reviewed } };
+    const current = { ...draft, entranceRegion: 12582, reviewed, entrance: { ...entrance, reviewed } };
     assert.equal(exportProblem(snapshot, [current]), '');
     const changed = mergeDraft(current, { regions: [12683], entrancePlane: 1 });
     assert.equal(exportProblem(snapshot, [changed]), '');

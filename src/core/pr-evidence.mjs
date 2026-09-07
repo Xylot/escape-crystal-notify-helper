@@ -63,7 +63,7 @@ export function evidencePlan(changes, contexts, sources) {
     }
     if (!links.size || links.size > 12) throw new Error(`Provide 1–12 wiki sources for ${change.name}.`);
     normalizedSources[change.id] = [...links].sort();
-    const entranceRegions = entranceChunks.length ? [...new Set(entranceChunks.map(id => { const p = chunkOrigin(id); return regionId(p.x, p.y); }))] : entrance ? [integer(supplied.entrance.region ?? regionId(entrance.x, entrance.y), 0, 65535, 'Entrance region')] : [];
+    const entranceRegions = entranceChunks.length ? [...new Set(entranceChunks.map(id => { const p = chunkOrigin(id); return regionId(p.x, p.y); }))] : entrance ? [integer(change.entranceRegion ?? supplied.entrance.region ?? regionId(entrance.x, entrance.y), 0, 65535, 'Entrance region')] : [];
     for (const [kind, context, regions, chunks] of [['arena', arena, change.regions, change.chunks ?? []], ['entrance', entrance, entranceRegions, entranceChunks]]) {
       if (!context) continue;
       for (const [index, group] of regionGroups(regions).entries()) {
@@ -81,7 +81,7 @@ export function evidencePlan(changes, contexts, sources) {
 export function cleanChanges(changes) {
   if (!Array.isArray(changes) || changes.length > 100) throw new Error('Choose 1–100 encounters.');
   return changes.map(c => {
-    const result = Object.fromEntries(['id','name','regionType','regions','deathType','baseRaw','chunks','entranceOverlay'].filter(key=>c[key]!==undefined).map(key=>[key,c[key]]));
+    const result = Object.fromEntries(['id','name','regionType','regions','deathType','baseRaw','chunks','entranceOverlay','entranceRegion'].filter(key=>c[key]!==undefined).map(key=>[key,c[key]]));
     if (c.entrance) result.entrance = Object.fromEntries(['overlay','direction','plane','objectType','ids','chunks'].map(key=>[key,c.entrance[key]]));
     return result;
   }).sort((a,b)=>a.id.localeCompare(b.id));
