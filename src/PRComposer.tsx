@@ -16,7 +16,8 @@ const statusText:Record<string,string>={prepared:'Ready to create',working:'Fini
 function remember(signature:string,record:any){try{const saved=JSON.parse(localStorage.getItem(HISTORY)||'{}');saved[signature]={id:record.id,revision:record.revision,pr:record.pr,status:record.status};localStorage.setItem(HISTORY,JSON.stringify(saved));}catch{/* Server status remains authoritative. */}}
 
 function StateSummary({state,models,sources}:{state:any;models:string[];sources:string[]}) {
-  return <><p>Name: {state.name}</p><p>{isDungeon(state)?'Dungeon':'Arena'} regions: {state.regions.join(', ')} · {state.deathType}</p><p>Coverage chunks: {state.chunks?.join(', ')||'Whole regions'}</p>
+  return <><p>Name: {state.name}</p><p>{isDungeon(state)?'Dungeon':'Arena'} regions: {(state.arenaRegions??state.regions).join(', ')} · {state.deathType}</p><p>Coverage chunks: {state.chunks?.join(', ')||'Whole regions'}</p>
+    {state.entranceRegions&&<p>Entrance area: {state.entranceDangerous===false?'Not dangerous · notify only in selected chunks':'Dangerous'} · Regions: {state.entranceRegions.join(', ')} · Notification chunks: {state.entranceNotifyChunks?.join(', ')||'Whole entrance area'}</p>}
     {!isDungeon(state)&&<p>Entrance: {state.entrance?`${state.entrance.objectType} · ${state.entrance.ids.join(', ')} · ${state.entrance.overlay} · direction ${state.entrance.direction||'default'} · plane ${state.entrance.plane||'default'} · chunks ${state.entrance.chunks.join(', ')||'none'}`:state.entranceRaw?'Special source settings':'None'}</p>}
     {state.entranceRaw&&!state.entrance&&<pre>{state.entranceRaw}</pre>}{state.extraSettings?.length>0&&<pre>{state.extraSettings.join('\n')}</pre>}
     {!!models.length&&<><h5>Entrance model references & variants</h5><div className="entrance-portraits">{models.map(id=><MoidThumbnail key={id} id={id}/>)}</div></>}

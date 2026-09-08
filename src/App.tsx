@@ -8,20 +8,23 @@ import ReviewQueue from './ReviewQueue';
 import PRComposer from './PRComposer';
 import { PR_API, prJSON, finishRedirect } from './pr-client';
 import { mergeDraft, defaultDraft } from './core/authoring.mjs';
+import { discardEncounter } from './core/draft-workspace.mjs';
 import Discovery from './Discovery';
 import { Crystal, Icon, type IconName } from './Icons';
 import {suggestedArenaRegions,encounterLocations} from './core/encounter.mjs';
-import { buildLibrary, encounterExclusion } from './core/library.mjs';
+import { createLibraryResolver, encounterExclusion } from './core/library.mjs';
 import { fetchBossCatalog } from './core/catalog.mjs';
 import { loadParser } from './parser';
-import { parseJava, enumName, generateEntry } from './core/java.mjs';
+import {generateEncounter} from './core/encounter-export.mjs';
+import { parseJava, enumName } from './core/java.mjs';
 import { importWiki, extractWiki, wikiTitle, wikiUrl } from './core/wiki.mjs';
 import { applyProposal, validateProposal, fullPatch, PLUGIN_REPO, JAVA_PATH } from './core/proposal.mjs';
 import type { Boss, Draft, Snapshot, EvidenceContexts, Location } from './types';
 
 const EMPTY:Snapshot={version:1,generatedAt:null,baseCommit:null,source:'',entries:[],candidates:[],warnings:[]};
 const STORAGE='escape-crystal-editor:v1';
-function draftOf(b:Boss):Draft {if(b.raw)return existingDraft(b);if(isDungeon(b))return defaultDraft({id:b.id,name:b.name,regionType:'DUNGEONS',regions:suggestedArenaRegions(b),deathType:b.deathType,baseRaw:null});return defaultDraft({id:b.id,name:b.name,regions:suggestedArenaRegions(b),entranceRegion:encounterLocations(b).entrance[0]?.region,entrancePlane:encounterLocations(b).entrance[0]?.plane??undefined,deathType:b.deathType,baseRaw:b.raw});}
+type WorkspaceRevision={drafts:Record<string,Draft>;evidenceContexts:EvidenceContexts};
+function draftOf(b:Boss):Draft {if(b.raw)return existingDraft(b);if(isDungeon(b))return defaultDraft({id:b.id,name:b.name,regionType:'DUNGEONS',regions:suggestedArenaRegions(b),deathType:b.deathType,baseRaw:null});return defaultDraft({entranceDangerous:null,id:b.id,name:b.name,regions:suggestedArenaRegions(b),entranceRegion:encounterLocations(b).entrance[0]?.region,entrancePlane:encounterLocations(b).entrance[0]?.plane??undefined,deathType:b.deathType,baseRaw:b.raw});}
 function saveFile(name:string,text:string,type='text/plain') { const url=URL.createObjectURL(new Blob([text],{type})); const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); }
 export default function App() {
   const editGuard=useRef<EditNavigationGuard>(null);
@@ -42,12 +45,13 @@ export default function App() {
   const [prIds,setPRIds]=useState<string[]|null>(null),[prEnabled,setPREnabled]=useState(false);
   const [evidenceContexts,setEvidenceContexts]=useState<EvidenceContexts>(()=>{try{return JSON.parse(localStorage.getItem('escape-crystal-evidence:v1')||'{}');}catch{return {};}});
   useEffect(()=>{try{localStorage.setItem('escape-crystal-evidence:v1',JSON.stringify(evidenceContexts));}catch{}},[evidenceContexts]);
-  useEffect(()=>{if(!PR_API)return;prJSON('/config').then(c=>setPREnabled(c.enabled)).catch(()=>{});finishRedirect().then(login=>{if(login){const ids=JSON.parse(sessionStorage.getItem('escape-crystal-pr-selection')||'[]');if(ids.length)setPRIds(ids);}}).catch(e=>setNotice(e.message));},[]);
+  useEffect(()=>{if(!PR_API)return;prJSON('/config').then(c=>{setPREnabled(c.enabled&&c.proposalVersion>=2);if(c.enabled&&!(c.proposalVersion>=2))setNotice('Update the PR backend to support entrance danger settings. Proposal downloads remain available.');}).catch(()=>{});finishRedirect().then(login=>{if(login){const ids=JSON.parse(sessionStorage.getItem('escape-crystal-pr-selection')||'[]');if(ids.length)setPRIds(ids);}}).catch(e=>setNotice(e.message));},[]);
   function openPR(ids:string[]){sessionStorage.setItem('escape-crystal-pr-selection',JSON.stringify(ids));setReview(false);setPRIds(ids);}
   function saveContext(kind:'arena'|'entrance',location:Location){if(!boss)return;setEvidenceContexts(previous=>JSON.stringify(previous[boss.id]?.[kind])===JSON.stringify(location)?previous:{...previous,[boss.id]:{...previous[boss.id],[kind]:location}});}
   const [importKind,setImportKind]=useState('BOSSES');
   const [input,setInput]=useState(''),[paste,setPaste]=useState('');
-  const [ready,setReady]=useState(false),[past,setPast]=useState<Record<string,Draft>[]>([]),[future,setFuture]=useState<Record<string,Draft>[]>([]);
+  const [ready,setReady]=useState(false),[past,setPast]=useState<WorkspaceRevision[]>([]),[future,setFuture]=useState<WorkspaceRevision[]>([]);
+  const [editorRevision,setEditorRevision]=useState(0);
   useEffect(()=>{
     if(!modal&&!review&&!help&&!prIds)return;
     const previous=document.activeElement as HTMLElement|null;
@@ -70,7 +74,8 @@ export default function App() {
     }catch(e){setNotice(`Could not load saved data: ${(e as Error).message}`);}finally{setReady(true);}
   })();},[]);
   useEffect(()=>{if(!ready)return;try{localStorage.setItem(STORAGE,JSON.stringify({version:1,drafts,imports,snapshot}));}catch{setNotice('Browser storage is full or unavailable. Download your proposal before leaving.');}},[drafts,imports,snapshot,ready]);
-  const bosses=useMemo(()=>buildLibrary([...snapshot.candidates,...(snapshot.dungeons??[])],imports,snapshot.entries,drafts) as Boss[],[snapshot,imports,drafts]);
+  const resolveLibrary=useMemo(()=>createLibraryResolver([...snapshot.candidates,...(snapshot.dungeons??[])],imports,snapshot.entries),[snapshot.candidates,snapshot.dungeons,snapshot.entries,imports]);
+  const bosses=useMemo(()=>resolveLibrary(drafts) as Boss[],[resolveLibrary,drafts]);
   const boss=bosses.find(b=>b.id===active)??bosses[0];
   const draft=useMemo(()=>boss?(drafts[boss.id]??draftOf(boss)):null,[boss,drafts]);
   const supported=(b:Boss)=>!!b.raw||!!b.supportedBy?.length;
@@ -78,15 +83,23 @@ export default function App() {
   const categories=[...new Set(bosses.flatMap(b=>b.categories??[]))].sort();
   const filtered=bosses.filter(b=>(filter==='drafts'||category!=='all'||(!isDungeon(b)&&!b.categories?.some(c=>/quest|event/i.test(c))))&&b.name.toLowerCase().includes(search.toLowerCase())&&(category==='all'||b.categories?.includes(category))&&(filter==='all'||filter==='supported'&&supported(b)||filter==='new'&&!supported(b)||filter==='drafts'&&drafts[b.id]||filter==='unresolved'&&!b.maps.length&&!b.raw));
   const changes=Object.values(drafts).filter(d=>!encounterExclusion(d)), conflicts=changes.filter(c=>(snapshot.entries.find(b=>b.id===c.id)?.raw??null)!==c.baseRaw);
-  function commit(next:Record<string,Draft>) {setPast(p=>[...p.slice(-49),drafts]);setFuture([]);setDrafts(next);}
+  function workspace():WorkspaceRevision{return {drafts,evidenceContexts};}
+  function restore(next:WorkspaceRevision){
+    setDrafts(next.drafts);setEvidenceContexts(next.evidenceContexts);
+    // Drop mounted map controls' manual selections along with the saved state.
+    setEditorRevision(value=>value+1);
+    if(boss&&!next.drafts[boss.id]&&!boss.raw)setStep('setup');
+  }
+  function commit(next:Record<string,Draft>,contexts=evidenceContexts) {setPast(p=>[...p.slice(-49),workspace()]);setFuture([]);setDrafts(next);setEvidenceContexts(contexts);}
   function applyEdit(nextDraft:Draft,context:EvidenceContexts[string]) {
     const next={...drafts};
     if(changedSections(nextDraft).length)next[nextDraft.id]=nextDraft;else delete next[nextDraft.id];
-    if(JSON.stringify(next)!==JSON.stringify(drafts))commit(next);
-    setEvidenceContexts(previous=>({...previous,[nextDraft.id]:context}));
+    const contexts={...evidenceContexts,[nextDraft.id]:context};
+    if(JSON.stringify(next)!==JSON.stringify(drafts)||JSON.stringify(contexts)!==JSON.stringify(evidenceContexts))commit(next,contexts);
   }
-  function deleteDraft(id:string){const next={...drafts};delete next[id];commit(next);}
-  function undo(){if(!past.length)return;setFuture(f=>[drafts,...f]);setDrafts(past.at(-1)!);setPast(p=>p.slice(0,-1));}
+  function deleteDraft(id:string){const next=discardEncounter(workspace(),id);commit(next.drafts,next.evidenceContexts);restore(next);}
+  function undo(){if(!past.length)return;setFuture(f=>[workspace(),...f]);restore(past.at(-1)!);setPast(p=>p.slice(0,-1));}
+  function redo(){if(!future.length)return;setPast(p=>[...p.slice(-49),workspace()]);restore(future[0]);setFuture(f=>f.slice(1));}
   function update(partial:Partial<Draft>) {if(!draft||!boss)return;if(boss.raw&&!['BOSSES','DUNGEONS'].includes(boss.regionType??'')){setNotice('This entry belongs to another plugin category and is read-only here.');return;}if(!boss.raw&&boss.supportedBy?.length){setNotice('This encounter is already covered by a grouped entry. Open that entry to edit coverage.');return;}commit({...drafts,[boss.id]:mergeDraft(draft,partial)});}
   function select(b:Boss) {setView('editor');setActive(b.id);setStep(isDungeon(b)?'coverage':'setup');window.scrollTo({top:0});if(!b.raw&&!b.maps.length&&!b.locationsLoaded&&!busy)void loadLocations(b);}
   function openImport(){setImportKind(category==='Dungeons'?'DUNGEONS':'BOSSES');setInput('');setPaste('');setModal(true);}
@@ -116,15 +129,17 @@ export default function App() {
     const next:Boss={id:existing?.id??enumName(result.title,importKind),regionType:importKind,categories:existing?.categories??(importKind==='DUNGEONS'?['Dungeons']:[]),name:result.title,wikiTitle:result.title,regions:[],raw:null,deathType:'',optionalArgs:[],...result};
     setImports(v=>[...v.filter(b=>b.id!==next.id),next]);setActive(next.id);setStep(isDungeon(next)?'coverage':'setup');setView('editor');setModal(false);setNotice(`Imported ${next.maps.length} map suggestions. ${isDungeon(next)?'Select the dungeon regions to include.':'Review entrance and arena locations separately.'}`);
   });}
-  function proposal(ids?:string[]){const selected=ids?changes.filter(c=>ids.includes(c.id)):changes;const p={version:1,repository:PLUGIN_REPO,baseCommit:snapshot.baseCommit,changes:selected};validateProposal(p);if(conflicts.some(c=>selected.some(d=>d.id===c.id)))throw new Error('Resolve upstream conflicts before exporting.');return p;}
+  function proposal(ids?:string[]){const selected=ids?changes.filter(c=>ids.includes(c.id)):changes;const p={version:2,repository:PLUGIN_REPO,baseCommit:snapshot.baseCommit,changes:selected};validateProposal(p);if(conflicts.some(c=>selected.some(d=>d.id===c.id)))throw new Error('Resolve upstream conflicts before exporting.');return p;}
   function exportData(kind:string,ids?:string[]){try{
     const p=proposal(ids),after=applyProposal(snapshot.source,p);
     if(kind==='json'){saveFile('escape-crystal-proposal.json',JSON.stringify(p,null,2),'application/json');setNotice(`Proposal downloaded with ${p.changes.length} encounter${p.changes.length===1?'':'s'}.`);}
     if(kind==='patch'){saveFile('escape-crystal.patch',fullPatch(snapshot.source,after),'text/x-diff');setNotice('Patch downloaded.');}
     if(kind==='copy')navigator.clipboard.writeText(JSON.stringify(p)).then(()=>setNotice('Proposal copied. Paste it into the plugin workflow.')).catch(()=>setNotice('Clipboard unavailable; download the JSON proposal instead.'));
   }catch(e){setNotice((e as Error).message);}}
-  let preview='';
-  try {preview=draft&&boss?generateEntry(draft,boss.raw?boss:null)+',':'';} catch(e) {preview=(e as Error).message;}
+  const preview=useMemo(()=>{
+    if(view!=='editor'||!['coverage','review'].includes(step))return '';
+    try{return draft&&boss?generateEncounter(draft,boss.raw?boss:null)+',':'';}catch(e){return (e as Error).message;}
+  },[view,step,draft,boss]);
   return <div className={`app-shell ${view==='editor'?'authoring-view':''}`} onClickCapture={event=>{
     const target=(event.target as HTMLElement).closest<HTMLElement>('button,a,summary');
     if(editGuard.current&&target?.closest('.topbar,.sidebar')){
@@ -140,7 +155,7 @@ export default function App() {
     {notice&&<div className="notice" role="status">{notice.message}<button aria-label="Dismiss message" onClick={()=>setNotice('')}>×</button></div>}
     {busy&&<div className="busy" role="status">{busy}…</div>}
     <main inert={modal||review||help||!!prIds} id="main-content" tabIndex={-1} className={`workspace ${view==='discover'?'discovery-workspace':'editor-workspace'}`}>
-      {view==='discover'?<Discovery bosses={filtered} onSelect={select} drafts={drafts} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} category={category} setCategory={setCategory} categories={categories} onImport={openImport} total={bosses.length} unsupported={unsupportedCount} supportedCount={bosses.length-unsupportedCount} ready={ready}/>:boss&&draft&&(draft.baseRaw||boss.raw)&&['BOSSES','DUNGEONS'].includes(boss.regionType??'BOSSES')?<EncounterEditor key={boss.id} boss={boss} draft={draft} snapshot={snapshot} saved={!!drafts[boss.id]} busy={busy} onApply={applyEdit} context={evidenceContexts[boss.id]??{}} onBack={()=>{setView('discover');window.scrollTo({top:0});}} onDiscard={()=>deleteDraft(boss.id)} canUndo={!!past.length} canRedo={!!future.length} onUndo={undo} onRedo={()=>{setPast(p=>[...p,drafts]);setDrafts(future[0]);setFuture(f=>f.slice(1));}} onLoad={()=>loadLocations()} onError={setNotice} onCreatePR={prEnabled?openPR:undefined} onExport={exportData} registerGuard={registerEditGuard}/>:boss&&draft?<Authoring key={boss.id} boss={boss} draft={draft} snapshot={snapshot} saved={!!drafts[boss.id]} busy={busy} step={step} setStep={setStep} update={update} onLoad={()=>loadLocations()} onError={setNotice} onBack={()=>{setView('discover');window.scrollTo({top:0});}} onDiscard={()=>deleteDraft(boss.id)} canUndo={!!past.length} canRedo={!!future.length} onUndo={undo} onRedo={()=>{setPast(p=>[...p,drafts]);setDrafts(future[0]);setFuture(f=>f.slice(1));}} preview={preview} onCreatePR={prEnabled?openPR:undefined} evidenceContext={evidenceContexts[boss.id]} onEvidenceContext={saveContext} onEntranceImage={id=>setEvidenceContexts(previous=>({...previous,[boss.id]:{...previous[boss.id],entranceImage:id}}))} onExport={exportData} bosses={bosses} onSelect={select}/>:<p className="empty">Loading encounter…</p>}
+      {view==='discover'?<Discovery bosses={filtered} onSelect={select} drafts={drafts} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} category={category} setCategory={setCategory} categories={categories} onImport={openImport} total={bosses.length} unsupported={unsupportedCount} supportedCount={bosses.length-unsupportedCount} ready={ready}/>:boss&&draft&&(draft.baseRaw||boss.raw)&&['BOSSES','DUNGEONS'].includes(boss.regionType??'BOSSES')?<EncounterEditor key={`${boss.id}:${editorRevision}`} boss={boss} draft={draft} snapshot={snapshot} saved={!!drafts[boss.id]} busy={busy} onApply={applyEdit} context={evidenceContexts[boss.id]??{}} onBack={()=>{setView('discover');window.scrollTo({top:0});}} onDiscard={()=>deleteDraft(boss.id)} canUndo={!!past.length} canRedo={!!future.length} onUndo={undo} onRedo={redo} onLoad={()=>loadLocations()} onError={setNotice} onCreatePR={prEnabled?openPR:undefined} onExport={exportData} registerGuard={registerEditGuard}/>:boss&&draft?<Authoring key={`${boss.id}:${editorRevision}`} boss={boss} draft={draft} snapshot={snapshot} saved={!!drafts[boss.id]} busy={busy} step={step} setStep={setStep} update={update} onLoad={()=>loadLocations()} onError={setNotice} onBack={()=>{setView('discover');window.scrollTo({top:0});}} onDiscard={()=>deleteDraft(boss.id)} canUndo={!!past.length} canRedo={!!future.length} onUndo={undo} onRedo={redo} preview={preview} onCreatePR={prEnabled?openPR:undefined} evidenceContext={evidenceContexts[boss.id]} onEvidenceContext={saveContext} onEntranceImage={id=>setEvidenceContexts(previous=>({...previous,[boss.id]:{...previous[boss.id],entranceImage:id}}))} onExport={exportData} bosses={bosses} onSelect={select}/>:<p className="empty">Loading encounter…</p>}
     </main>
     {help&&<div className="modal-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="help-title" className="modal"><button className="close" onClick={()=>setHelp(false)} aria-label="Close guide">×</button><div className="eyebrow">THE CONTRIBUTOR’S FIELD GUIDE</div><h2 id="help-title">Give an encounter an escape plan.</h2><div className="guide-step"><Icon name="compass"/><div><h3>Find a boss</h3><p>Choose an encounter that needs coverage, or import a page from the OSRS Wiki.</p></div></div><div className="guide-step"><Icon name="map"/><div><h3>Check the map</h3><p>Load wiki locations. Select the arena’s regions and configure the entrance if needed. Confirm the coordinates and death behavior in game.</p></div></div><div className="guide-step"><Icon name="check"/><div><h3>Review and share</h3><p>Check your settings, then use Review changes to download a patch or proposal for the maintainer.</p></div></div><p className="guide-note">Drafts stay in this browser. Export a proposal to keep a portable copy. Nothing is submitted automatically.</p><button className="primary wide" onClick={()=>{setHelp(false);navigateLibrary();}}>Find an encounter <Icon name="arrow" size={16}/></button></section></div>}
     {modal&&<div className="modal-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="import-title" className="modal"><button className="close" onClick={()=>setModal(false)} aria-label="Close import">×</button><div className="eyebrow">ADD CONTENT</div><h2 id="import-title">Start with a wiki page</h2><p>Import a boss or dungeon from the OSRS Wiki.</p><label className="field">Encounter type<select value={importKind} onChange={e=>setImportKind(e.target.value)}><option value="BOSSES">Boss</option><option value="DUNGEONS">Dungeon · regions and chunks only</option></select></label><label className="field">Wiki title or URL<input autoFocus value={input} onChange={e=>setInput(e.target.value)} placeholder="Shellbane gryphon"/></label><details><summary>Paste wikitext instead</summary><p className="muted">Use the wiki’s source editor if browser requests are blocked.</p><textarea aria-label="Wikitext" rows={8} value={paste} onChange={e=>setPaste(e.target.value)} placeholder="{{Map|x=3179|y=8876}}"/></details><button className="primary wide" disabled={!!busy||!input.trim()} onClick={doImport}>{busy||'Import locations →'}</button></section></div>}

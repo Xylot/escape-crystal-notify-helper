@@ -10,6 +10,11 @@ export function encounterExclusion(boss){
   return [boss.name,boss.wikiTitle,boss.id?.replace(/^BOSS_/,'')].filter(Boolean).map(name=>EXCLUDED_ENCOUNTERS.get(bossKey(name))).find(Boolean)??null;
 }
 export function buildLibrary(candidates,imports,entries,drafts){
+  return createLibraryResolver(candidates,imports,entries)(drafts);
+}
+
+// Support matching depends on source/catalog data, not on authoring controls.
+export function createLibraryResolver(candidates,imports,entries){
   const input=new Map(candidates.map(b=>[b.id,b]));
   imports.forEach(b=>input.set(b.id,{...input.get(b.id),...b}));
   const merged=new Map();
@@ -20,6 +25,20 @@ export function buildLibrary(candidates,imports,entries,drafts){
     merged.set(row.id,row);
   }
   for(const entry of entries.filter(e=>['BOSSES','DUNGEONS'].includes(e.regionType)))if(!merged.has(entry.id))merged.set(entry.id,{...entry,maps:[],links:[],warnings:[],wikiTitle:DUNGEON_ALIASES[entry.id]??entry.wikiTitle??entry.name,...(isDungeon(entry)?{categories:['Dungeons']}:{}),supportedBy:[{id:entry.id,name:entry.name}],supportKnown:true});
+  const catalog=merged;
+  const entrances=new Map(entries.filter(e=>e.regionType==='BOSSES'&&e.optionalArgs?.some(a=>a.includes('EscapeCrystalNotifyRegionEntrance('))).map(e=>[e.id,e]));
+  return drafts=>{
+  const merged=new Map(catalog);
   for(const draft of Object.values(drafts))if(!merged.has(draft.id))merged.set(draft.id,{...draft,raw:draft.baseRaw,optionalArgs:[],maps:[],links:[],warnings:['Not present in the current catalog. Review source changes.'],wikiTitle:draft.name,...(isDungeon(draft)?{categories:['Dungeons']}:{}),supportedBy:[],supportKnown:entries.length>0});
-  return [...merged.values()].filter(b=>!encounterExclusion(b)).sort((a,b)=>a.name.localeCompare(b.name));
+  const pairedIds=new Set();
+  for(const boss of merged.values()) {
+    if(!boss.id.startsWith('BOSS_')||boss.id.endsWith('_ENTRANCE'))continue;
+    const entrance=entrances.get(`${boss.id}_ENTRANCE`);
+    // Keep independently saved legacy entrance drafts reachable until exported or discarded.
+    if(entrance&&boss.raw&&!drafts[entrance.id]&&(!drafts[boss.id]||drafts[boss.id].entranceBaseRaw!==undefined)) {
+      merged.set(boss.id,{...boss,entranceEntry:entrance});pairedIds.add(entrance.id);
+    }
+  }
+  return [...merged.values()].filter(b=>!pairedIds.has(b.id)&&!encounterExclusion(b)).sort((a,b)=>a.name.localeCompare(b.name));
+  };
 }

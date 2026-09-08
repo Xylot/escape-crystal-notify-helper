@@ -35,7 +35,7 @@ export function encounterLocations(boss){
   const score=m=>(m.role==='arena'?100:0)+words.filter(w=>m.title.toLowerCase().includes(w)).length*20+(/cave|lair|chamber|dungeon/i.test(m.title)?15:0);
   const arena=dedupe(boss.maps.filter(m=>m.role!=='entrance')).sort((a,b)=>score(b)-score(a));
   const pluginLocation=(x,y,role)=>({x,y,region:regionId(x,y),plane:null,mapId:null,role,caption:'Current plugin coverage',source:'https://github.com/Xylot/escape-crystal-notify',title:'Plugin source',revision:null,verified:false});
-  if(!entrance.length)for(const id of originalEntranceChunks(boss.optionalArgs)){
+  if(!entrance.length)for(const id of originalEntranceChunks(boss.entranceEntry?.optionalArgs??boss.optionalArgs)){
     const p=chunkOrigin(id),next=pluginLocation(p.x+4,p.y+4,'entrance');
     if(!entrance.some(l=>sameLocation(l,next)))entrance.push(next);
   }

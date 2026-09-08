@@ -120,11 +120,11 @@ export function exportCoverage(change, existing = null) {
 }
 
 /** @param {any} change @param {any} existing */
-export function generateEntry(change, existing = null) {
+export function generateEntry(change, existing = null, exactCoverage = null) {
   const type=encounterType(change);
   if(!['BOSSES','DUNGEONS'].includes(type))throw new Error('Unsupported encounter category.');
   if(isDungeon(change)&&(change.entrance||change.entranceOverlay))throw new Error('Dungeons do not have entrance settings.');
-  const coverage = exportCoverage(change, existing);
+  const coverage = exactCoverage ?? exportCoverage(change, existing);
   let optional = existing ? [...existing.optionalArgs] : [];
   if (!change.entrance && change.entranceOverlay) {
     if (!['PRIORITIZED_WITH_HIGHLIGHT','DEPRIORITIZED_WITH_HIGHLIGHT'].includes(change.entranceOverlay)) throw new Error('Unsupported entrance priority.');

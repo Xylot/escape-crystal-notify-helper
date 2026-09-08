@@ -1,15 +1,17 @@
-import { parseJava, generateEntry, exportCoverage } from './java.mjs';
+import { parseJava, exportCoverage } from './java.mjs';
 import { integer, chunkOrigin, regionId } from './coordinates.mjs';
 import { validateEntrance, OVERLAYS } from './entrance.mjs';
 import { encounterType } from './encounter-kind.mjs';
+import {expandEncounter, hasEntrancePolicy, sourceEntry} from './encounter-export.mjs';
 export const PLUGIN_REPO = 'Xylot/escape-crystal-notify';
 export const JAVA_PATH = 'src/main/java/com/escapecrystalnotify/EscapeCrystalNotifyRegion.java';
 export function validateProposal(proposal) {
-  if (!proposal || proposal.version !== 1 || proposal.repository !== PLUGIN_REPO) throw new Error('Unsupported proposal format or target repository.');
+  if (!proposal || ![1,2].includes(proposal.version) || proposal.repository !== PLUGIN_REPO) throw new Error('Unsupported proposal format or target repository.');
   if (!/^[a-f0-9]{40}$/.test(proposal.baseCommit)) throw new Error('Refresh plugin data before exporting: a verified source commit is required.');
   if (!Array.isArray(proposal.changes) || !proposal.changes.length || proposal.changes.length > 100) throw new Error('Proposal must contain 1–100 changes.');
   const ids = new Set();
   for (const c of proposal.changes) {
+    if(proposal.version===1&&hasEntrancePolicy(c))throw new Error('Entrance danger settings require proposal version 2.');
     const type=encounterType(c);
     if (!['BOSSES','DUNGEONS'].includes(type)||!(type==='DUNGEONS'?/^DUNGEON_[A-Z0-9_]+$/:/^BOSS_[A-Z0-9_]+$/).test(c.id) || ids.has(c.id)) throw new Error('Invalid or duplicate enum identifier or category.');
     if(type==='DUNGEONS'&&(c.entrance!==undefined||c.entranceOverlay!==undefined))throw new Error('Dungeons do not have entrance settings.');
@@ -27,7 +29,7 @@ export function validateProposal(proposal) {
       c.chunks.forEach(n=>integer(n,0,4194303,'Chunk ID'));
       if(c.chunks.some(n=>{const p=chunkOrigin(n);return !c.regions.includes(regionId(p.x,p.y));}))throw new Error('Each region-restriction chunk must lie inside a selected region.');
     }
-    exportCoverage(c);
+    if(hasEntrancePolicy(c))expandEncounter(c);else exportCoverage(c);
   }
   return proposal;
 }
@@ -35,6 +37,7 @@ export function applyProposal(source, proposal) {
   validateProposal(proposal);
   const parsed = parseJava(source), edits = [], additions = [];
   const availableDeaths = new Set(parsed.entries.map(e => e.deathType));
+  const targets=new Set();
   for (const c of proposal.changes) {
     if (!availableDeaths.has(c.deathType)) throw new Error(`Death classification ${c.deathType} is not present in current source.`);
     const existing = parsed.entries.find(e => e.id === c.id);
@@ -42,9 +45,16 @@ export function applyProposal(source, proposal) {
     if (existing && existing.regionType !== encounterType(c)) throw new Error('An existing encounter cannot change category.');
     if ((c.entrance || c.chunks !== undefined) && existing?.optionalArgs.some(a=>a.includes('Quest.'))) throw new Error('Quest-gated entrance or chunk edits require manual Java review.');
     // Optional arguments are always read from trusted current source, never proposal text.
-    const entry = generateEntry({ ...c, regions: [...c.regions].sort((a,b) => a-b) }, existing);
-    if (existing) edits.push({ start: existing.start, end: existing.end, text: entry });
-    else additions.push(entry);
+    const paired=parsed.entries.find(e=>e.id===`${c.id}_ENTRANCE`);
+    if(c.entranceBaseRaw!==undefined&&(paired?.raw??null)!==c.entranceBaseRaw)throw new Error(`Conflict: ${c.id}_ENTRANCE changed upstream. Refresh and review both entries.`);
+    for(const entry of expandEncounter(c,existing??null,c.entranceBaseRaw?paired:null)) {
+      if(targets.has(entry.id))throw new Error(`Duplicate generated enum identifier: ${entry.id}. Select the encounter only once.`);
+      targets.add(entry.id);
+      const original=parsed.entries.find(e=>e.id===entry.id);
+      if((original?.raw??null)!==entry.baseRaw)throw new Error(`Conflict: ${entry.id} changed upstream or already exists. Refresh both encounter entries.`);
+      if(original)edits.push({start:original.start,end:original.end,text:entry.raw});
+      else additions.push(entry.raw);
+    }
   }
   const eol = source.includes('\r\n') ? '\r\n' : '\n';
   if (additions.length) edits.push({ start: parsed.insertAt, end: parsed.insertAt, text: additions.join(`,${eol}    `) + `,${eol}    ` });
@@ -53,9 +63,9 @@ export function applyProposal(source, proposal) {
   parseJava(result); return result;
 }
 export function overlapWarnings(changes, entries) {
-  const covered = changes.map(c => {
-    try { return {...c, regions: exportCoverage(c, entries.find(e => e.id === c.id)).regions}; }
-    catch { return c; } // Incomplete drafts show their export validation error separately.
+  const covered = changes.flatMap(c => {
+    try { return expandEncounter(c,entries.find(e=>e.id===c.id)).map(e=>sourceEntry(e.raw)); }
+    catch { return [c]; } // Incomplete drafts show their export validation error separately.
   });
   const final = new Map(entries.map(e => [e.id, e]));
   covered.forEach(c => final.set(c.id, c));

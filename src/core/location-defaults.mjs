@@ -16,11 +16,18 @@ export function hasAreaSelection(boss, draft, entrance) {
   return entrance ? draft.entranceRegion!==undefined || !!draft.entrance || boss.optionalArgs.some(a=>a.includes('RegionEntrance(')) : draft.regions.length>0 || !!draft.chunks?.length;
 }
 
+export function entranceNotificationDefault(boss, draft, fallback) {
+  if (!fallback || draft.entranceNotifyChunks !== undefined || draft.entrance?.ids?.length) return null;
+  const args = [...(boss.optionalArgs ?? []), ...(boss.entranceEntry?.optionalArgs ?? [])];
+  if (args.some(arg => arg.includes('RegionEntrance('))) return null;
+  if (draft.entranceRegion !== undefined && !fallback.coverage.regions.includes(draft.entranceRegion)) return null;
+  return locationAreaChange(boss, draft, fallback.location, true, fallback.coverage);
+}
+
 export function locationAreaChange(boss, draft, location, entrance, coverage) {
   if(!entrance)return coverage?{regions:[...coverage.regions],chunks:[...coverage.chunks]}:null;
+  if(location.notificationChunks)coverage={regions:[location.region],chunks:location.notificationChunks};
   const change={entranceRegion:coverage&&!coverage.regions.includes(location.region)?coverage.regions[0]:location.region,entrancePlane:location.plane??0};
   if(!coverage)return change;
-  if(!draft.entrance&&boss.optionalArgs.some(a=>a.includes('RegionEntrance(')))return change;
-  if(!coverage.chunks.length&&!draft.entrance)return change;
-  return {...change,entrance:{overlay:draft.entranceOverlay??'DEPRIORITIZED_WITH_HIGHLIGHT',direction:'',plane:'',objectType:'GAME_OBJECT',ids:[],...draft.entrance,chunks:[...coverage.chunks]}};
+  return {...change,entranceNotifyChunks:[...coverage.chunks]};
 }

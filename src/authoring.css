@@ -2093,6 +2093,9 @@ button,input:not([type=checkbox]),select,summary {
 .authoring-view .authoring-steps button { min-height:52px; padding:8px 12px; }
 .authoring-view .authoring-steps small { display:none; }
 .authoring-stage { flex:1; min-height:0; min-width:0; overflow:auto; position:relative; overscroll-behavior:contain; scrollbar-gutter:stable; padding:4px; }
+/* Suggestions are a scrolling list, rather than a viewport-filling map. */
+.authoring-view .authoring-stage:has(> .choosing-entrance-map) { display:block; overflow-y:auto; overflow-x:hidden; }
+.authoring-view .choosing-entrance-map > .authoring-map { display:block; min-height:auto; }
 .authoring-view .authoring-footer { position:static; flex-shrink:0; margin:12px -24px 0; padding:10px 24px; box-shadow:none; }
 .authoring-view .authoring-sources { position:absolute; inset:4px 4px auto auto; width:min(740px,100%); max-height:calc(100% - 8px); overflow:auto; z-index:700; background:white; box-shadow:0 8px 32px #26324425; }
 .authoring-view .authoring-sources .inspector-panel { grid-template-columns:1fr; }

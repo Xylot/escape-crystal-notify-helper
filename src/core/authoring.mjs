@@ -6,7 +6,7 @@ export function defaultDraft(draft) {
 }
 
 export function entranceOverlay(draft) {
-  return draft.entrance?.overlay ?? draft.entranceOverlay ?? draft.baseRaw?.match(/EscapeCrystalNotifyRegionEntranceOverlayType\.(PRIORITIZED_WITH_HIGHLIGHT|DEPRIORITIZED_WITH_HIGHLIGHT)/)?.[1] ?? 'DEPRIORITIZED_WITH_HIGHLIGHT';
+  return draft.entrance?.overlay ?? draft.entranceOverlay ?? (draft.entranceBaseRaw??draft.baseRaw)?.match(/EscapeCrystalNotifyRegionEntranceOverlayType\.(PRIORITIZED_WITH_HIGHLIGHT|DEPRIORITIZED_WITH_HIGHLIGHT)/)?.[1] ?? 'DEPRIORITIZED_WITH_HIGHLIGHT';
 }
 
 // Keep chunk restrictions within the selected coverage.
@@ -14,6 +14,8 @@ export function mergeDraft(draft, change) {
   const next = { ...draft, ...change };
   if ('entranceOverlay' in change && next.entrance) next.entrance = {...next.entrance, overlay: change.entranceOverlay};
   if (change.entrance) next.entranceOverlay = change.entrance.overlay;
+  if(change.entrance&&change.entranceDangerous===undefined&&draft.entranceDangerous===undefined&&!draft.entrance&&!draft.entranceBaseRaw&&!draft.baseRaw?.includes('EscapeCrystalNotifyRegionEntrance('))next.entranceDangerous=null;
+  if(change.entranceDangerous===false&&next.entranceNotifyChunks===undefined)next.entranceNotifyChunks=[...(next.entrance?.chunks??[])];
   if ('regions' in change && !('chunks' in change) && next.chunks) {
     next.chunks = next.chunks.filter(id => {
       if (!Number.isInteger(id) || id < 0 || id > 4194303) return false;
@@ -29,7 +31,7 @@ export function exportProblem(snapshot, changes) {
   if (!changes.length) return 'Choose at least one draft to export.';
   try {
     applyProposal(snapshot.source, {
-      version: 1, repository: PLUGIN_REPO, baseCommit: snapshot.baseCommit, changes,
+      version: 2, repository: PLUGIN_REPO, baseCommit: snapshot.baseCommit, changes,
     });
     return '';
   } catch (error) {

@@ -2,8 +2,27 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import Parser from 'wikiparser-node';
 import {extractBossCatalog,reconcileCatalog,supportFor} from '../src/core/catalog.mjs';
-import {buildLibrary,encounterExclusion} from '../src/core/library.mjs';
+import {buildLibrary,createLibraryResolver,encounterExclusion} from '../src/core/library.mjs';
 const page=text=>({text,title:'Boss',revision:123});
+
+test('cached catalog matching preserves draft pairing behavior without rebuilding unchanged bosses',()=>{
+  const candidates=[{id:'BOSS_TEST',name:'Test',wikiTitle:'Test',maps:[]},{id:'BOSS_NEW',name:'New',wikiTitle:'New',maps:[]}];
+  const entries=[{id:'BOSS_TEST',name:'Test',regionType:'BOSSES',raw:'boss source',optionalArgs:[]},
+    {id:'BOSS_TEST_ENTRANCE',name:'Test entrance',regionType:'BOSSES',raw:'entrance source',optionalArgs:['new EscapeCrystalNotifyRegionEntrance(...)']}];
+  const resolve=createLibraryResolver(candidates,[],entries);
+  const original=resolve({});
+  const newBoss=original.find(b=>b.id==='BOSS_NEW');
+  for(const drafts of [{BOSS_NEW:{id:'BOSS_NEW',name:'New',entranceDangerous:true}},
+    {BOSS_NEW:{id:'BOSS_NEW',name:'New',entranceDangerous:false}},
+    {BOSS_TEST_ENTRANCE:{id:'BOSS_TEST_ENTRANCE',name:'Test entrance'}},
+    {BOSS_TEST:{id:'BOSS_TEST',name:'Test',baseRaw:'boss source'}},{}]){
+    const actual=resolve(drafts);
+    assert.deepEqual(actual,buildLibrary(candidates,[],entries,drafts));
+    assert.equal(actual.find(b=>b.id==='BOSS_NEW'),newBoss);
+  }
+  assert.ok(original.find(b=>b.id==='BOSS_TEST').entranceEntry);
+  assert.equal(entries[0].entranceEntry,undefined);
+});
 test('unneeded encounters stay excluded across catalog refreshes, imports, entries and saved drafts',()=>{
   const names=['Callisto','Chaos Elemental','Chaos Fanatic','Scorpia','Venenatis',"Vet'ion",'Revenant maledictus','Gemstone Crab','Tempoross',"Phosani's Nightmare"];
   const excluded=names.map((name,i)=>({id:`TEST_${i}`,name,wikiTitle:name,regionType:'BOSSES'}));

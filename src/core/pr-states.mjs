@@ -1,5 +1,5 @@
-import {baselineEntry, editingBaseline} from './editing.mjs';
-import {generateEntry} from './java.mjs';
+import {editingBaseline} from './editing.mjs';
+import {expandEncounter, hasEntrancePolicy, encounterCoverage} from './encounter-export.mjs';
 import {originalEntranceChunks} from './encounter.mjs';
 import {regionOrigin} from './coordinates.mjs';
 import {evidencePlan, regionGroups} from './pr-evidence.mjs';
@@ -16,11 +16,28 @@ export function reviewState(raw) {
 export function proposalStates(changes) {
   return Object.fromEntries(changes.map(change=>{
     let before=null;
-    try {before=change.baseRaw?reviewState(change.baseRaw):null;}
+    try {before=change.baseRaw?combinedState([change.baseRaw,...(change.entranceBaseRaw?[change.entranceBaseRaw]:[])]):null;}
     catch {throw new Error(`Conflict: ${change.id} has an invalid original entry. Refresh the plugin source.`);}
-    const after=reviewState(generateEntry(change,change.baseRaw?baselineEntry(change.baseRaw):null));
+    const after=combinedState(expandEncounter(change).map(e=>e.raw));
+    if(hasEntrancePolicy(change)&&after.entranceRaw) {
+      after.arenaRegions=[...change.regions];
+      after.entranceDangerous=change.entranceDangerous;
+      after.entranceRegions=encounterCoverage(change).entranceRegions;
+      after.entranceNotifyChunks=change.entranceNotifyChunks??after.entranceNotifyChunks??[];
+    }
     return [change.id,{before,after}];
   }));
+}
+
+function combinedState(raws) {
+  const state=reviewState(raws[0]);
+  if(raws.length>1) {
+    const entranceEntry=reviewState(raws[1]);
+    Object.assign(state,{entranceEntry,entrance:entranceEntry.entrance,entranceRaw:entranceEntry.entranceRaw,
+      entranceChunks:entranceEntry.entranceChunks,entranceRegions:entranceEntry.regions,
+      entranceNotifyChunks:entranceEntry.chunks,entranceDangerous:!entranceEntry.chunks.length});
+  }
+  return state;
 }
 
 export function stateDifferences(before,after) {
@@ -31,6 +48,9 @@ export function stateDifferences(before,after) {
   scalar('Death classification',before.deathType,after.deathType);
   list('Regions',before.regions,after.regions);
   list('Coverage chunks',before.chunks,after.chunks);
+  list('Entrance regions',before.entranceRegions,after.entranceRegions);
+  list('Entrance notification chunks',before.entranceNotifyChunks,after.entranceNotifyChunks);
+  scalar('Entrance area dangerous',before.entranceDangerous,after.entranceDangerous);
   scalar('Coverage mode',before.chunks.length?'Selected chunks':'Whole regions',after.chunks.length?'Selected chunks':'Whole regions');
   if((before.entrance||!before.entranceRaw)&&(after.entrance||!after.entranceRaw)) {
     scalar('Entrance',before.entrance?'Configured':null,after.entrance?'Configured':null);
@@ -50,21 +70,27 @@ export function comparisonEvidence(changes,states,contexts,sources) {
     for(const phase of pair.before?['before','after']:['after']) {
       const state=pair[phase];
       const arena=supplied.arena;
-      const fallback=regionOrigin(state.regions[0]);
-      const entrance=supplied.entrance??{...arena,x:fallback.x+32,y:fallback.y+32,region:state.regions[0]};
+      const entranceRegion=state.entranceRegions?.[0]??state.regions[0];
+      const fallback=regionOrigin(entranceRegion);
+      const entrance=supplied.entrance??{...arena,x:fallback.x+32,y:fallback.y+32,region:entranceRegion};
       const plane={GROUND:0,FIRST_FLOOR:1,SECOND_FLOOR:2}[state.entrance?.plane];
       const entranceContext={...entrance,...(plane===undefined?{}:{plane})};
-      const c={...state,entrance:state.entranceRaw?{chunks:state.entranceChunks}:undefined};
-      const plan=evidencePlan([pair.before?c:change],{[c.id]:{arena,entrance:entranceContext}},sources);
+      const c={...state,regions:state.arenaRegions??state.regions,entrance:state.entranceRaw?{chunks:state.entranceChunks}:undefined};
+      const plan=evidencePlan([pair.before||hasEntrancePolicy(change)?c:change],{[c.id]:{arena,entrance:entranceContext}},sources);
       // Unrestricted entrance detection applies throughout the entry's coverage.
       // A selected preview location must not narrow the before/after evidence.
       if(pair.before&&state.entranceRaw&&!state.entranceChunks.length) {
         const sample=plan.panels.find(p=>p.kind==='entrance');
         plan.panels=plan.panels.filter(p=>p.kind!=='entrance');
-        for(const [index,group] of regionGroups(state.regions).entries()) {
+        for(const [index,group] of regionGroups(state.entranceRegions??state.regions).entries()) {
           const xs=group.map(id=>id>>8),ys=group.map(id=>id&255);
           plan.panels.push({...sample,id:`${c.id}-entrance-${index+1}`,regions:group,minX:Math.min(...xs),maxY:Math.max(...ys),columns:Math.max(...xs)-Math.min(...xs)+1,rows:Math.max(...ys)-Math.min(...ys)+1});
         }
+      }
+      if(state.entranceRegions?.length) {
+        const notification=evidencePlan([{...c,regions:state.entranceRegions,chunks:state.entranceNotifyChunks??[],entrance:undefined}],{[c.id]:{arena:entranceContext}},sources);
+        plan.panels.push(...notification.panels.map(p=>({...p,id:p.id.replace('-arena-','-notification-'),kind:'notification',label:'Entrance notification coverage'})));
+        plan.panels=plan.panels.map(p=>p.kind==='entrance'?{...p,label:'Entrance object detection'}:p);
       }
       result.panels.push(...plan.panels.map(p=>pair.before?{...p,id:p.id.replace(`${c.id}-`,`${c.id}-${phase}-`),state:phase}:p));
       result.contexts[c.id]={...result.contexts[c.id],[phase]:plan.contexts[c.id]};

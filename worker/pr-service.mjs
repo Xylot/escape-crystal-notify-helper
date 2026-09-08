@@ -13,7 +13,8 @@ export function target(env){
 }
 const md = value => String(value).replace(/[\\`*_{}[\]<>()!#|]/g,'\\$&').replace(/[\r\n]+/g,' ');
 function stateBody(record,c,images){
-    let text=`- ${isDungeon(c)?'Dungeon':'Arena'} regions: ${c.regions.join(', ')}\n- Death classification: ${md(c.deathType)}\n- ${isDungeon(c)?'Dungeon':'Arena'} chunks: ${c.chunks?.length?c.chunks.join(', '):'Whole selected regions'}\n`;
+    let text=`- ${isDungeon(c)?'Dungeon':'Arena'} regions: ${(c.arenaRegions??c.regions).join(', ')}\n- Death classification: ${md(c.deathType)}\n- ${isDungeon(c)?'Dungeon':'Arena'} chunks: ${c.chunks?.length?c.chunks.join(', '):'Whole selected regions'}\n`;
+    if(c.entranceRegions)text+=`- Entrance area: ${c.entranceDangerous===false?'Not dangerous; notify only in selected chunks':'Dangerous'}\n- Entrance regions: ${c.entranceRegions.join(', ')}\n- Entrance notification chunks: ${c.entranceNotifyChunks?.join(', ')||'Whole entrance area'}\n`;
     if(c.entrance)text+=`- Entrance: ${md(c.entrance.objectType)}; IDs: ${c.entrance.ids.map(md).join(', ')}\n- Entrance options: ${md(c.entrance.overlay)}, direction ${md(c.entrance.direction||'default')}, plane ${md(c.entrance.plane||'default')}\n- Entrance chunks: ${c.entrance.chunks.join(', ')||'None'}\n`;
     else if(!isDungeon(c))text+=`- Entrance: ${Object.hasOwn(c,'entranceRaw')?(c.entranceRaw?'Special source settings (shown below)':'None'):c.entranceOverlay?`priority ${md(c.entranceOverlay)}; other settings preserved`:'existing configuration preserved, if present'}.\n`;
     const models=record.presentation?.[c.id]?.images??[];
@@ -84,14 +85,14 @@ async function submittedRecords(owner,revision,gh,store){
 
 export async function prepare(input,owner,gh,store,env){
   const {repo,branch}=target(env),changes=cleanChanges(input.changes);
-  validateProposal({version:1,repository:PLUGIN_REPO,baseCommit:'0'.repeat(40),changes});
+  validateProposal({version:2,repository:PLUGIN_REPO,baseCommit:'0'.repeat(40),changes});
   const states=proposalStates(changes);
   const evidence=comparisonEvidence(changes,states,input.contexts,input.sources);
   const presentation=cleanPresentation(changes,input.presentation);
   const revision=await digest(stableJSON({changes,evidence,presentation,repo,branch}));
   const submitted=await submittedRecords(owner,revision,gh,store);
   const blocking=submitted.find(r=>!canReplace(r.pr));if(blocking)return publicRecord(blocking);
-  const base=await gh.upstream(repo,branch),after=applyProposal(base.source,{version:1,repository:PLUGIN_REPO,baseCommit:base.sha,changes});
+  const base=await gh.upstream(repo,branch),after=applyProposal(base.source,{version:2,repository:PLUGIN_REPO,baseCommit:base.sha,changes});
   if(after===base.source)throw new HttpError(409,'These settings already match the plugin. There are no changes to submit.');
   // Closed attempts keep their evidence and history. A deterministic new fingerprint
   // gives concurrent preparations one fresh submission, with separate branch names.

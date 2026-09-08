@@ -1,6 +1,7 @@
 import { maskJava, parseJava, splitArgs } from './java.mjs';
 import { validateEntrance } from './entrance.mjs';
 import { entranceOverlay, mergeDraft } from './authoring.mjs';
+import {notificationChunks} from './encounter-export.mjs';
 
 const entrancePrefix = 'new EscapeCrystalNotifyRegionEntrance(';
 const unique = values => [...new Set(values)].sort((a, b) => String(a).localeCompare(String(b), undefined, {numeric:true}));
@@ -40,23 +41,25 @@ export function readEntrance(optionalArgs) {
 }
 
 export function existingDraft(entry) {
-  return {id:entry.id, name:entry.name, regionType:entry.regionType, deathType:entry.deathType, regions:[...entry.regions], baseRaw:entry.raw};
+  return {id:entry.id, name:entry.name, regionType:entry.regionType, deathType:entry.deathType, regions:[...entry.regions], baseRaw:entry.raw,
+    ...(entry.entranceEntry?{entranceBaseRaw:entry.entranceEntry.raw,entranceDangerous:!notificationChunks(entry.entranceEntry).length,entranceNotifyChunks:notificationChunks(entry.entranceEntry)}:{})};
 }
 
-export function editingBaseline(raw) {
+export function editingBaseline(raw, entranceBaseRaw) {
   const entry = baselineEntry(raw);
-  const entrance = readEntrance(entry.optionalArgs);
+  const paired=entranceBaseRaw?baselineEntry(entranceBaseRaw):null;
+  const entrance = readEntrance((paired??entry).optionalArgs);
   const chunkExpression = entry.optionalArgs.map(a => maskJava(a).trim()).find(a => a.startsWith('List.'));
   const chunks = chunkExpression ? literalList(chunkExpression) : undefined;
   const quest = entry.optionalArgs.some(a => maskJava(a).includes('Quest.'));
   return {entry, entrance, chunks,
     coverageReason:quest ? 'Quest-gated coverage restrictions need a source edit.' : chunkExpression && !chunks ? 'These coverage restrictions need a source edit.' : '',
     entranceReason:quest ? 'This quest-gated entrance needs a source edit. Its existing configuration is preserved.' : entrance.reason,
-    draft:existingDraft(entry)};
+    draft:existingDraft({...entry,entranceEntry:paired})};
 }
 
 export function editableDraft(draft) {
-  const baseline = editingBaseline(draft.baseRaw);
+  const baseline = editingBaseline(draft.baseRaw,draft.entranceBaseRaw);
   return {...draft,
     chunks:draft.chunks ?? baseline.chunks,
     entrance:draft.entrance ?? (baseline.entrance.value ? {...baseline.entrance.value, overlay:entranceOverlay(draft)} : undefined)};
@@ -72,12 +75,12 @@ export function sectionValues(draft, section) {
   const current = editableDraft(draft);
   if (section === 'details') return {name:current.name, deathType:current.deathType};
   if (section === 'coverage') return {regions:unique(current.regions), chunks:unique(current.chunks ?? [])};
-  return {entrance:entranceValue(current.entrance), priority:entranceOverlay(current),
+  return {entrance:entranceValue(current.entrance), priority:entranceOverlay(current),dangerous:current.entranceDangerous??null,notifyChunks:unique(current.entranceNotifyChunks??[]),
     region:current.entranceRegion ?? null, plane:current.entrancePlane ?? null};
 }
 
 export function changedSections(draft) {
-  const baseline = editingBaseline(draft.baseRaw).draft;
+  const baseline = editingBaseline(draft.baseRaw,draft.entranceBaseRaw).draft;
   return ['details','coverage', ...(baseline.regionType === 'DUNGEONS' ? [] : ['entrance'])]
     .filter(section => !equal(sectionValues(draft,section), sectionValues(baseline,section)));
 }
@@ -85,8 +88,8 @@ export function changedSections(draft) {
 // Keep hydration local to the form. Persist only deliberate edits, so unrelated
 // changes never replace preserved constructors or trip quest-gate validation.
 export function applySection(previous, working, section) {
-  const baseline = editingBaseline(previous.baseRaw);
-  const keys = section === 'details' ? ['name','deathType'] : section === 'coverage' ? ['regions','chunks'] : ['entrance','entranceOverlay','entranceRegion','entrancePlane'];
+  const baseline = editingBaseline(previous.baseRaw,previous.entranceBaseRaw);
+  const keys = section === 'details' ? ['name','deathType'] : section === 'coverage' ? ['regions','chunks'] : ['entrance','entranceOverlay','entranceRegion','entrancePlane','entranceDangerous','entranceNotifyChunks'];
   const patch = Object.fromEntries(keys.map(key => [key, working[key]]));
   if (patch.entrance) delete patch.entranceOverlay;
   const next = mergeDraft(previous, patch);
