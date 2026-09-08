@@ -2207,3 +2207,4 @@ button,input:not([type=checkbox]),select,summary {
   .authoring-view .location-pane .map-wrap { height:clamp(240px,42dvh,460px); }
   .authoring-view .object-studio-grid { grid-template-columns:1fr; }
 }
+.fresh-edit-note { margin:0; padding:10px 32px; color:var(--muted); font-size:13px; background:var(--surface); border-bottom:1px solid var(--line); }

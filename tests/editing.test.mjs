@@ -76,7 +76,7 @@ test('entrance ID edits keep approach, plane, priority and all chunk regions',()
   const next=applySection(draft,{...working,entrance:{...working.entrance,ids:['12345']}},'entrance');
   assert.equal(next.entrance.direction,working.entrance.direction);
   assert.deepEqual(next.entrance.chunks,working.entrance.chunks);
-  assert.deepEqual(readEntrance(exportEntry(next).optionalArgs).value,next.entrance);
+  assert.deepEqual(readEntrance(exportEntry(next).optionalArgs).value,{...next.entrance,ids:['ObjectID.HUNDRED_VARZE_BASE']});
   assert.deepEqual(changedSections(next),['entrance']);
   const restored=applySection(next,editableDraft(draft),'entrance');
   assert.equal(restored.entrance,undefined);

@@ -29,6 +29,22 @@ test('removing a region also removes its draft chunk restrictions', () => {
   assert.deepEqual(next.chunks, [kept]);
   assert.deepEqual(mergeDraft({...draft,chunks:[-1]}, {regions:[12682]}).chunks, []);
 });
+
+test('entrance chunk selections keep their region in sync when mapping outside the arena',()=>{
+  const selected=[812245,812246,814293,814294];
+  const previous={...draft,regions:[12955],entranceRegion:12955,entranceDangerous:true,entranceNotifyChunks:[]};
+  const next=mergeDraft(previous,{entranceNotifyChunks:selected});
+  assert.equal(next.entranceRegion,12698);assert.deepEqual(next.regions,[12955]);
+  assert.deepEqual(next.entranceNotifyChunks,selected);
+  assert.equal(mergeDraft(next,{entranceNotifyChunks:[]}).entranceRegion,12698);
+  // An explicit region edit is still validated, rather than silently discarded.
+  assert.equal(mergeDraft(next,{entranceRegion:12955,entranceNotifyChunks:selected}).entranceRegion,12955);
+  assert.equal(mergeDraft(previous,{entranceNotifyChunks:[-1]}).entranceRegion,12955);
+  const arena=regionOrigin(12955),other=chunkId(arena.x,arena.y);
+  const both=mergeDraft(next,{entranceNotifyChunks:[...selected,other]});
+  assert.equal(both.entranceRegion,12698);
+  assert.equal(mergeDraft(both,{entranceNotifyChunks:[other]}).entranceRegion,12955);
+});
 test('one ready encounter can export independently of an unfinished draft', () => {
   const unfinished = { ...draft, id: 'BOSS_UI_UNFINISHED', regions: [] };
   assert.equal(exportProblem(snapshot, [draft]), '');

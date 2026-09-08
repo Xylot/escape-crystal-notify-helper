@@ -23,7 +23,7 @@ test('quick review selects every suggested object and replaces stale detection l
   assert.deepEqual(next.regions,draft.regions);
   const entries=expandEncounter(JSON.parse(JSON.stringify(next)));
   assert.equal(entries.length,1);
-  assert.match(entries[0].raw,/123, 456/);
+  assert.match(entries[0].raw,/ObjectID\.BALLOON_YELLOW_POP, ObjectID\.FAI_VARROCK_WALLS_POOR_CRUMBLE_DOUBLE/);
   const split=expandEncounter({...next,entranceDangerous:false,regions:[12851],chunks:undefined});
   assert.equal(split.length,2);
   assert.match(split[1].raw,/BOSS_QUICK_ENTRANCE/);

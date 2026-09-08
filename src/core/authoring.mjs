@@ -1,5 +1,6 @@
 import { applyProposal, PLUGIN_REPO } from './proposal.mjs';
 import { chunkOrigin, regionId } from './coordinates.mjs';
+import {notificationAreaChange} from './location-defaults.mjs';
 
 export function defaultDraft(draft) {
   return { ...draft, deathType: draft.deathType || 'UNSAFE' };
@@ -16,6 +17,9 @@ export function mergeDraft(draft, change) {
   if (change.entrance) next.entranceOverlay = change.entrance.overlay;
   if(change.entrance&&change.entranceDangerous===undefined&&draft.entranceDangerous===undefined&&!draft.entrance&&!draft.entranceBaseRaw&&!draft.baseRaw?.includes('EscapeCrystalNotifyRegionEntrance('))next.entranceDangerous=null;
   if(change.entranceDangerous===false&&next.entranceNotifyChunks===undefined)next.entranceNotifyChunks=[...(next.entrance?.chunks??[])];
+  if(Array.isArray(next.entranceNotifyChunks)&&!('entranceRegion' in change)&&('entranceNotifyChunks' in change||change.entranceDangerous===false)) {
+    Object.assign(next,notificationAreaChange(next.entranceNotifyChunks,next.entranceRegion));
+  }
   if ('regions' in change && !('chunks' in change) && next.chunks) {
     next.chunks = next.chunks.filter(id => {
       if (!Number.isInteger(id) || id < 0 || id > 4194303) return false;

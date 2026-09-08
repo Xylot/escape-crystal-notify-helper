@@ -17,6 +17,7 @@ test('display lookup matches exact IDs across object files without confusing NPC
  assert.equal(gamevalMatches(index,['12'],'ANY').length,3);
  assert.equal(gamevalMatches(index,['123'],'GAME_OBJECT')[0].file,'ObjectID1');
  assert.equal(gamevalMatches(index,['ObjectID1.NEW_GATE'],'GAME_OBJECT')[0].id,'123');
+ assert.equal(gamevalMatches(index,['ObjectID.NEW_GATE'],'GAME_OBJECT')[0].id,'123');
  assert.equal(gamevalMatches(index,['NpcID.GUARD'],'GAME_OBJECT').length,0);
  assert.deepEqual(gamevalMatches(index,['999999'],'GAME_OBJECT'),[]);
  assert.equal(gamevalMatches(index,['12','12','ObjectID.DOOR'],'GAME_OBJECT').length,2);

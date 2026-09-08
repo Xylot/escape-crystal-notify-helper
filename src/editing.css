@@ -10,6 +10,10 @@
 .edit-toolbar p,.edit-section-heading p,.edit-overview-heading p { margin:4px 0 0; color:var(--muted); font-size:14px; }
 .edit-toolbar>div { gap:8px; flex-shrink:0; }
 .edit-toolbar button { padding:7px 11px; }
+.edit-fresh-option { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; padding:18px 22px; margin-bottom:24px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+.edit-fresh-option>div { flex:1 1 260px; }
+.edit-fresh-option p { margin:6px 0 0; color:var(--muted); font-size:14px; }
+.edit-fresh-option>button { flex-shrink:0; }
 .edit-overview-heading { margin-bottom:20px; }
 .edit-overview-heading h2,.edit-section-heading h2 { margin:0; font-size:23px; }
 .edit-overview-layout { display:grid; grid-template-columns:minmax(0,1fr) 260px; gap:24px; align-items:start; }

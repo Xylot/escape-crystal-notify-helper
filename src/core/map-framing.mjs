@@ -1,3 +1,15 @@
+import {chunkOrigin} from './coordinates.mjs';
+
+// Include the full 8x8 footprint, rather than centering on a chunk's southwest corner.
+export function chunkSelectionCenter(chunks) {
+  const points=chunks.filter(id=>Number.isInteger(id)&&id>=0&&id<=4194303).map(chunkOrigin);
+  if(!points.length)return null;
+  return [
+    (Math.min(...points.map(p=>p.x))+Math.max(...points.map(p=>p.x))+8)/2,
+    (Math.min(...points.map(p=>p.y))+Math.max(...points.map(p=>p.y))+8)/2,
+  ];
+}
+
 // Only tighten the view once the local neighbourhood has finished loading.
 // Missing tiles elsewhere, or a failed central tile, are not enough evidence.
 export function sparseMapBounds(center, tiles, selected = []) {

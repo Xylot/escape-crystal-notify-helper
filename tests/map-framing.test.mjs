@@ -1,7 +1,18 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {sparseMapBounds} from '../src/core/map-framing.mjs';
+import {sparseMapBounds,chunkSelectionCenter} from '../src/core/map-framing.mjs';
+import {chunkId} from '../src/core/coordinates.mjs';
 const center=[2911,8036],home=11645;
+test('entrance framing centers Bryophyta’s four selected chunks, including their full footprint',()=>{
+  assert.deepEqual(chunkSelectionCenter([812245,812246,814293,814294]),[3176,9904]);
+  assert.deepEqual(chunkSelectionCenter([812245]),[3172,9900]);
+});
+test('chunk framing spans region boundaries and ignores invalid unfinished input',()=>{
+  assert.deepEqual(chunkSelectionCenter([chunkId(3192,9896),chunkId(3200,9904)]),[3200,9904]);
+  assert.deepEqual(chunkSelectionCenter([-1,812245,4194304,NaN,'812245']),[3172,9900]);
+  assert.equal(chunkSelectionCenter([]),null);
+  assert.equal(chunkSelectionCenter([-1,NaN]),null);
+});
 function tiles(){const result=new Map();for(let x=44;x<=46;x++)for(let y=124;y<=126;y++)result.set((x<<8)|y,false);result.set(home,true);return result;}
 test('isolated cave fits its full region with north-up bounds',()=>{
   assert.deepEqual(sparseMapBounds(center,tiles(),[home]),[[8000,2880],[8064,2944]]);

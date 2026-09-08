@@ -6,6 +6,7 @@ import { RegionMap } from './Map';
 import { encounterLocations,originalEntranceChunks,refreshedLocation } from './core/encounter.mjs';
 import { chunkOrigin,regionId,regionOrigin } from './core/coordinates.mjs';
 import {outlineCoverage} from './core/map-outline.mjs';
+import {chunkSelectionCenter} from './core/map-framing.mjs';
 import {loadRegionObjects} from './core/region-objects.mjs';
 import {entranceMapSuggestions,uniqueEntranceMapChoices} from './core/entrance-map-suggestions.mjs';
 import {suggestedEntranceChange} from './core/entrance-selection.mjs';
@@ -56,7 +57,8 @@ export default function EncounterMaps(props:Props){
     const location={...choice.location,notificationChunks:choice.chunks};
     const change=locationAreaChange(boss,props.draft,location,true,{regions:choice.regions,chunks:choice.chunks});
     if(change)props.update(change);
-    props.onEvidenceContext?.('entrance',location);setChosenLocation(location);setChoosingMap(false);
+    const context={...location,region:change&&'entranceRegion' in change?change.entranceRegion:location.region};
+    props.onEvidenceContext?.('entrance',context);setChosenLocation(context);setChoosingMap(false);
   };
   const shared=!props.focus&&locations.shared&&!split;
   const useSuggestion=(choice:EntranceMapChoice)=>{
@@ -87,14 +89,17 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,evidenceContext,
 
 
   const [entranceMode,setEntranceMode]=useState(false),[recenter,setRecenter]=useState(0);
+  // Snapshot the selection on entry; clicking chunks must not move the map mid-edit.
+  const [entranceCenter,setEntranceCenter]=useState(()=>chunkSelectionCenter(draft.entranceNotifyChunks??[]));
+  const [jumpCenter,setJumpCenter]=useState<[number,number]|null>(null);
   const sameChoice=(l:Location,m:Location)=>l.x===m.x&&l.y===m.y&&l.source===m.source&&l.plane===m.plane&&l.mapId===m.mapId&&JSON.stringify(l.outline)===JSON.stringify(m.outline);
   const all=useMemo(()=>[...locations,...alternatives.filter(m=>!locations.some(l=>sameChoice(l,m)))],[locations,alternatives]);
   const saved=refreshedLocation(evidenceContext?.[kind],all) as Location|undefined;
   const regionFallback=useMemo<Location|null>(()=>{const region=kind==='entrance'?draft.entranceRegion:draft.regions[0];if(region===undefined)return null;const p=regionOrigin(region);return {x:p.x+32,y:p.y+32,region,plane:null,mapId:null,role:'location',caption:'Selected coverage · verify this location in game',source:'',title:'Selected region',revision:null,verified:false};},[kind,draft.regions[0],draft.entranceRegion]);
   const selected=manual??(choice!==''?all[Number(choice)]:undefined)??saved??(kind==='entrance'&&draft.entranceRegion!==undefined?regionFallback:undefined)??locations[0]??regionFallback;
   useEffect(()=>{setChoice('');},[locations,alternatives]);
-  const center=useMemo<[number,number]>(()=>selected?[selected.x,selected.y]:[0,0],[selected?.x,selected?.y,recenter]);
   const isEntrance=kind==='entrance'||combined&&entranceMode;
+  const center=useMemo<[number,number]>(()=>jumpCenter??(isEntrance&&entranceCenter?entranceCenter as [number,number]:selected?[selected.x,selected.y]:[0,0]),[selected?.x,selected?.y,isEntrance,entranceCenter,jumpCenter,recenter]);
   const chunkTarget=isEntrance?'entrance':'arena';
   const notificationMode=isEntrance;
   const chunkMode=notificationMode||chunkModes[chunkTarget];
@@ -145,8 +150,8 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,evidenceContext,
       {combined&&<button className={entranceMode?'chosen':''} onClick={()=>setEntranceMode(v=>!v)}>{entranceMode?'Entrance chunks':'Arena coverage'}</button>}
       {!isEntrance&&<><button aria-pressed={!chunkMode} className={!chunkMode?'chosen':''} onClick={()=>setChunkMode(false)}>Regions</button><button aria-pressed={chunkMode} className={chunkMode?'chosen':''} onClick={()=>setChunkMode(true)}>Chunks</button></>}
       {isEntrance&&<><span>Notification chunks</span><span>Region {entranceRegions[0]??'not located'}</span></>}
-      <button className="recenter" onClick={()=>setRecenter(n=>n+1)}>⌖ Recenter</button>
-    <form className="pane-jump" onSubmit={e=>{e.preventDefault();try{const parts=jump.trim().split(/[\s,]+/);if(parts.length!==2)throw new Error('Enter X, Y coordinates.');const[x,y]=parts.map(Number);const r=regionId(x,y);if(isEntrance)update({entranceRegion:r});setManual({x,y,region:r,plane:shownPlane,mapId:null,role:kind==='entrance'?'entrance':'location',caption:'Manual location',source:'',title:'Manual coordinates',revision:null,verified:false});}catch(error){onError((error as Error).message);}}}><input aria-label={`${label} coordinates`} value={jump} onChange={e=>setJump(e.target.value)} placeholder="Jump to X, Y"/><button>Go →</button>{selected&&<code>Region {selected.region}</code>}</form>
+      <button className="recenter" onClick={()=>{setJumpCenter(null);setEntranceCenter(chunkSelectionCenter(draft.entranceNotifyChunks??[]));setRecenter(n=>n+1);}}>⌖ Recenter</button>
+    <form className="pane-jump" onSubmit={e=>{e.preventDefault();try{const parts=jump.trim().split(/[\s,]+/);if(parts.length!==2)throw new Error('Enter X, Y coordinates.');const[x,y]=parts.map(Number);const r=regionId(x,y);setJumpCenter([x,y]);if(isEntrance)update({entranceRegion:r});setManual({x,y,region:r,plane:shownPlane,mapId:null,role:kind==='entrance'?'entrance':'location',caption:'Manual location',source:'',title:'Manual coordinates',revision:null,verified:false});}catch(error){onError((error as Error).message);}}}><input aria-label={`${label} coordinates`} value={jump} onChange={e=>setJump(e.target.value)} placeholder="Jump to X, Y"/><button>Go →</button>{selected&&<code>Region {selected.region}</code>}</form>
     </div>
     {selected?<RegionMap tileSource={selected.tiles} selected={isEntrance?entranceRegions:draft.regions} existing={isEntrance?EMPTY_IDS:boss.regions} locations={mapLocations} center={center} plane={shownPlane} chunks={chunks} chunkMode={chunkMode} onChunkToggle={toggleChunk} onToggle={id=>isEntrance?update({entranceRegion:id}):update({regions:draft.regions.includes(id)?draft.regions.filter(n=>n!==id):[...draft.regions,id].sort((a,b)=>a-b)})}/>:<div className="missing-location"><span>{kind==='entrance'?'↳':'◇'}</span><h3>{loading?'Finding wiki locations…':kind==='entrance'?'Entrance not located':isDungeon(boss)?'Dungeon not located':'Arena not located'}</h3><p>Load suggested locations from the wiki, or jump to known coordinates above.</p><button disabled={loading} onClick={onLoad}>{loading?'Loading…':'Load wiki locations'}</button></div>}
 

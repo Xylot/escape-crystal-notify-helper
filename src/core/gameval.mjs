@@ -1,7 +1,7 @@
 const PATH='runelite-api/src/main/java/net/runelite/api/gameval';
 export function indexGameval(entries){
   const index=new Map();
-  for(const entry of entries)for(const key of [entry.id,`${entry.file}.${entry.name}`]){
+  for(const entry of entries)for(const key of [entry.id,`${entry.file}.${entry.name}`,...(entry.file==='ObjectID1'?[`ObjectID.${entry.name}`]:[])]){
     const typed=`${entry.objectType}:${key}`;
     index.set(typed,[...(index.get(typed)??[]),entry]);
   }

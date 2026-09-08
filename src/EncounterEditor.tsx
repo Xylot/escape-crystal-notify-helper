@@ -24,7 +24,7 @@ type Props = {
   onBack:()=>void; onDiscard:()=>void; onUndo:()=>void; onRedo:()=>void;
   canUndo:boolean; canRedo:boolean; onLoad:()=>void; onError:(message:string)=>void;
   onExport:(kind:string, ids:string[])=>void; onCreatePR?:(ids:string[])=>void;
-  registerGuard:(guard:EditNavigationGuard)=>void;
+  registerGuard:(guard:EditNavigationGuard)=>void; onStartFresh:()=>void;
 };
 const labels:Record<Section,string> = {details:'Details', coverage:'Coverage', entrance:'Entrance'};
 const deathLabels:Record<string,string> = {UNSAFE:'Unsafe death', UNSAFE_HCGIM:'Unsafe only for HCGIM', SAFE:'Safe death'};
@@ -174,6 +174,7 @@ export default function EncounterEditor(p:Props) {
       <div className="edit-identity"><BossPortrait boss={p.boss} compact/><div><span className="eyebrow">EDITING EXISTING ENCOUNTER</span><h1>{p.draft.name}</h1></div><span className="edit-save-state"><Icon name={p.saved?'file':'shield'} size={16}/>{p.saved?'Local draft saved':'Current plugin settings'}</span></div>
       <div className="edit-toolbar"><p>Choose what to change. Everything else stays as it is.</p><div><button disabled={!p.canUndo || !!section} onClick={p.onUndo}>↶ Undo</button><button disabled={!p.canRedo || !!section} onClick={p.onRedo}>↷ Redo</button><button aria-pressed={sources} onClick={()=>setSources(v=>!v)}><Icon name="book" size={16}/> Sources</button></div></div>
     </header>
+    {!section&&!review&&<div className="edit-fresh-option"><div><strong>Want to set it up again?</strong><p>Start the guided flow with fresh defaults and empty selections. Your contribution will update this encounter. Undo restores your previous draft.</p></div><button onClick={()=>navigate(p.onStartFresh)}>Start from scratch <Icon name="arrow" size={14}/></button></div>}
     {sources&&<div className="edit-sources"><BossImageSource title={p.boss.wikiTitle} dungeon={dungeon}/><SourcesPanel boss={sourceBoss}/><button disabled={!!p.busy} onClick={p.onLoad}>{p.busy?'Loading…':'Refresh wiki locations'}</button></div>}
     <p className="sr-only" role="status">{status}</p>
     {section&&working ? <div className="edit-session">

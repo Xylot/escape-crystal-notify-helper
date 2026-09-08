@@ -5,6 +5,7 @@ import Authoring, { type AuthoringStep } from './Authoring';
 import EncounterEditor, {type EditNavigationGuard} from './EncounterEditor';
 import {changedSections, existingDraft} from './core/editing.mjs';
 import ReviewQueue from './ReviewQueue';
+import {freshEditDraft, proposalDraft} from './core/fresh-edit.mjs';
 import PRComposer from './PRComposer';
 import { PR_API, prJSON, finishRedirect } from './pr-client';
 import { mergeDraft, defaultDraft } from './core/authoring.mjs';
@@ -82,7 +83,7 @@ export default function App() {
   const unsupportedCount=bosses.filter(b=>!supported(b)).length;
   const categories=[...new Set(bosses.flatMap(b=>b.categories??[]))].sort();
   const filtered=bosses.filter(b=>(filter==='drafts'||category!=='all'||(!isDungeon(b)&&!b.categories?.some(c=>/quest|event/i.test(c))))&&b.name.toLowerCase().includes(search.toLowerCase())&&(category==='all'||b.categories?.includes(category))&&(filter==='all'||filter==='supported'&&supported(b)||filter==='new'&&!supported(b)||filter==='drafts'&&drafts[b.id]||filter==='unresolved'&&!b.maps.length&&!b.raw));
-  const changes=Object.values(drafts).filter(d=>!encounterExclusion(d)), conflicts=changes.filter(c=>(snapshot.entries.find(b=>b.id===c.id)?.raw??null)!==c.baseRaw);
+  const changes=Object.values(drafts).filter(d=>!encounterExclusion(d)).map(d=>proposalDraft(d) as Draft), conflicts=changes.filter(c=>(snapshot.entries.find(b=>b.id===c.id)?.raw??null)!==c.baseRaw);
   function workspace():WorkspaceRevision{return {drafts,evidenceContexts};}
   function restore(next:WorkspaceRevision){
     setDrafts(next.drafts);setEvidenceContexts(next.evidenceContexts);
@@ -96,6 +97,13 @@ export default function App() {
     if(changedSections(nextDraft).length)next[nextDraft.id]=nextDraft;else delete next[nextDraft.id];
     const contexts={...evidenceContexts,[nextDraft.id]:context};
     if(JSON.stringify(next)!==JSON.stringify(drafts)||JSON.stringify(contexts)!==JSON.stringify(evidenceContexts))commit(next,contexts);
+  }
+  function startFreshEdit() {
+    if(!boss)return;
+    const contexts={...evidenceContexts};delete contexts[boss.id];
+    commit({...drafts,[boss.id]:freshEditDraft(boss,drafts[boss.id]) as Draft},contexts);
+    setEditorRevision(value=>value+1);setStep(isDungeon(boss)?'coverage':'setup');
+    if(!boss.maps.length&&!boss.locationsLoaded&&!busy)void loadLocations(boss);
   }
   function deleteDraft(id:string){const next=discardEncounter(workspace(),id);commit(next.drafts,next.evidenceContexts);restore(next);}
   function undo(){if(!past.length)return;setFuture(f=>[workspace(),...f]);restore(past.at(-1)!);setPast(p=>p.slice(0,-1));}
@@ -138,7 +146,7 @@ export default function App() {
   }catch(e){setNotice((e as Error).message);}}
   const preview=useMemo(()=>{
     if(view!=='editor'||!['coverage','review'].includes(step))return '';
-    try{return draft&&boss?generateEncounter(draft,boss.raw?boss:null)+',':'';}catch(e){return (e as Error).message;}
+    try{return draft&&boss?generateEncounter(proposalDraft(draft),boss.raw?boss:null)+',':'';}catch(e){return (e as Error).message;}
   },[view,step,draft,boss]);
   return <div className={`app-shell ${view==='editor'?'authoring-view':''}`} onClickCapture={event=>{
     const target=(event.target as HTMLElement).closest<HTMLElement>('button,a,summary');
@@ -155,7 +163,7 @@ export default function App() {
     {notice&&<div className="notice" role="status">{notice.message}<button aria-label="Dismiss message" onClick={()=>setNotice('')}>×</button></div>}
     {busy&&<div className="busy" role="status">{busy}…</div>}
     <main inert={modal||review||help||!!prIds} id="main-content" tabIndex={-1} className={`workspace ${view==='discover'?'discovery-workspace':'editor-workspace'}`}>
-      {view==='discover'?<Discovery bosses={filtered} onSelect={select} drafts={drafts} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} category={category} setCategory={setCategory} categories={categories} onImport={openImport} total={bosses.length} unsupported={unsupportedCount} supportedCount={bosses.length-unsupportedCount} ready={ready}/>:boss&&draft&&(draft.baseRaw||boss.raw)&&['BOSSES','DUNGEONS'].includes(boss.regionType??'BOSSES')?<EncounterEditor key={`${boss.id}:${editorRevision}`} boss={boss} draft={draft} snapshot={snapshot} saved={!!drafts[boss.id]} busy={busy} onApply={applyEdit} context={evidenceContexts[boss.id]??{}} onBack={()=>{setView('discover');window.scrollTo({top:0});}} onDiscard={()=>deleteDraft(boss.id)} canUndo={!!past.length} canRedo={!!future.length} onUndo={undo} onRedo={redo} onLoad={()=>loadLocations()} onError={setNotice} onCreatePR={prEnabled?openPR:undefined} onExport={exportData} registerGuard={registerEditGuard}/>:boss&&draft?<Authoring key={`${boss.id}:${editorRevision}`} boss={boss} draft={draft} snapshot={snapshot} saved={!!drafts[boss.id]} busy={busy} step={step} setStep={setStep} update={update} onLoad={()=>loadLocations()} onError={setNotice} onBack={()=>{setView('discover');window.scrollTo({top:0});}} onDiscard={()=>deleteDraft(boss.id)} canUndo={!!past.length} canRedo={!!future.length} onUndo={undo} onRedo={redo} preview={preview} onCreatePR={prEnabled?openPR:undefined} evidenceContext={evidenceContexts[boss.id]} onEvidenceContext={saveContext} onEntranceImage={id=>setEvidenceContexts(previous=>({...previous,[boss.id]:{...previous[boss.id],entranceImage:id}}))} onExport={exportData} bosses={bosses} onSelect={select}/>:<p className="empty">Loading encounter…</p>}
+      {view==='discover'?<Discovery bosses={filtered} onSelect={select} drafts={drafts} search={search} setSearch={setSearch} filter={filter} setFilter={setFilter} category={category} setCategory={setCategory} categories={categories} onImport={openImport} total={bosses.length} unsupported={unsupportedCount} supportedCount={bosses.length-unsupportedCount} ready={ready}/>:boss&&draft&&draft.editFlow!=='fresh'&&(draft.baseRaw||boss.raw)&&['BOSSES','DUNGEONS'].includes(boss.regionType??'BOSSES')?<EncounterEditor key={`${boss.id}:${editorRevision}`} boss={boss} draft={draft} snapshot={snapshot} saved={!!drafts[boss.id]} busy={busy} onApply={applyEdit} context={evidenceContexts[boss.id]??{}} onBack={()=>{setView('discover');window.scrollTo({top:0});}} onDiscard={()=>deleteDraft(boss.id)} canUndo={!!past.length} canRedo={!!future.length} onUndo={undo} onRedo={redo} onLoad={()=>loadLocations()} onError={setNotice} onCreatePR={prEnabled?openPR:undefined} onExport={exportData} registerGuard={registerEditGuard} onStartFresh={startFreshEdit}/>:boss&&draft?<Authoring key={`${boss.id}:${editorRevision}`} boss={boss} draft={draft} snapshot={snapshot} saved={!!drafts[boss.id]} busy={busy} step={step} setStep={setStep} update={update} onLoad={()=>loadLocations()} onError={setNotice} onBack={()=>{setView('discover');window.scrollTo({top:0});}} onDiscard={()=>deleteDraft(boss.id)} canUndo={!!past.length} canRedo={!!future.length} onUndo={undo} onRedo={redo} preview={preview} onCreatePR={prEnabled?openPR:undefined} evidenceContext={evidenceContexts[boss.id]} onEvidenceContext={saveContext} onEntranceImage={id=>setEvidenceContexts(previous=>({...previous,[boss.id]:{...previous[boss.id],entranceImage:id}}))} onExport={exportData} bosses={bosses} onSelect={select}/>:<p className="empty">Loading encounter…</p>}
     </main>
     {help&&<div className="modal-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="help-title" className="modal"><button className="close" onClick={()=>setHelp(false)} aria-label="Close guide">×</button><div className="eyebrow">THE CONTRIBUTOR’S FIELD GUIDE</div><h2 id="help-title">Give an encounter an escape plan.</h2><div className="guide-step"><Icon name="compass"/><div><h3>Find a boss</h3><p>Choose an encounter that needs coverage, or import a page from the OSRS Wiki.</p></div></div><div className="guide-step"><Icon name="map"/><div><h3>Check the map</h3><p>Load wiki locations. Select the arena’s regions and configure the entrance if needed. Confirm the coordinates and death behavior in game.</p></div></div><div className="guide-step"><Icon name="check"/><div><h3>Review and share</h3><p>Check your settings, then use Review changes to download a patch or proposal for the maintainer.</p></div></div><p className="guide-note">Drafts stay in this browser. Export a proposal to keep a portable copy. Nothing is submitted automatically.</p><button className="primary wide" onClick={()=>{setHelp(false);navigateLibrary();}}>Find an encounter <Icon name="arrow" size={16}/></button></section></div>}
     {modal&&<div className="modal-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="import-title" className="modal"><button className="close" onClick={()=>setModal(false)} aria-label="Close import">×</button><div className="eyebrow">ADD CONTENT</div><h2 id="import-title">Start with a wiki page</h2><p>Import a boss or dungeon from the OSRS Wiki.</p><label className="field">Encounter type<select value={importKind} onChange={e=>setImportKind(e.target.value)}><option value="BOSSES">Boss</option><option value="DUNGEONS">Dungeon · regions and chunks only</option></select></label><label className="field">Wiki title or URL<input autoFocus value={input} onChange={e=>setInput(e.target.value)} placeholder="Shellbane gryphon"/></label><details><summary>Paste wikitext instead</summary><p className="muted">Use the wiki’s source editor if browser requests are blocked.</p><textarea aria-label="Wikitext" rows={8} value={paste} onChange={e=>setPaste(e.target.value)} placeholder="{{Map|x=3179|y=8876}}"/></details><button className="primary wide" disabled={!!busy||!input.trim()} onClick={doImport}>{busy||'Import locations →'}</button></section></div>}

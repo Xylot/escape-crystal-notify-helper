@@ -24,10 +24,21 @@ export function entranceNotificationDefault(boss, draft, fallback) {
   return locationAreaChange(boss, draft, fallback.location, true, fallback.coverage);
 }
 
+// A map's center can remain in the arena after selecting entrance chunks elsewhere.
+// Restricted notification coverage comes from the selected chunks, not that center.
+export function notificationAreaChange(chunks, preferredRegion) {
+  const change={entranceNotifyChunks:[...chunks]};
+  if(chunks.length&&chunks.every(id=>Number.isInteger(id)&&id>=0&&id<=4194303)) {
+    const regions=[...new Set(chunks.map(id=>{const point=chunkOrigin(id);return regionId(point.x,point.y);}))].sort((a,b)=>a-b);
+    change.entranceRegion=regions.includes(preferredRegion)?preferredRegion:regions[0];
+  }
+  return change;
+}
+
 export function locationAreaChange(boss, draft, location, entrance, coverage) {
   if(!entrance)return coverage?{regions:[...coverage.regions],chunks:[...coverage.chunks]}:null;
   if(location.notificationChunks)coverage={regions:[location.region],chunks:location.notificationChunks};
   const change={entranceRegion:coverage&&!coverage.regions.includes(location.region)?coverage.regions[0]:location.region,entrancePlane:location.plane??0};
   if(!coverage)return change;
-  return {...change,entranceNotifyChunks:[...coverage.chunks]};
+  return {...change,...notificationAreaChange(coverage.chunks,change.entranceRegion)};
 }

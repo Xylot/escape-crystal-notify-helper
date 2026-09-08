@@ -79,7 +79,7 @@ test('paired edits preserve baselines, priority, notifications, and independent 
   const entries=parseJava(applyProposal(source,proposal([safe]))).entries;
   const row=buildLibrary([],[],entries,{}).find(e=>e.id===boss.id),draft=existingDraft(row);
   assert.deepEqual(changedSections(draft),[]);
-  const working=editableDraft(draft);assert.equal(working.entrance.ids[0],'58439');
+  const working=editableDraft(draft);assert.equal(working.entrance.ids[0],'ObjectID.TT_LAIR_ENTRANCE');
   const next=applySection(draft,{...working,entranceDangerous:true},'entrance');
   assert.deepEqual(next.entranceNotifyChunks,[entranceChunk,nearbyChunk]);
   assert.equal(generated(next).length,2);assert.deepEqual(notificationChunks(generated(next)[1]),next.entranceNotifyChunks);

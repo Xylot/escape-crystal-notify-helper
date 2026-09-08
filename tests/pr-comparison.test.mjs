@@ -57,7 +57,7 @@ test('entrance ID, chunk, priority and plane edits show independent before/after
   const data=edit('Abyssal Sire','entrance',working=>({entrance:{...working.entrance,ids:['123'],chunks:working.entrance.chunks.slice(1),plane:'FIRST_FLOOR',overlay:'DEPRIORITIZED_WITH_HIGHLIGHT'}}));
   const p=await prepare(data,'1',new FakeGitHub(),new MemoryStore(),env),pair=p.states[data.changes[0].id];
   const diff=stateDifferences(pair.before,pair.after);
-  assert.ok(diff.added.includes('Entrance IDs: 123'));
+  assert.ok(diff.added.includes('Entrance IDs: ObjectID.BALLOON_YELLOW_POP'));
   assert.ok(diff.removed.includes('Entrance chunks: 774740'));
   assert.ok(diff.added.includes('Entrance plane: FIRST_FLOOR'));
   const before=p.evidence.panels.filter(p=>p.state==='before'&&p.kind==='entrance');
