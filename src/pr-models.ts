@@ -3,6 +3,7 @@ import {loadRegionObjects} from './core/region-objects.mjs';
 import {loadGameval} from './core/gameval.mjs';
 import {modelFamily, modelVariants, moidImage} from './core/moid-images.mjs';
 import {encounterScope} from './core/pr-presentation.mjs';
+import {proposalStates} from './core/pr-states.mjs';
 import type {Boss,Draft,EvidenceContexts} from './types';
 
 function imageAvailable(id:string):Promise<boolean> {
@@ -54,11 +55,14 @@ export async function loadEntranceModels(selectedIds:string[],objectType:string,
 }
 
 export async function prepareModels(drafts:Draft[],bosses:Boss[],contexts:EvidenceContexts) {
-  const result:Record<string,{scope:string;images:string[]}> = {};
+  const result:Record<string,{scope:string;images:string[];beforeImages?:string[]}> = {};
+  const states=proposalStates(drafts);
   for (const draft of drafts) {
     const selected = contexts[draft.id]?.entranceImage;
-    const images = isDungeon(draft)?[]:await loadEntranceModels(draft.entrance?.ids??[],draft.entrance?.objectType??'GAME_OBJECT',selected);
-    result[draft.id] = {scope:encounterScope(bosses.find(b=>b.id===draft.id)??draft),images};
+    const pair=states[draft.id];
+    const images = isDungeon(draft)?[]:await loadEntranceModels(pair.after.entrance?.ids??[],pair.after.entrance?.objectType??'GAME_OBJECT',selected);
+    const beforeImages=pair.before&&!isDungeon(draft)?await loadEntranceModels(pair.before.entrance?.ids??[],pair.before.entrance?.objectType??'GAME_OBJECT'):[];
+    result[draft.id] = {scope:encounterScope(bosses.find(b=>b.id===draft.id)??draft),images,...(pair.before?{beforeImages}:{})};
   }
   return result;
 }

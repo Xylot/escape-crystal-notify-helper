@@ -12,6 +12,12 @@ export function originalEntranceChunks(optionalArgs=[]) {
 export function sameLocation(a,b){
   return a.region===b.region && (a.plane??0)===(b.plane??0) && (a.mapId===null||b.mapId===null||a.mapId===b.mapId);
 }
+// Maps feed their current view back into the editor. Preserve identity when
+// that view has not changed, otherwise it becomes a render/effect feedback loop.
+export function mergeEvidenceContext(context, kind, location) {
+  if (JSON.stringify(context[kind]) === JSON.stringify(location)) return context;
+  return {...context, [kind]:location};
+}
 export function encounterLocations(boss){
   const dedupe=locations=>locations.filter((m,i,all)=>all.findIndex(n=>n.x===m.x&&n.y===m.y&&n.plane===m.plane&&n.mapId===m.mapId)===i);
   const entrance=dedupe(boss.maps.filter(m=>m.role==='entrance'));

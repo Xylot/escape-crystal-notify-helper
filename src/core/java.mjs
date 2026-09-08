@@ -140,7 +140,10 @@ export function generateEntry(change, existing = null) {
     if (i >= 0) optional[i] = entranceJava(change.entrance);
     else optional.unshift(entranceJava(change.entrance));
   }
-  if (coverage.chunks !== undefined) {
+  const originalChunkArg = existing?.optionalArgs.map(a => maskJava(a).trim()).find(a => a.startsWith('List.'));
+  const originalChunkIds = originalChunkArg ? literalChunks(originalChunkArg) : [];
+  const sameChunks = (a, b) => JSON.stringify([...new Set(a)].sort((x,y)=>x-y)) === JSON.stringify([...new Set(b)].sort((x,y)=>x-y));
+  if (coverage.chunks !== undefined && (change.chunks !== undefined || !sameChunks(coverage.chunks, originalChunkIds))) {
     const i = optional.findIndex(a => /^List\.of\([\d,\s]*\)$/.test(maskJava(a).trim()));
     if(i>=0) optional.splice(i,1);
     if(coverage.chunks.length) {

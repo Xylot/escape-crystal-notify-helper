@@ -15,20 +15,27 @@ export default function EncounterMaps(props:Props){
   return <div className="encounter-workspace">
     {!props.focus&&<div className="encounter-intro"><span>ENCOUNTER LOCATIONS</span><p>{shared?'Entrance and arena share a map region.':'Compare the approach and the fight without losing your place.'}</p>{locations.shared&&<button onClick={()=>setSplit(v=>!v)}>{split?'Combine maps':'Separate maps'}</button>}</div>}
     <div className={`encounter-grid ${shared||props.focus?'shared-map':''}`}>
-      {!shared&&!isDungeon(boss)&&<div hidden={props.focus==='arena'}><LocationPane {...props} kind="entrance" locations={locations.entrance} alternatives={boss.maps} /></div>}
-      <div hidden={props.focus==='entrance'}><LocationPane {...props} kind="arena" locations={locations.arena} alternatives={boss.maps} combined={shared}/></div>
+      {!shared&&!isDungeon(boss)&&props.focus!=='arena'&&<div><LocationPane {...props} kind="entrance" locations={locations.entrance} alternatives={boss.maps} /></div>}
+      {props.focus!=='entrance'&&<div><LocationPane {...props} kind="arena" locations={locations.arena} alternatives={boss.maps} combined={shared}/></div>}
     </div>
   </div>;
 }
 function LocationPane({boss,draft,update,onError,onLoad,loading,evidenceContext,onEvidenceContext,kind,locations,alternatives,combined=false}:Props&{kind:'entrance'|'arena';locations:Location[];alternatives:Location[];combined?:boolean}){
   const [choice,setChoice]=useState(''),[manual,setManual]=useState<Location|null>(null),[plane,setPlane]=useState<number|null>(null),[jump,setJump]=useState('');
-  const [chunkMode,setChunkMode]=useState(false),[entranceMode,setEntranceMode]=useState(false),[recenter,setRecenter]=useState(0);
+  const [chunkModes,setChunkModes]=useState(()=>({
+    arena:!!draft.chunks?.length,
+    entrance:!!(draft.entrance?.chunks??originalEntranceChunks(boss.optionalArgs)).length,
+  }));
+  const [entranceMode,setEntranceMode]=useState(false),[recenter,setRecenter]=useState(0);
   const all=useMemo(()=>[...locations,...alternatives.filter(m=>!locations.some(l=>l.x===m.x&&l.y===m.y&&l.source===m.source))],[locations,alternatives]);
   const saved=evidenceContext?.[kind];
   const regionFallback=useMemo<Location|null>(()=>{if(kind!=='arena'||!draft.regions.length)return null;const p=regionOrigin(draft.regions[0]);return {x:p.x+32,y:p.y+32,region:draft.regions[0],plane:null,mapId:null,role:'location',caption:'Selected coverage · verify this location in game',source:'',title:'Selected region',revision:null,verified:false};},[kind,draft.regions[0]]);
   const selected=manual??(choice!==''?all[Number(choice)]:saved??locations[0]??regionFallback);
-  const center=useMemo<[number,number]>(()=>selected?[selected.x,selected.y]:[0,0],[selected,recenter]);
+  const center=useMemo<[number,number]>(()=>selected?[selected.x,selected.y]:[0,0],[selected?.x,selected?.y,recenter]);
   const isEntrance=kind==='entrance'||combined&&entranceMode;
+  const chunkTarget=isEntrance?'entrance':'arena';
+  const chunkMode=chunkModes[chunkTarget];
+  const setChunkMode=(value:boolean)=>setChunkModes(previous=>({...previous,[chunkTarget]:value}));
   const shownPlane=(isEntrance?draft.entrancePlane:undefined)??plane??selected?.plane??0;
   const oldChunks=useMemo(()=>originalEntranceChunks(boss.optionalArgs),[boss.optionalArgs]);
   const chunks:number[]=isEntrance?(draft.entrance?.chunks??oldChunks):(draft.chunks??EMPTY_IDS);
@@ -52,7 +59,7 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,evidenceContext,
     <div className="pane-tools">
       {combined&&<button className={entranceMode?'chosen':''} onClick={()=>setEntranceMode(v=>!v)}>{entranceMode?'Entrance chunks':'Arena coverage'}</button>}
       {!isEntrance&&<><button aria-pressed={!chunkMode} className={!chunkMode?'chosen':''} onClick={()=>setChunkMode(false)}>Regions</button><button aria-pressed={chunkMode} className={chunkMode?'chosen':''} onClick={()=>setChunkMode(true)}>Chunks</button></>}
-      {isEntrance&&<><span>Region {entranceRegions[0]??'not located'}</span><button className={chunkMode?'chosen':''} aria-pressed={chunkMode} onClick={()=>setChunkMode(v=>!v)}>{chunkMode?'Done with chunks':'Restrict to chunks (optional)'}</button></>}
+      {isEntrance&&<><span>Region {entranceRegions[0]??'not located'}</span><button className={chunkMode?'chosen':''} aria-pressed={chunkMode} onClick={()=>setChunkMode(!chunkMode)}>{chunkMode?'Done with chunks':'Restrict to chunks (optional)'}</button></>}
       <button className="recenter" onClick={()=>setRecenter(n=>n+1)}>⌖ Recenter</button>
     <form className="pane-jump" onSubmit={e=>{e.preventDefault();try{const parts=jump.trim().split(/[\s,]+/);if(parts.length!==2)throw new Error('Enter X, Y coordinates.');const[x,y]=parts.map(Number);const r=regionId(x,y);if(isEntrance)update({entranceRegion:r});setManual({x,y,region:r,plane:shownPlane,mapId:null,role:kind==='entrance'?'entrance':'location',caption:'Manual location',source:'',title:'Manual coordinates',revision:null,verified:false});}catch(error){onError((error as Error).message);}}}><input aria-label={`${label} coordinates`} value={jump} onChange={e=>setJump(e.target.value)} placeholder="Jump to X, Y"/><button>Go →</button>{selected&&<code>Region {selected.region}</code>}</form>
     </div>
@@ -62,4 +69,3 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,evidenceContext,
     {selected&&<div className="map-provenance">{selected.tiles?`Wiki rendered tiles · ${selected.tiles.version}`:'Legacy map tiles · visual alignment not verified'}{selected.pinX!==undefined&&<span>Pointer {selected.pinX}, {selected.pinY} · {selected.icon}</span>}</div>}
   </section>;
 }
-

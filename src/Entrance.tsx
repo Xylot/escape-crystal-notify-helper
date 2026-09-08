@@ -9,10 +9,10 @@ import { loadGameval, searchGameval } from './core/gameval.mjs';
 import { Icon } from './Icons';
 import RegionObjects from './RegionObjects';
 
-export default function EntranceEditor({ boss, draft, update, onError, guided = false, imageSelection, onImageSelect, onEditArea }: {
-  boss: Boss; draft: Draft; update: (d: Partial<Draft>) => void; onError: (s: string) => void; guided?: boolean; imageSelection?:string|null; onImageSelect?:(id:string|null|undefined)=>void; onEditArea?:()=>void;
+export default function EntranceEditor({ boss, draft, update, onError, guided = false, editing = false, imageSelection, onImageSelect, onEditArea }: {
+  boss: Boss; draft: Draft; update: (d: Partial<Draft>) => void; onError: (s: string) => void; guided?: boolean; editing?:boolean; imageSelection?:string|null; onImageSelect?:(id:string|null|undefined)=>void; onEditArea?:()=>void;
 }) {
-  const [method, setMethod] = useState('region');
+  const [method, setMethod] = useState(editing && draft.entrance?.ids.length ? 'manual' : 'region');
   const [ids, setIds] = useState(draft.entrance?.ids.join(', ') ?? '');
   const idInput = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState(draft.name), [results, setResults] = useState<any[]>([]);
@@ -30,7 +30,7 @@ export default function EntranceEditor({ boss, draft, update, onError, guided = 
   const areaRegion=draft.entranceRegion ?? boss.maps.find(m=>m.role==='entrance')?.region;
   const areaPlane=draft.entrancePlane ?? boss.maps.find(m=>m.role==='entrance')?.plane ?? 0;
   return <div className="entrance-object-studio">
-    <header className="object-studio-heading"><div><span className="eyebrow">ENTRANCE OBJECT</span><h2>What opens the way?</h2><p>Find the object players interact with, then choose the image that best represents it.</p></div><button type="button" className="object-area-context" onClick={onEditArea}><Icon name="map" size={20}/><span><strong>{areaRegion!=null?`Region ${areaRegion}`:'Choose entrance area'}</strong><small>Plane {areaPlane} · Edit area</small></span><Icon name="arrow" size={16}/></button></header>
+    <header className="object-studio-heading"><div><span className="eyebrow">ENTRANCE OBJECT</span><h2>{editing?'Edit entrance detection':'What opens the way?'}</h2><p>{editing?'Adjust the selected IDs and interaction settings, or browse for a replacement.':'Find the object players interact with, then choose the image that best represents it.'}</p></div><button type="button" className="object-area-context" onClick={onEditArea}><Icon name="map" size={20}/><span><strong>{areaRegion!=null?`Region ${areaRegion}`:'Choose entrance area'}</strong><small>Plane {areaPlane} · Edit area</small></span><Icon name="arrow" size={16}/></button></header>
     {existing && !draft.entrance && <div className="preserved-notice"><Icon name="shield" size={17}/><span>Existing entrance preserved. Adding IDs replaces its detection configuration.</span></div>}
     <div className="object-studio-grid"><section className="object-browser" aria-label="Browse entrance objects">
     <div className="object-methods" aria-label="Find entrance objects">{[['region', 'Nearby'], ['gameval', 'Name or ID'], ['wiki', 'Wiki'], ['manual', 'Manual']].map(([value, label]) => <button key={value} aria-pressed={method === value} className={method === value ? 'chosen' : ''} onClick={() => setMethod(value)}>{label}</button>)}</div>

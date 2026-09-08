@@ -6,7 +6,7 @@
   "routes": [{ "pattern": "crystal-pr.emmi.sh", "custom_domain": true }],
   "workers_dev": true,
   "vars": {
-    "ALLOWED_ORIGINS": "http://127.0.0.1:5174,https://crystal.emmi.sh",
+    "ALLOWED_ORIGINS": "http://127.0.0.1:5173,https://crystal.emmi.sh",
     "BASE_BRANCH": "master",
     "DEPLOYMENT_MODE": "production",
     "PR_ENABLED": "true"

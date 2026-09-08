@@ -21,7 +21,11 @@ export function chunkOrigin(id) {
 }
 export function regionTileUrl(id, plane = 0) {
   const { x, y } = regionOrigin(id); integer(plane, 0, 3, 'Plane');
-  return `https://raw.githubusercontent.com/Explv/osrs_map_tiles/master/${plane}/8/${x / 64 - 16}/${y / 64 - 19}.png`;
+  // Explv's RS_OFFSET_X is 1024 - 64 (15 regions), not 1024.
+  // Its TMS grid starts at world Y=1216 (19 regions). At zoom 8,
+  // each 256px image covers exactly one 64x64 world region.
+  // https://github.com/Explv/explv.github.io/blob/master/js/model/Position.js
+  return `https://raw.githubusercontent.com/Explv/osrs_map_tiles/master/${plane}/8/${x / 64 - 15}/${y / 64 - 19}.png`;
 }
 export function wikiRegionTileUrl(id,source,plane=source.plane){
   if(!/^[A-Za-z0-9_-]+$/.test(source.version)||!Number.isInteger(source.mapId)||!Number.isInteger(plane)||plane<0||plane>3)throw new Error('Invalid wiki tile source.');

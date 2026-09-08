@@ -31,6 +31,8 @@ Entrance object thumbnails use MOID's first orientation. Missing images show an 
 
 The authoring steps are **Setup → Arena → Entrance area → Entrance object → Review & export**. Entrance area contains the map, region/plane selection, and chunk restrictions. Entrance object provides a dedicated visual candidate browser alongside detection IDs, interaction settings, and the independently chosen MOID reference image. Review provides separate shortcuts back to the area and object steps. Arena-only exports and preservation of existing plugin entrances remain available.
 
+Existing plugin encounters open in an **Encounter overview** with Details, Coverage, and Entrance sections (dungeons omit Entrance). Every overview section is collapsible, including the contribution panel. Coverage and Entrance display terrain map squares with highlighted chunk restrictions; their preview-plane selectors never change the draft. Choose **Edit**, adjust the populated settings, then **Apply changes** to save one local draft revision or **Cancel** to leave the section unchanged. Applied edits show **Original → Your changes** comparisons and support Undo/Redo. **Review changes** opens the existing proposal, patch, and PR export actions. Navigating away from unapplied edits offers Apply, Discard, or Keep editing. Opening a section never creates a draft; restoring all settings to the original removes it. Entrance reference preferences are saved separately. Special or quest-gated Java settings remain preserved and unsupported controls explain when a source edit is needed. New encounters and their unfinished drafts retain guided creation.
+
 1. Sync the plugin and select a boss, or import a wiki title/URL. If CORS blocks requests, paste the page's wikitext in the import dialog.
 2. Inspect wiki locations and linked caves; outside entrance pins are distinct from arena candidates. Select 64×64 regions, inspect 8×8 chunk IDs, and choose a death classification.
 3. Optionally configure an entrance using numeric IDs or `ObjectID.*`/`NpcID.*` constants. A replacement intentionally replaces the whole existing entrance constructor; inspect preserved arguments first. Advanced boolean variants are not synthesized.
@@ -38,6 +40,8 @@ The authoring steps are **Setup → Arena → Entrance area → Entrance object 
 5. Download a patch or JSON proposal, or copy the proposal into the plugin's manually triggered workflow.
 
 When the optional backend is configured, single and batch reviews can prepare a GitHub PR with map screenshots and wiki links. Only the final Create pull request action writes branches, commits, and the PR. Downloads remain available without a backend. See [backend setup](docs/pr-backend-setup.md). Existing source arguments are retained from the trusted current plugin source. Proposal text is parsed as data, never evaluated.
+
+PRs that edit existing encounters list additions and removals, then show collapsible **Before** and **After** states. Each state includes its full settings, coverage and entrance screenshots, available model references, and wiki sources. These states are frozen from the original and generated Java entries, so unchanged chunk restrictions remain visible. New encounters retain the addition layout, including in mixed batches. Deploy the updated frontend and PR Worker together to enable this format; existing prepared submissions retain their original evidence contract. Before and after screenshots both count toward the 32-image submission limit.
 
 ## Dungeons
 

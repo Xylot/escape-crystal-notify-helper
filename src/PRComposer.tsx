@@ -9,10 +9,28 @@ import { wikiUrl } from './core/wiki.mjs';
 import { prJSON, signIn, signOut, PRFailure } from './pr-client';
 import { renderEvidence, type EvidenceImage } from './pr-screenshots';
 import { Icon } from './Icons';
+import {stateDifferences} from './core/pr-states.mjs';
 
 const HISTORY='escape-crystal-pr-history:v1';
 const statusText:Record<string,string>={prepared:'Ready to create',working:'Finishing submission…','creating-fork':'Creating your fork…','uploading-screenshots':'Uploading screenshots…','committing-code':'Committing boss changes…','creating-pr':'Creating your pull request…',complete:'Pull request created',closed:'Pull request closed',merged:'Pull request merged',retry:'Submission needs a retry'};
 function remember(signature:string,record:any){try{const saved=JSON.parse(localStorage.getItem(HISTORY)||'{}');saved[signature]={id:record.id,revision:record.revision,pr:record.pr,status:record.status};localStorage.setItem(HISTORY,JSON.stringify(saved));}catch{/* Server status remains authoritative. */}}
+
+function StateSummary({state,models,sources}:{state:any;models:string[];sources:string[]}) {
+  return <><p>Name: {state.name}</p><p>{isDungeon(state)?'Dungeon':'Arena'} regions: {state.regions.join(', ')} · {state.deathType}</p><p>Coverage chunks: {state.chunks?.join(', ')||'Whole regions'}</p>
+    {!isDungeon(state)&&<p>Entrance: {state.entrance?`${state.entrance.objectType} · ${state.entrance.ids.join(', ')} · ${state.entrance.overlay} · direction ${state.entrance.direction||'default'} · plane ${state.entrance.plane||'default'} · chunks ${state.entrance.chunks.join(', ')||'none'}`:state.entranceRaw?'Special source settings':'None'}</p>}
+    {state.entranceRaw&&!state.entrance&&<pre>{state.entranceRaw}</pre>}{state.extraSettings?.length>0&&<pre>{state.extraSettings.join('\n')}</pre>}
+    {!!models.length&&<><h5>Entrance model references & variants</h5><div className="entrance-portraits">{models.map(id=><MoidThumbnail key={id} id={id}/>)}</div></>}
+    <div className="pr-sources">{sources.map(source=><a key={source} href={source} target="_blank" rel="noreferrer">{decodeURIComponent(new URL(source).pathname.slice(3)).replaceAll('_',' ')}{new URL(source).search?' · revision':''} ↗</a>)}</div></>;
+}
+
+export function EncounterSummary({change,preview,images}:{change:any;preview:any;images:EvidenceImage[]}) {
+  const pair=preview.states?.[change.id],presentation=preview.presentation?.[change.id];
+  const diff=pair?.before?stateDifferences(pair.before,pair.after):null;
+  return <article><h4>{change.name}</h4>
+    {diff&&(['added','removed'] as const).map(key=><div key={key}><h5>{key==='added'?'Additions':'Removals'}</h5>{diff[key].length?<ul>{diff[key].map((line:string)=><li key={line}>{line}</li>)}</ul>:<p>None.</p>}</div>)}
+    {pair?.before?(['before','after'] as const).map(phase=><details key={phase}><summary>{phase==='before'?'Before':'After'}</summary><StateSummary state={pair[phase]} models={(phase==='before'?presentation?.beforeImages:presentation?.images)??[]} sources={preview.evidence.sources[change.id]}/><div className="pr-images">{images.filter(image=>preview.evidence.panels.some((p:any)=>p.id===image.id&&p.bossId===change.id&&p.state===phase)).map(image=><figure key={image.id}><img src={image.url} alt={image.id.replaceAll('_',' ')}/></figure>)}</div></details>)
+    :<StateSummary state={pair?.after??change} models={presentation?.images??[]} sources={preview.evidence.sources[change.id]}/>}</article>;
+}
 
 export default function PRComposer({drafts,bosses,contexts,onClose}:{drafts:Draft[];bosses:Boss[];contexts:EvidenceContexts;onClose:()=>void}){
   const [login,setLogin]=useState(''),[preview,setPreview]=useState<any>(null),[images,setImages]=useState<EvidenceImage[]>([]),[title,setTitle]=useState(''),[introduction,setIntroduction]=useState(''),[busy,setBusy]=useState(''),[error,setError]=useState('');
@@ -68,9 +86,9 @@ export default function PRComposer({drafts,bosses,contexts,onClose}:{drafts:Draf
         <label className="field">PR title<input value={title} maxLength={200} disabled={!!busy} onChange={e=>setTitle(e.target.value)}/></label>
         <label className="field">Introduction<textarea rows={3} value={introduction} maxLength={6000} disabled={!!busy} onChange={e=>setIntroduction(e.target.value)}/></label>
       </>}
-      <h3>Encounter changes</h3><div className="pr-summary">{preview.changes.map((c:any)=><article key={c.id}><h4>{c.name}</h4><p>Regions: {c.regions.join(', ')} · {c.deathType}</p><p>{isDungeon(c)?'Dungeon':'Arena'} chunks: {c.chunks?.join(', ')||'Whole regions'}</p>{!isDungeon(c)&&<p>Entrance: {c.entrance?`${c.entrance.objectType} · ${c.entrance.ids.join(', ')} · chunks ${c.entrance.chunks.join(', ')||'none'}`:'Existing settings preserved, if present'}</p>}{!!preview.presentation?.[c.id]?.images.length&&<><h5>Entrance model references & variants</h5><div className="entrance-portraits">{preview.presentation[c.id].images.map((id:string)=><MoidThumbnail key={id} id={id}/>)}</div><p className="muted">Related forms are shown for reference. Detection IDs are unchanged.</p></>}<div className="pr-sources">{preview.evidence.sources[c.id].map((source:string)=><a key={source} href={source} target="_blank" rel="noreferrer">{decodeURIComponent(new URL(source).pathname.slice(3)).replaceAll('_',' ')}{new URL(source).search?' · revision':''} ↗</a>)}</div></article>)}</div>
-      <h3>Region & chunk screenshots</h3><p className="muted">Editor selections, not in-game verification. Images are stored on a separate evidence branch in your fork.</p>
-      <div className="pr-images">{images.map(image=><figure key={image.id}><img src={image.url} alt={image.id.replaceAll('_',' ')}/><figcaption>{image.id.replaceAll('_',' ')}</figcaption></figure>)}</div>
+      <h3>Encounter changes</h3><div className="pr-summary">{preview.changes.map((c:any)=><EncounterSummary key={c.id} change={c} preview={preview} images={images}/>)}</div>
+      <h3>Region & chunk screenshots</h3><p className="muted">Before and after screenshots appear with their state above. Editor selections, not in-game verification. Images are stored on a separate evidence branch in your fork.</p>
+      <div className="pr-images">{images.filter(image=>!preview.evidence.panels.find((p:any)=>p.id===image.id)?.state).map(image=><figure key={image.id}><img src={image.url} alt={image.id.replaceAll('_',' ')}/><figcaption>{image.id.replaceAll('_',' ')}</figcaption></figure>)}</div>
       {!complete&&images.length!==preview.evidence.panels.length&&!busy&&<p className="export-issue">Screenshots are incomplete. Refresh the preview to retry before submitting.</p>}
       <details className="review-code"><summary>Exact code diff</summary><pre>{preview.patch}</pre></details>
       <details className="review-code"><summary>Generated PR description</summary><pre>{preview.body.replace(preview.introduction,introduction)}</pre></details>

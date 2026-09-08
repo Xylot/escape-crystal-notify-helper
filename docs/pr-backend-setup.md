@@ -6,7 +6,7 @@
 - D1: `escape-crystal-pr`, bound as `DB`; initial migration applied.
 - `TOKEN_ENCRYPTION_KEY`: generated securely and stored as a Worker secret.
 - Production target: `Xylot/escape-crystal-notify`, branch `master`.
-- OAuth secrets are configured. PR creation is enabled for `http://127.0.0.1:5174` and `https://crystal.emmi.sh`; `/config` reports `enabled: true`.
+- OAuth secrets are configured. PR creation is enabled for `http://127.0.0.1:5173` and `https://crystal.emmi.sh`; `/config` reports `enabled: true`.
 - Live OAuth sign-in was verified as Xylot. Same-tab sign-in is available when a popup is not visible.
 - Live preparation successfully reads upstream and produces the Java diff, wiki links, and Shellbane cave PNG evidence. The wiki tile host returns HTTP 403 to the Worker but explicitly permits anonymous browser CORS requests. Evidence now downloads public tiles directly in the browser, falling back to the authenticated Worker endpoint if necessary. No GitHub or editor credentials are sent to tile hosts. Failed downloads still block submission.
 
@@ -31,7 +31,7 @@ Open https://github.com/settings/applications/new and enter:
 | Field | Value |
 | --- | --- |
 | Application name | Escape Crystal Content Editor |
-| Homepage URL | `http://127.0.0.1:5174/` for initial local testing |
+| Homepage URL | `http://127.0.0.1:5173/` for initial local testing |
 | Authorization callback URL | `https://crystal-pr.emmi.sh/auth/callback` |
 
 Device flow is not used. The application uses authorization-code flow with PKCE and requests `public_repo`. Expired authorization requires signing in again; refresh tokens are not retained.
@@ -53,7 +53,7 @@ In a PowerShell terminal, start the editor with:
 
 ```powershell
 $env:VITE_PR_API_URL = 'https://crystal-pr.emmi.sh'
-npm run dev -- --port 5174
+npm run dev -- --port 5173
 ```
 
 The user designated the main plugin repository for the live test. Use a real, reviewed boss change. Review the exact Java diff, every screenshot, plane, region/chunk ID, and wiki source before the final Create pull request action. Confirm that the resulting PR is ready for review, its code diff contains only the boss Java file, and its embedded images use immutable evidence commit URLs. Retry the same revision and confirm it returns the same PR. No live test PR has been created yet.
