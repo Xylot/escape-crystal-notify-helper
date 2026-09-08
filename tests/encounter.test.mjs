@@ -1,8 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {encounterLocations,sameLocation,mergeEvidenceContext} from '../src/core/encounter.mjs';
+import {encounterLocations,sameLocation,mergeEvidenceContext,refreshedLocation} from '../src/core/encounter.mjs';
 import {regionId} from '../src/core/coordinates.mjs';
 const loc=(x,y,role,title,plane=null,mapId=null)=>({x,y,region:regionId(x,y),role,title,plane,mapId,source:'wiki',caption:''});
+
+test('refresh replaces an old polygon vertex with its outline without adopting unrelated polygons',()=>{
+  const saved={...loc(3241,3299,'location','Lumbridge cow field',0),mtype:'polygon'};
+  const outline={...loc(3253,3277,'location','Lumbridge cow field'),mtype:'polygon',outline:[[[3241,3299],[3266,3299],[3266,3255],[3241,3299]]]};
+  assert.equal(refreshedLocation(saved,[outline]),outline);
+  assert.equal(refreshedLocation({...saved,mtype:'pin'},[outline]).mtype,'pin');
+  assert.equal(refreshedLocation(saved,[{...outline,source:'other'}]),saved);
+  assert.equal(refreshedLocation(saved,[{...outline,plane:1}]),saved);
+});
 test('map evidence feedback settles after one update instead of producing new state forever',()=>{
   const entrance=loc(3028,4772,'entrance','Abyssal Sire',0);
   const initial={entranceImage:'27048'};

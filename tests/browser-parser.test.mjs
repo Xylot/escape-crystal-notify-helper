@@ -9,6 +9,15 @@ import '../scripts/vendor-parser.mjs';
 const context=vm.createContext({console,URL,setTimeout,clearTimeout});
 vm.runInContext(await readFile(new URL('../public/vendor/wikiparser.js',import.meta.url),'utf8'),context);
 const Parser=context.Parser;
+import {cowFieldMap} from './fixtures/cow-field.mjs';
+import {outlineCoverage} from '../src/core/map-outline.mjs';
+
+test('shipped browser parser preserves the cow field polygon as a single selectable area',()=>{
+  const result=extractWiki(Parser,{title:'Lumbridge cow field',revision:15156602,text:cowFieldMap});
+  assert.equal(result.maps.length,1);
+  assert.equal(result.maps[0].outline[0].length,27);
+  assert.deepEqual(outlineCoverage(result.maps[0].outline).regions,[12850,12851,13106,13107]);
+});
 
 test('shipped browser bundle supports map and catalog AST queries',()=>{
   const maps=extractWiki(Parser,{title:'Test',revision:1,text:'{{Map|x=3176|y=2477|caption=Entrance}}'});

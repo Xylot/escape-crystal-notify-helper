@@ -62,6 +62,7 @@ export function RegionMap(props:Props){
  useEffect(()=>{
   const group=pins.current;if(!group)return;group.clearLayers();
   for(const pin of props.locations){if(pin.plane!==null&&pin.plane!==props.plane)continue;if(props.tileSource&&pin.mapId!==null&&Number(pin.mapId)!==props.tileSource.mapId)continue;
+   if(pin.outline){L.polygon(pin.outline.map(ring=>ring.map(([x,y])=>[y,x] as L.LatLngTuple)),{color:'#3388ff',weight:3,fillOpacity:.08,interactive:false}).addTo(group);continue;}
    const point:L.LatLngExpression=[pin.pinY??pin.y+(pin.mtype==='pin'?.5:0),pin.pinX??pin.x+(pin.mtype==='pin'?.5:0)];
    if(pin.mtype==='pin'){const icon=L.divIcon({className:'wiki-pointer',iconSize:[26,42],iconAnchor:[13,42],html:'<svg width="26" height="42" viewBox="0 0 26 42"><path d="M13 0C5.8 0 0 5.8 0 13c0 9 13 29 13 29s13-20 13-29C26 5.8 20.2 0 13 0Z" fill="#ff4141"/><circle cx="13" cy="13" r="5.5" fill="white"/></svg>'});L.marker(point,{icon,interactive:false}).addTo(group);}else L.circleMarker(point,{radius:6,color:'#d9a54b',fillOpacity:1,interactive:false}).addTo(group);
   }

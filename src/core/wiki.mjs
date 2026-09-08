@@ -1,4 +1,5 @@
 import { regionId } from './coordinates.mjs';
+import {normalizeOutline, outlineCenter} from './map-outline.mjs';
 export const WIKI = 'https://oldschool.runescape.wiki';
 export function wikiTitle(input) {
   if (/^https?:/i.test(input)) {
@@ -39,6 +40,22 @@ export function extractWiki(Parser, page) {
     for (const [key, value] of Object.entries(args)) if (/^\d+$/.test(key)) {
       const match = String(value).trim().match(/^(\d+)\s*,\s*(\d+)$/); if (match) coords.push([match[1],match[2]]);
     }
+    const mtype=args.mtype?.trim().toLowerCase();
+    if (mtype === 'polygon') {
+      // Polygon x/y describe its viewport; only positional pairs are vertices.
+      const vertices=Object.entries(args).filter(([key])=>/^\d+$/.test(key)).sort(([a],[b])=>Number(a)-Number(b)).map(([,value])=>{
+        const match=String(value).trim().match(/^(\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)$/);
+        return match?[Number(match[1]),Number(match[2])]:null;
+      });
+      const outline=normalizeOutline([vertices]);
+      if (!outline) {warnings.push('A polygon map has unresolved or invalid vertices; review its source.');continue;}
+      const {x,y}=outlineCenter(outline),planeText=args.plane?.trim();
+      maps.push({x,y,region:regionId(x,y),outline,mtype:'polygon',plane:/^[0-3]$/.test(planeText??'')?Number(planeText):null,mapId:args.mapID??args.mapid??null,
+        role:'location',caption:args.caption||'Wiki location outline',source:wikiUrl(page.title),title:page.title,revision:page.revision,verified:false});
+      continue;
+    }
+    // Line vertices are not independent location suggestions either.
+    if (['line','polyline'].includes(mtype)) continue;
     if (!coords.length) warnings.push('A Map template has no literal coordinates. Template expansion or manual review is needed.');
     for (const [sx,sy] of coords) {
       if (!/^\d+$/.test(sx) || !/^\d+$/.test(sy) || +sx > 16383 || +sy > 16383) { warnings.push('Unresolved or invalid map coordinates.'); continue; }
@@ -71,7 +88,7 @@ export async function importWiki(Parser, title, knownLocations = [], followLinks
     try { const next = await read(linked); result.maps.push(...next.maps); result.warnings.push(...next.warnings); }
     catch (error) { result.warnings.push(`Could not inspect ${linked}: ${error.message}`); }
   }
-  result.maps = result.maps.filter((m,i,all)=>all.findIndex(n=>n.x===m.x && n.y===m.y && n.source===m.source)===i);
+  result.maps = result.maps.filter((m,i,all)=>all.findIndex(n=>n.x===m.x && n.y===m.y && n.source===m.source && n.plane===m.plane && n.mapId===m.mapId && JSON.stringify(n.outline)===JSON.stringify(m.outline))===i);
   return result;
 }
 export async function findEntranceCandidates(Parser, bossName) {

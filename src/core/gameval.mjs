@@ -1,4 +1,17 @@
 const PATH='runelite-api/src/main/java/net/runelite/api/gameval';
+export function indexGameval(entries){
+  const index=new Map();
+  for(const entry of entries)for(const key of [entry.id,`${entry.file}.${entry.name}`]){
+    const typed=`${entry.objectType}:${key}`;
+    index.set(typed,[...(index.get(typed)??[]),entry]);
+  }
+  return index;
+}
+export function gamevalMatches(index,ids,objectType='GAME_OBJECT'){
+  const types=objectType==='ANY'?['GAME_OBJECT','NPC']:[objectType];
+  const matches=ids.flatMap(id=>types.flatMap(type=>index.get(`${type}:${String(id)}`)??[]));
+  return [...new Map(matches.map(entry=>[`${entry.file}.${entry.name}`,entry])).values()];
+}
 export function parseGameval(source,file,revision){
   return source.split('\n').flatMap((line,index)=>{const m=line.match(/public static final int ([A-Z][A-Z0-9_]*)\s*=\s*(\d+);/);return m?[{name:m[1],id:m[2],file,objectType:file==='NpcID'?'NPC':'GAME_OBJECT',source:`https://github.com/runelite/runelite/blob/${revision}/${PATH}/${file}.java#L${index+1}`}]:[];});
 }

@@ -12,6 +12,15 @@ export function originalEntranceChunks(optionalArgs=[]) {
 export function sameLocation(a,b){
   return a.region===b.region && (a.plane??0)===(b.plane??0) && (a.mapId===null||b.mapId===null||a.mapId===b.mapId);
 }
+// Refreshing older imports must replace their polygon-vertex selection with
+// the corresponding outline, while retaining unrelated manual/view locations.
+export function refreshedLocation(saved,locations){
+  if(!saved)return saved;
+  return locations.find(m=>m.source===saved.source&&(m.plane===null||saved.plane===null||m.plane===saved.plane)&&(m.mapId===null||saved.mapId===null||m.mapId===saved.mapId)&&(
+    m.x===saved.x&&m.y===saved.y&&JSON.stringify(m.outline)===JSON.stringify(saved.outline)||
+    saved.mtype==='polygon'&&!saved.outline&&m.outline?.some(ring=>ring.some(([x,y])=>Math.abs(x-saved.x)<1&&Math.abs(y-saved.y)<1))
+  ))??saved;
+}
 // Maps feed their current view back into the editor. Preserve identity when
 // that view has not changed, otherwise it becomes a render/effect feedback loop.
 export function mergeEvidenceContext(context, kind, location) {
@@ -19,7 +28,7 @@ export function mergeEvidenceContext(context, kind, location) {
   return {...context, [kind]:location};
 }
 export function encounterLocations(boss){
-  const dedupe=locations=>locations.filter((m,i,all)=>all.findIndex(n=>n.x===m.x&&n.y===m.y&&n.plane===m.plane&&n.mapId===m.mapId)===i);
+  const dedupe=locations=>locations.filter((m,i,all)=>all.findIndex(n=>n.x===m.x&&n.y===m.y&&n.plane===m.plane&&n.mapId===m.mapId&&JSON.stringify(n.outline)===JSON.stringify(m.outline))===i);
   const entrance=dedupe(boss.maps.filter(m=>m.role==='entrance'));
   const words=boss.name.toLowerCase().split(/[^a-z]+/).filter(w=>w.length>3);
   // Prefer a boss-specific cave over a broad island/overworld map. Still a candidate.

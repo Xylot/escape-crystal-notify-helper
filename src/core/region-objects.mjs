@@ -1,4 +1,21 @@
+import {chunkId,chunkOrigin,regionId,integer} from './coordinates.mjs';
 export const DUMPER='Xylot/osrs-world-map-object-dumper';
+export function entranceObjectRegions(region,chunks=[]){
+ const regions=region===undefined?[]:[integer(region,0,65535,'Region ID')];
+ for(const id of chunks){const p=chunkOrigin(id);regions.push(regionId(p.x,p.y));}
+ return [...new Set(regions)].sort((a,b)=>a-b);
+}
+/** @param {any} data @param {number[]} regions @param {{region:number,x:number,y:number}[]} points @param {number|null} plane @returns {any[]} */
+export function entranceObjectCandidates(data,regions,points=[],plane=null){
+ return [...new Set(regions)].flatMap(region=>regionObjectCandidates(data,region,points.find(p=>p.region===region)??null,plane))
+   .sort((a,b)=>Number(b.entrance)-Number(a.entrance)||(a.distance??0)-(b.distance??0)||a.id-b.id);
+}
+/** @param {any[]} rows @param {number[]} chunks @param {boolean} entireRegions @returns {any[]} */
+export function objectsInEntranceChunks(rows,chunks=[],entireRegions=false){
+ if(entireRegions||!chunks.length)return rows;
+ const selected=new Set(chunks);
+ return rows.filter(row=>selected.has(chunkId(row.x,row.y)));
+}
 let pending;
 export async function loadRegionObjects(){
  if(pending)return pending;

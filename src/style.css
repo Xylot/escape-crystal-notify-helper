@@ -1257,6 +1257,18 @@ summary {
   padding: 5px;
   margin-left: 4px
 }
+.outline-coverage {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px;
+  border-top:1px solid var(--line);
+  background:var(--selected);
+}
+.outline-coverage p { margin:4px 0 0; font-size:var(--text-meta); }
+.outline-coverage button { flex-shrink:0; }
 .pane-tools {
   display: flex;
   align-items: center;
@@ -1712,6 +1724,9 @@ summary {
   margin: 9px 0;
   overflow-wrap: anywhere
 }
+.gameval-labels { display:block; overflow-wrap:anywhere; font-size:12px; }
+.gameval-labels .gameval-name { margin:5px 0; font-family:var(--font-mono,monospace); }
+.selected-gameval-names { margin:12px 0; }
 .evidence {
   border: 1px solid var(--line);
   border-radius: var(--radius-control);
