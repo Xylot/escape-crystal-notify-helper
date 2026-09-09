@@ -40,7 +40,7 @@ function values(draft:Draft, section:Section):[string,string][] {
   const e = current.entrance;
   if (!e && !baseline.entrance.raw) return [['Detection','No entrance configured']];
   const knownPriority = e || /EscapeCrystalNotifyRegionEntranceOverlayType\.(PRIORITIZED_WITH_HIGHLIGHT|DEPRIORITIZED_WITH_HIGHLIGHT)/.test(baseline.entrance.raw??'');
-  return [['Entrance area',current.entranceDangerous===false?'Not dangerous · notify only in selected chunks':current.entranceDangerous===true?'Dangerous':'Existing coverage preserved'],['Notification chunks',list(current.entranceNotifyChunks,'Whole entrance area')],['Priority',knownPriority ? priority(entranceOverlay(current)) : 'Preserved in source'],
+  return [['Entrance area',current.entranceDangerous===false?'Not dangerous · region notifications disabled':current.entranceDangerous===true?'Dangerous':'Existing coverage preserved'],['Entrance coverage chunks',list(current.entranceNotifyChunks,'Whole entrance area')],['Priority',knownPriority ? priority(entranceOverlay(current)) : 'Preserved in source'],
     ['Detection IDs',e ? list(e.ids) : 'Special configuration · preserved'],
     ['Interaction',e ? e.objectType.replaceAll('_',' ').toLowerCase() : 'Preserved in source'],
     ['Approach / plane',e ? `${e.direction.replaceAll('_',' ').toLowerCase() || 'Any direction'} / ${e.plane.replaceAll('_',' ').toLowerCase() || 'Any plane'}` : 'Preserved in source'],
@@ -201,7 +201,7 @@ export default function EncounterEditor(p:Props) {
         return <section key={id} className={`edit-record ${modified?'is-modified':''} ${collapsed[id]?'is-collapsed':''}`}><div className="edit-record-heading"><h3><button className="edit-collapse-toggle" aria-expanded={!collapsed[id]} aria-controls={`overview-${id}`} onClick={()=>setCollapsed(previous=>({...previous,[id]:!previous[id]}))}><span className="edit-collapse-chevron" aria-hidden="true">›</span><Icon name={id==='details'?'file':id==='coverage'?'map':'layers'} size={19}/>{labels[id]}</button>{modified&&<span className="edit-change-label">Changed</span>}</h3><button data-edit-section={id} disabled={!!blocked} onClick={()=>open(id)}>{id==='entrance'&&!baseline.entrance.raw&&!effective.entrance?'Add entrance':`Edit ${labels[id].toLowerCase()}`} <Icon name="arrow" size={14}/></button></div>
           <div id={`overview-${id}`} hidden={!!collapsed[id]}>
           {!collapsed[id]&&id==='coverage'&&<OverviewMapSquares regions={effective.regions} chunks={effective.chunks} locations={sourceBoss.maps} context={p.context.arena} label="Coverage"/>}
-          {!collapsed[id]&&id==='entrance'&&entranceRegions.length>0&&<OverviewMapSquares regions={entranceRegions} chunks={effective.entranceNotifyChunks??entranceChunks} locations={sourceBoss.maps.filter(location=>location.role==='entrance')} context={p.context.entrance} label="Entrance notification coverage"/>}
+          {!collapsed[id]&&id==='entrance'&&entranceRegions.length>0&&<OverviewMapSquares regions={entranceRegions} chunks={effective.entranceNotifyChunks??entranceChunks} locations={sourceBoss.maps.filter(location=>location.role==='entrance')} context={p.context.entrance} label={effective.entranceDangerous===false?"Entrance coverage (region notifications disabled)":"Entrance notification coverage"}/>}
           <ValueList rows={rows.filter(([key])=>id==='coverage'?key!=='Regions':key!=='Selected region')}/>
           {blocked&&<p className="edit-preservation-note">{blocked}</p>}
           {id==='entrance'&&entranceReason&&<p className="edit-preservation-note">{entranceReason}</p>}

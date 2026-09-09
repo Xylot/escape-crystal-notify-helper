@@ -16,8 +16,7 @@ export function mergeDraft(draft, change) {
   if ('entranceOverlay' in change && next.entrance) next.entrance = {...next.entrance, overlay: change.entranceOverlay};
   if (change.entrance) next.entranceOverlay = change.entrance.overlay;
   if(change.entrance&&change.entranceDangerous===undefined&&draft.entranceDangerous===undefined&&!draft.entrance&&!draft.entranceBaseRaw&&!draft.baseRaw?.includes('EscapeCrystalNotifyRegionEntrance('))next.entranceDangerous=null;
-  if(change.entranceDangerous===false&&next.entranceNotifyChunks===undefined)next.entranceNotifyChunks=[...(next.entrance?.chunks??[])];
-  if(Array.isArray(next.entranceNotifyChunks)&&!('entranceRegion' in change)&&('entranceNotifyChunks' in change||change.entranceDangerous===false)) {
+  if(Array.isArray(next.entranceNotifyChunks)&&!('entranceRegion' in change)&&'entranceNotifyChunks' in change) {
     Object.assign(next,notificationAreaChange(next.entranceNotifyChunks,next.entranceRegion));
   }
   if ('regions' in change && !('chunks' in change) && next.chunks) {

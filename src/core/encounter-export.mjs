@@ -1,4 +1,4 @@
-import {generateEntry, parseJava, maskJava, splitArgs, exportCoverage} from './java.mjs';
+import {generateEntry, parseJava, maskJava, splitArgs, exportCoverage, isNotifyRegion} from './java.mjs';
 import {integer, chunkOrigin, regionId} from './coordinates.mjs';
 import {isDungeon} from './encounter-kind.mjs';
 
@@ -45,7 +45,6 @@ export function expandEncounter(change, existing=sourceEntry(change.baseRaw), pa
     if(!Array.isArray(values)||values.length>256)throw new Error(`Invalid ${label.toLowerCase()} chunks.`);
     values.forEach(n=>integer(n,0,4194303,`${label} chunk ID`));
   }
-  if(change.entranceDangerous===false&&!notify.length)throw new Error('Select notification chunks near the non-dangerous entrance. Notifications still occur inside those chunks.');
   if(notify.length&&(!detection.length||detection.some(id=>!notify.includes(id))))throw new Error('Every object-detection chunk must be inside the entrance notification chunks. Select explicit object-detection chunks.');
   if(change.entranceRegion!==undefined)integer(change.entranceRegion,0,65535,'Entrance region');
   const areaChanged=change.entranceRegion!==undefined||change.entrance&&JSON.stringify(sorted(detection))!==JSON.stringify(sorted(detectionChunks(origin)))||change.entranceNotifyChunks!==undefined&&JSON.stringify(sorted(notify))!==JSON.stringify(sorted(notificationChunks(paired)));
@@ -64,14 +63,15 @@ export function expandEncounter(change, existing=sourceEntry(change.baseRaw), pa
   if(!split) {
     const coverage={regions:sorted([...change.regions,...regions]),chunks:sorted([...arenaChunks,...notify])};
     if(coverage.regions.length>256||coverage.chunks.length>256)throw new Error('Combined coverage exceeds 256 regions or chunks.');
-    return [{id:change.id,baseRaw:change.baseRaw,raw:generateEntry({...clean,chunks:coverage.chunks},existing,coverage)}];
+    return [{id:change.id,baseRaw:change.baseRaw,raw:generateEntry({...clean,chunks:coverage.chunks,notifyRegion:change.entranceDangerous},existing,coverage)}];
   }
   if(existing?.optionalArgs.some(a=>a.includes('Quest.')))throw new Error('Splitting quest-gated coverage requires manual Java review.');
-  const bossSource=existing?{...existing,optionalArgs:existing.optionalArgs.filter(a=>a!==entranceArg(existing))}:null;
+  const bossSource=existing?{...existing,optionalArgs:existing.optionalArgs.filter(a=>a!==entranceArg(existing)&&!/^(true|false)$/.test(maskJava(a).trim()))}:null;
   const bossChange={...clean,entrance:undefined,entranceOverlay:undefined,entranceRegion:undefined,chunks:arenaChunks};
   // Transfer only the trusted entrance constructor, never the arena's restrictions.
   const entranceSource=paired??(entranceArg(existing)?{...existing,optionalArgs:[entranceArg(existing)]}:null);
-  const entranceChange={...clean,id:entranceId,name:paired?.name??`${change.name} Entrance`,regions,chunks:notify};
+  const entranceChange={...clean,id:entranceId,name:paired?.name??`${change.name} Entrance`,regions,chunks:notify,
+    notifyRegion:change.entranceDangerous??isNotifyRegion(origin)};
   return [
     {id:change.id,baseRaw:change.baseRaw,raw:generateEntry(bossChange,bossSource,{regions:sorted(change.regions),chunks:arenaChunks})},
     {id:entranceId,baseRaw:change.entranceBaseRaw??null,raw:generateEntry(entranceChange,entranceSource,{regions,chunks:sorted(notify)})},

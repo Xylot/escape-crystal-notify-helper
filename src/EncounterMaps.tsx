@@ -149,7 +149,7 @@ function LocationPane({boss,draft,update,onError,onLoad,loading,evidenceContext,
     <div className="pane-tools">
       {combined&&<button className={entranceMode?'chosen':''} onClick={()=>setEntranceMode(v=>!v)}>{entranceMode?'Entrance chunks':'Arena coverage'}</button>}
       {!isEntrance&&<><button aria-pressed={!chunkMode} className={!chunkMode?'chosen':''} onClick={()=>setChunkMode(false)}>Regions</button><button aria-pressed={chunkMode} className={chunkMode?'chosen':''} onClick={()=>setChunkMode(true)}>Chunks</button></>}
-      {isEntrance&&<><span>Notification chunks</span><span>Region {entranceRegions[0]??'not located'}</span></>}
+      {isEntrance&&<><span>{draft.entranceDangerous===false?'Entrance coverage chunks':'Notification chunks'}</span><span>Region {entranceRegions[0]??'not located'}</span></>}
       <button className="recenter" onClick={()=>{setJumpCenter(null);setEntranceCenter(chunkSelectionCenter(draft.entranceNotifyChunks??[]));setRecenter(n=>n+1);}}>⌖ Recenter</button>
     <form className="pane-jump" onSubmit={e=>{e.preventDefault();try{const parts=jump.trim().split(/[\s,]+/);if(parts.length!==2)throw new Error('Enter X, Y coordinates.');const[x,y]=parts.map(Number);const r=regionId(x,y);setJumpCenter([x,y]);if(isEntrance)update({entranceRegion:r});setManual({x,y,region:r,plane:shownPlane,mapId:null,role:kind==='entrance'?'entrance':'location',caption:'Manual location',source:'',title:'Manual coordinates',revision:null,verified:false});}catch(error){onError((error as Error).message);}}}><input aria-label={`${label} coordinates`} value={jump} onChange={e=>setJump(e.target.value)} placeholder="Jump to X, Y"/><button>Go →</button>{selected&&<code>Region {selected.region}</code>}</form>
     </div>

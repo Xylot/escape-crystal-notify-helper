@@ -75,6 +75,11 @@ export function parseJava(source) {
 }
 export function enumName(name, type = 'BOSSES') { return (type === 'DUNGEONS' ? 'DUNGEON_' : 'BOSS_') + name.normalize('NFKD').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').toUpperCase(); }
 export function javaString(name) { return JSON.stringify(name).replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029'); }
+// Only top-level booleans control region notifications. Entrance constructors
+// have their own independent flags (for example, escapeCrystalDisabled).
+export function isNotifyRegion(entry) {
+  return !entry?.optionalArgs.some(arg => maskJava(arg).trim() === 'false');
+}
 function literalChunks(expression) {
   if (!expression) return [];
   if (!/^List\.of\([\d,\s]*\)$/.test(expression)) throw new Error('Existing chunk restrictions need manual Java review.');
@@ -139,6 +144,14 @@ export function generateEntry(change, existing = null, exactCoverage = null) {
     const i = optional.findIndex(a => maskJava(a).trim().startsWith('new EscapeCrystalNotifyRegionEntrance('));
     if (i >= 0) optional[i] = entranceJava(change.entrance);
     else optional.unshift(entranceJava(change.entrance));
+  }
+  if (change.notifyRegion !== undefined) {
+    if (typeof change.notifyRegion !== 'boolean') throw new Error('Invalid region notification flag.');
+    const flag = optional.findIndex(a => /^(true|false)$/.test(maskJava(a).trim()));
+    if (flag >= 0) optional.splice(flag, 1);
+    const entranceIndex = optional.findIndex(a => maskJava(a).trim().startsWith('new EscapeCrystalNotifyRegionEntrance('));
+    if (entranceIndex < 0) throw new Error('A notification flag requires an entrance constructor.');
+    if (!change.notifyRegion || flag >= 0) optional.splice(entranceIndex + 1, 0, String(change.notifyRegion));
   }
   const originalChunkArg = existing?.optionalArgs.map(a => maskJava(a).trim()).find(a => a.startsWith('List.'));
   const originalChunkIds = originalChunkArg ? literalChunks(originalChunkArg) : [];

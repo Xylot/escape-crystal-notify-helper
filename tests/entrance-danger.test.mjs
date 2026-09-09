@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {chunkId} from '../src/core/coordinates.mjs';
-import {parseJava} from '../src/core/java.mjs';
+import {parseJava,isNotifyRegion} from '../src/core/java.mjs';
 import {expandEncounter,generateEncounter,notificationChunks,detectionChunks,sourceEntry} from '../src/core/encounter-export.mjs';
 import {applyProposal,validateProposal,fullPatch,PLUGIN_REPO,JAVA_PATH} from '../src/core/proposal.mjs';
 import {existingDraft,editableDraft,applySection,changedSections} from '../src/core/editing.mjs';
@@ -30,8 +30,49 @@ test('non-dangerous entrance produces independently restricted entries with the 
   assert.deepEqual(notificationChunks(arena),[arenaChunk]);
   assert.deepEqual(notificationChunks(entry),[entranceChunk,nearbyChunk]);
   assert.deepEqual(detectionChunks(entry),[entranceChunk]);
+  assert.equal(isNotifyRegion(entry),false);assert.equal(isNotifyRegion(arena),true);
+  assert.match(entry.raw,/\), false, List\.of\(/);
   assert.equal(entry.deathType,'UNSAFE');assert.equal(arena.optionalArgs.some(a=>a.includes('new EscapeCrystalNotifyRegionEntrance(')),false);
   assert.deepEqual(generated({...safe,deathType:'UNSAFE_HCGIM'}).map(e=>e.deathType),['UNSAFE_HCGIM','UNSAFE_HCGIM']);
+});
+
+test('No supports an unrestricted entrance and does not force notification chunks into the draft',()=>{
+  const draft=mergeDraft({...boss,entrance:{...entrance,chunks:[]}},{entranceDangerous:false});
+  assert.equal(draft.entranceNotifyChunks,undefined);
+  const [arena,entry]=generated(draft);
+  assert.equal(isNotifyRegion(arena),true);assert.equal(isNotifyRegion(entry),false);
+  assert.deepEqual(notificationChunks(entry),[]);assert.deepEqual(detectionChunks(entry),[]);
+  assert.match(entry.raw,/\), false, 12582\)$/);
+  assert.doesNotThrow(()=>validateProposal(proposal([draft])));
+  assert.equal(isNotifyRegion(generated({...draft,entranceNotifyChunks:[]})[1]),false);
+});
+
+test('Shellbane entrance-only source loads No and toggles its flag without changing entrance settings',()=>{
+  const raw='BOSS_SHELLBANE_GRYPHON_ENTRANCE("Shellbane Gryphon Entrance", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, null, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, 58439), false, 12582)';
+  const arena=generated({...boss,entrance:undefined})[0];
+  const row={...arena,entranceEntry:sourceEntry(raw)},draft=existingDraft(row);
+  assert.equal(draft.entranceDangerous,false);assert.deepEqual(changedSections(draft),[]);
+  assert.equal(generated(draft)[1].raw,raw);
+  const yes=applySection(draft,{...editableDraft(draft),entranceDangerous:true},'entrance');
+  assert.equal(generated(yes)[1].raw,raw.replace('), false, 12582', '), true, 12582'));
+  assert.equal(isNotifyRegion(generated({...yes,entranceDangerous:false})[1]),false);
+  const states=proposalStates([yes])[boss.id];
+  assert.equal(states.before.entranceDangerous,false);assert.equal(states.after.entranceDangerous,true);
+  assert.ok(stateDifferences(states.before,states.after).added.includes('Entrance area dangerous: true'));
+  assert.equal(isNotifyRegion(generated({...draft,entranceDangerous:undefined})[1]),false);
+});
+
+test('chunk restrictions and nested entrance booleans do not determine region danger',()=>{
+  const [arena,entry]=generated(safe);
+  const legacy=sourceEntry(entry.raw.replace('), false, List.of(', '), List.of('));
+  assert.equal(existingDraft({...arena,entranceEntry:legacy}).entranceDangerous,true);
+  assert.equal(isNotifyRegion(sourceEntry(legacy.raw.replace('EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT','false, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT'))),true);
+  const explicit=sourceEntry(legacy.raw.replace('), List.of(', '), true, List.of('));
+  const draft=existingDraft({...arena,entranceEntry:explicit});
+  const result=generated({...draft,entranceDangerous:false})[1];
+  assert.equal(result.optionalArgs.filter(arg=>arg==='false').length,1);
+  assert.equal(result.optionalArgs.includes('true'),false);
+  assert.deepEqual(notificationChunks(result),notificationChunks(entry));
 });
 
 test('dangerous entrances combine compatible coverage and split mixed restrictions',()=>{
@@ -56,8 +97,8 @@ test('new entrance authoring requires an answer while arena-only and v1 drafts r
   assert.equal(mergeDraft(boss,{entrance:{...entrance,ids:['1']}}).entranceDangerous,undefined);
 });
 
-test('empty, invalid, uncovered and shared-region notification selections fail closed',()=>{
-  for(const entranceNotifyChunks of [[],[-1],['42'],[nearbyChunk]])assert.throws(()=>validateProposal(proposal([{...safe,entranceNotifyChunks}])));
+test('invalid, uncovered and shared-region notification selections fail closed',()=>{
+  for(const entranceNotifyChunks of [[-1],['42'],[nearbyChunk]])assert.throws(()=>validateProposal(proposal([{...safe,entranceNotifyChunks}])));
   assert.throws(()=>validateProposal(proposal([{...safe,entrance:{...entrance,chunks:[]}}])),/explicit object-detection chunks/);
   assert.throws(()=>validateProposal(proposal([{...safe,regions:[12582,12682]}])),/share a region/);
   assert.throws(()=>validateProposal(proposal([{...safe,entranceRegion:12583}])),/every entrance region/);
@@ -144,7 +185,8 @@ test('preview, cleaning, JSON, patch and PR generation produce identical split e
   assert.deepEqual(result.evidence.panels.find(p=>p.kind==='arena').regions,[12682]);
   assert.deepEqual(result.evidence.panels.find(p=>p.kind==='notification').chunks,[entranceChunk,nearbyChunk]);
   assert.deepEqual(result.evidence.panels.find(p=>p.kind==='entrance').chunks,[entranceChunk]);
-  assert.match(result.body,/Not dangerous; notify only in selected chunks/);
+  assert.match(result.body,/Not dangerous; region notifications disabled/);
+  assert.match(result.evidence.panels.find(p=>p.kind==='notification').label,/region notifications disabled/);
   const draft=existingDraft(buildLibrary([],[],parseJava(after).entries,{}).find(e=>e.id===boss.id));
   const edited={...draft,entranceDangerous:true,entranceNotifyChunks:[]};
   const states=proposalStates([edited]),pair=states[boss.id];

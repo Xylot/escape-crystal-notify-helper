@@ -3,14 +3,15 @@ import {expandEncounter, hasEntrancePolicy, encounterCoverage} from './encounter
 import {originalEntranceChunks} from './encounter.mjs';
 import {regionOrigin} from './coordinates.mjs';
 import {evidencePlan, regionGroups} from './pr-evidence.mjs';
+import {isNotifyRegion} from './java.mjs';
 
 // Read the complete generated entry, including settings omitted by sparse edits.
 export function reviewState(raw) {
   const baseline=editingBaseline(raw),entry=baseline.entry;
-  return {id:entry.id,name:entry.name,regionType:entry.regionType,deathType:entry.deathType,
+  return {id:entry.id,name:entry.name,regionType:entry.regionType,deathType:entry.deathType,notifyRegion:isNotifyRegion(entry),
     regions:entry.regions,chunks:baseline.chunks??[],entrance:baseline.entrance.value,
     entranceRaw:baseline.entrance.raw,entranceChunks:baseline.entrance.value?.chunks??originalEntranceChunks(entry.optionalArgs),
-    extraSettings:entry.optionalArgs.filter(arg=>arg!==baseline.entrance.raw&&!/^List\.of\([\d,\s]*\)$/.test(arg)&&arg!=='null')};
+    extraSettings:entry.optionalArgs.filter(arg=>arg!==baseline.entrance.raw&&!/^List\.of\([\d,\s]*\)$/.test(arg)&&!['null','true','false'].includes(arg))};
 }
 
 export function proposalStates(changes) {
@@ -21,7 +22,7 @@ export function proposalStates(changes) {
     const after=combinedState(expandEncounter(change).map(e=>e.raw));
     if(hasEntrancePolicy(change)&&after.entranceRaw) {
       after.arenaRegions=[...change.regions];
-      after.entranceDangerous=change.entranceDangerous;
+      after.entranceDangerous=change.entranceDangerous??after.entranceDangerous??after.notifyRegion;
       after.entranceRegions=encounterCoverage(change).entranceRegions;
       after.entranceNotifyChunks=change.entranceNotifyChunks??after.entranceNotifyChunks??[];
     }
@@ -35,7 +36,7 @@ function combinedState(raws) {
     const entranceEntry=reviewState(raws[1]);
     Object.assign(state,{entranceEntry,entrance:entranceEntry.entrance,entranceRaw:entranceEntry.entranceRaw,
       entranceChunks:entranceEntry.entranceChunks,entranceRegions:entranceEntry.regions,
-      entranceNotifyChunks:entranceEntry.chunks,entranceDangerous:!entranceEntry.chunks.length});
+      entranceNotifyChunks:entranceEntry.chunks,entranceDangerous:entranceEntry.notifyRegion});
   }
   return state;
 }
@@ -89,7 +90,7 @@ export function comparisonEvidence(changes,states,contexts,sources) {
       }
       if(state.entranceRegions?.length) {
         const notification=evidencePlan([{...c,regions:state.entranceRegions,chunks:state.entranceNotifyChunks??[],entrance:undefined}],{[c.id]:{arena:entranceContext}},sources);
-        plan.panels.push(...notification.panels.map(p=>({...p,id:p.id.replace('-arena-','-notification-'),kind:'notification',label:'Entrance notification coverage'})));
+        plan.panels.push(...notification.panels.map(p=>({...p,id:p.id.replace('-arena-','-notification-'),kind:'notification',label:state.entranceDangerous===false?'Entrance coverage (region notifications disabled)':'Entrance notification coverage'})));
         plan.panels=plan.panels.map(p=>p.kind==='entrance'?{...p,label:'Entrance object detection'}:p);
       }
       result.panels.push(...plan.panels.map(p=>pair.before?{...p,id:p.id.replace(`${c.id}-`,`${c.id}-${phase}-`),state:phase}:p));

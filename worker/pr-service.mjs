@@ -14,7 +14,7 @@ export function target(env){
 const md = value => String(value).replace(/[\\`*_{}[\]<>()!#|]/g,'\\$&').replace(/[\r\n]+/g,' ');
 function stateBody(record,c,images){
     let text=`- ${isDungeon(c)?'Dungeon':'Arena'} regions: ${(c.arenaRegions??c.regions).join(', ')}\n- Death classification: ${md(c.deathType)}\n- ${isDungeon(c)?'Dungeon':'Arena'} chunks: ${c.chunks?.length?c.chunks.join(', '):'Whole selected regions'}\n`;
-    if(c.entranceRegions)text+=`- Entrance area: ${c.entranceDangerous===false?'Not dangerous; notify only in selected chunks':'Dangerous'}\n- Entrance regions: ${c.entranceRegions.join(', ')}\n- Entrance notification chunks: ${c.entranceNotifyChunks?.join(', ')||'Whole entrance area'}\n`;
+    if(c.entranceRegions)text+=`- Entrance area: ${c.entranceDangerous===false?'Not dangerous; region notifications disabled':'Dangerous'}\n- Entrance regions: ${c.entranceRegions.join(', ')}\n- Entrance coverage chunks: ${c.entranceNotifyChunks?.join(', ')||'Whole entrance area'}\n`;
     if(c.entrance)text+=`- Entrance: ${md(c.entrance.objectType)}; IDs: ${c.entrance.ids.map(md).join(', ')}\n- Entrance options: ${md(c.entrance.overlay)}, direction ${md(c.entrance.direction||'default')}, plane ${md(c.entrance.plane||'default')}\n- Entrance chunks: ${c.entrance.chunks.join(', ')||'None'}\n`;
     else if(!isDungeon(c))text+=`- Entrance: ${Object.hasOwn(c,'entranceRaw')?(c.entranceRaw?'Special source settings (shown below)':'None'):c.entranceOverlay?`priority ${md(c.entranceOverlay)}; other settings preserved`:'existing configuration preserved, if present'}.\n`;
     const models=record.presentation?.[c.id]?.images??[];

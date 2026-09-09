@@ -31,7 +31,7 @@ export function selectEntranceIds(draft, config, ids, objectType, placements = {
   const change = {entrance};
   // Whole-area notifications need no restriction. Otherwise include the chosen
   // object's chunk without making the author return to the map.
-  if (draft.entranceDangerous === false || draft.entranceNotifyChunks?.length) {
+  if (draft.entranceNotifyChunks?.length) {
     change.entranceNotifyChunks = [...new Set([...(draft.entranceNotifyChunks ?? []), ...chunks])].sort((a,b)=>a-b);
   }
   return change;

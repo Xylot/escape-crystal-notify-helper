@@ -59,6 +59,7 @@ test('whole-area notifications stay unrestricted and existing unknown placements
   const draft={entranceDangerous:true,entranceNotifyChunks:[]};
   const selected=selectEntranceIds(draft,fresh,['123'],'GAME_OBJECT',{'123':[a]});
   assert.equal(selected.entranceNotifyChunks,undefined);
+  assert.equal(selectEntranceIds({...draft,entranceDangerous:false},fresh,['123'],'GAME_OBJECT',{'123':[a]}).entranceNotifyChunks,undefined);
   const existing={...fresh,ids:['999'],chunks:[cb]};
   assert.deepEqual(selectEntranceIds(draft,existing,['999','123'],'GAME_OBJECT',{'123':[a]}).entrance.chunks,[ca,cb]);
 });

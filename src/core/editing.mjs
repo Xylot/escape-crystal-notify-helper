@@ -1,4 +1,4 @@
-import { maskJava, parseJava, splitArgs } from './java.mjs';
+import { maskJava, parseJava, splitArgs, isNotifyRegion } from './java.mjs';
 import { validateEntrance } from './entrance.mjs';
 import { entranceOverlay, mergeDraft } from './authoring.mjs';
 import {notificationChunks} from './encounter-export.mjs';
@@ -42,7 +42,7 @@ export function readEntrance(optionalArgs) {
 
 export function existingDraft(entry) {
   return {id:entry.id, name:entry.name, regionType:entry.regionType, deathType:entry.deathType, regions:[...entry.regions], baseRaw:entry.raw,
-    ...(entry.entranceEntry?{entranceBaseRaw:entry.entranceEntry.raw,entranceDangerous:!notificationChunks(entry.entranceEntry).length,entranceNotifyChunks:notificationChunks(entry.entranceEntry)}:{})};
+    ...(entry.entranceEntry?{entranceBaseRaw:entry.entranceEntry.raw,entranceDangerous:isNotifyRegion(entry.entranceEntry),entranceNotifyChunks:notificationChunks(entry.entranceEntry)}:{})};
 }
 
 export function editingBaseline(raw, entranceBaseRaw) {
