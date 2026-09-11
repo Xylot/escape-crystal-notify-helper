@@ -7,6 +7,7 @@ import {isDungeon} from './encounter-kind.mjs';
 export function freshEditDraft(boss, previous) {
   return defaultDraft({id:boss.id, name:boss.name, regionType:boss.regionType,
     baseRaw:previous ? previous.baseRaw : boss.raw,
+    ...(previous?.metadataBase||boss.metadataBase?{metadataBase:previous?.metadataBase??boss.metadataBase,recommendedSeconds:2,petIcon:''}:{}),
     ...(previous?.entranceBaseRaw !== undefined || boss.entranceEntry ? {
       entranceBaseRaw:previous?.entranceBaseRaw !== undefined ? previous.entranceBaseRaw : boss.entranceEntry.raw,
     } : {}),
@@ -27,7 +28,7 @@ export function freshEditForm(draft) {
 // The existing proposal contract preserves an entrance when no replacement was
 // authored. Keep that behavior, including paired entries, and omit UI metadata.
 export function proposalDraft(draft) {
-  const {editFlow, ...change} = draft;
+  const {editFlow, setupProgress, entranceSetupProgress, ...change} = draft;
   if(editFlow !== 'fresh' || change.entrance || isDungeon(change))return change;
   for(const key of ['entranceDangerous','entranceNotifyChunks','entranceRegion','entrancePlane'])delete change[key];
   if(change.entranceBaseRaw) {

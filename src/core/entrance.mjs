@@ -4,8 +4,13 @@ export const OVERLAYS=['PRIORITIZED_WITH_HIGHLIGHT','DEPRIORITIZED_WITH_HIGHLIGH
 export const DIRECTIONS=['','NORTHWARD','SOUTHWARD','EASTWARD','WESTWARD','NORTHWARD_INCLUSIVE','SOUTHWARD_INCLUSIVE','EASTWARD_INCLUSIVE','WESTWARD_INCLUSIVE'];
 export const PLANES=['','GROUND','FIRST_FLOOR','SECOND_FLOOR'];
 export const OBJECT_TYPES=['GAME_OBJECT','NPC','ANY'];
+// Callers pass comment-masked Java. Keep the fluent flag out of constructor args.
+export const instanceSuffix=/\.\s*withInstancedBoss\s*\(\s*\)\s*$/;
+export const entranceConstructor=expression=>expression.replace(instanceSuffix,'').trim();
+export const entranceIsInstanced=expression=>instanceSuffix.test(expression??'');
 export function validateEntrance(e) {
   if(!e || !OVERLAYS.includes(e.overlay) || !DIRECTIONS.includes(e.direction) || !PLANES.includes(e.plane) || !OBJECT_TYPES.includes(e.objectType)) throw new Error('Unsupported entrance settings.');
+  if(e.bossInstanced!==undefined&&typeof e.bossInstanced!=='boolean')throw new Error('Choose whether the boss fight is instanced.');
   if(!Array.isArray(e.ids)||!e.ids.length||e.ids.length>100)throw new Error('Provide 1–100 entrance object/NPC IDs.');
   for(const id of e.ids) {
     if(typeof id!=='string'||! /^(?:\d{1,9}|(?:ObjectID1?|NpcID)\.[A-Z][A-Z0-9_]*)$/.test(id))throw new Error(`Invalid entrance ID: ${id}`);
@@ -21,5 +26,5 @@ export function entranceJava(e) {
   args.push(e.chunks.length?`List.of(${[...new Set(e.chunks)].sort((a,b)=>a-b).join(', ')})`:'null');
   if(e.plane)args.push(`EscapeCrystalNotifyRegionEntrancePlaneLevel.${e.plane}`);
   args.push(`EscapeCrystalNotifyRegionEntranceObjectType.${e.objectType}`,...new Set(e.ids.map(id=>gamevalCodeId(id,e.objectType))));
-  return `new EscapeCrystalNotifyRegionEntrance(${args.join(', ')})`;
+  return `new EscapeCrystalNotifyRegionEntrance(${args.join(', ')})${e.bossInstanced?'.withInstancedBoss()':''}`;
 }

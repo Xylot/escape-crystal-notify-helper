@@ -1,19 +1,23 @@
-import { parseJava, exportCoverage } from './java.mjs';
+import { parseJava, exportCoverage,maskJava } from './java.mjs';
 import { integer, chunkOrigin, regionId } from './coordinates.mjs';
 import { validateEntrance, OVERLAYS } from './entrance.mjs';
 import { encounterType } from './encounter-kind.mjs';
 import {expandEncounter, hasEntrancePolicy, sourceEntry} from './encounter-export.mjs';
+import {applyMetadata,hasMetadata,validateMetadata} from './encounter-metadata.mjs';
 export const PLUGIN_REPO = 'Xylot/escape-crystal-notify';
 export const JAVA_PATH = 'src/main/java/com/escapecrystalnotify/EscapeCrystalNotifyRegion.java';
 export function validateProposal(proposal) {
-  if (!proposal || ![1,2].includes(proposal.version) || proposal.repository !== PLUGIN_REPO) throw new Error('Unsupported proposal format or target repository.');
+  if (!proposal || ![1,2,3,4].includes(proposal.version) || proposal.repository !== PLUGIN_REPO) throw new Error('Unsupported proposal format or target repository.');
   if (!/^[a-f0-9]{40}$/.test(proposal.baseCommit)) throw new Error('Refresh plugin data before exporting: a verified source commit is required.');
   if (!Array.isArray(proposal.changes) || !proposal.changes.length || proposal.changes.length > 100) throw new Error('Proposal must contain 1–100 changes.');
   const ids = new Set();
   for (const c of proposal.changes) {
+    if((c.bossInstanced!==undefined||c.entrance?.bossInstanced!==undefined)&&proposal.version<4)throw new Error('Instanced boss settings require proposal version 4.');
     if(proposal.version===1&&hasEntrancePolicy(c))throw new Error('Entrance danger settings require proposal version 2.');
     const type=encounterType(c);
-    if (!['BOSSES','DUNGEONS'].includes(type)||!(type==='DUNGEONS'?/^DUNGEON_[A-Z0-9_]+$/:/^BOSS_[A-Z0-9_]+$/).test(c.id) || ids.has(c.id)) throw new Error('Invalid or duplicate enum identifier or category.');
+    if(hasMetadata(c)&&proposal.version<3)throw new Error('Inactivity time and pet icons require proposal version 3.');
+    validateMetadata(c);
+    if (!['BOSSES','RAIDS','DUNGEONS'].includes(type)||!(type==='DUNGEONS'?/^DUNGEON_[A-Z0-9_]+$/:type==='RAIDS'?/^RAIDS_[A-Z0-9_]+$/:/^BOSS_[A-Z0-9_]+$/).test(c.id) || ids.has(c.id)) throw new Error('Invalid or duplicate enum identifier or category.');
     if(type==='DUNGEONS'&&(c.entrance!==undefined||c.entranceOverlay!==undefined))throw new Error('Dungeons do not have entrance settings.');
     ids.add(c.id);
     if (typeof c.name !== 'string' || !c.name.trim() || c.name.length > 160 || /[\x00-\x1f]/.test(c.name)) throw new Error('Invalid encounter name.');
@@ -48,6 +52,7 @@ export function applyProposal(source, proposal) {
     const paired=parsed.entries.find(e=>e.id===`${c.id}_ENTRANCE`);
     if(c.entranceBaseRaw!==undefined&&(paired?.raw??null)!==c.entranceBaseRaw)throw new Error(`Conflict: ${c.id}_ENTRANCE changed upstream. Refresh and review both entries.`);
     for(const entry of expandEncounter(c,existing??null,c.entranceBaseRaw?paired:null)) {
+      if(/\.\s*withInstancedBoss\s*\(/.test(maskJava(entry.raw))&&!/\bgetInstancedOnlyRegionIdsFromTypes\s*\(/.test(maskJava(source,true)))throw new Error('Sync plugin source: this revision does not support instanced boss notifications.');
       if(targets.has(entry.id))throw new Error(`Duplicate generated enum identifier: ${entry.id}. Select the encounter only once.`);
       targets.add(entry.id);
       const original=parsed.entries.find(e=>e.id===entry.id);
@@ -77,8 +82,15 @@ export function overlapWarnings(changes, entries) {
   }
   return [...new Set(warnings)];
 }
-export function fullPatch(before, after) {
+export function applyProposalFiles(sources,proposal) {
+  const region=applyProposal(sources[JAVA_PATH],proposal);
+  return {[JAVA_PATH]:region,...applyMetadata(sources,proposal.changes)};
+}
+export function proposalPatch(sources,after) {
+  return Object.entries(after).filter(([path,text])=>text!==sources[path]).map(([path,text])=>fullPatch(sources[path],text,path)).join('');
+}
+export function fullPatch(before, after, path=JAVA_PATH) {
   const a = before.replace(/\r\n/g,'\n').split('\n'), b = after.replace(/\r\n/g,'\n').split('\n');
   if (a.at(-1) === '') a.pop(); if (b.at(-1) === '') b.pop();
-  return `--- a/${JAVA_PATH}\n+++ b/${JAVA_PATH}\n@@ -1,${a.length} +1,${b.length} @@\n` + a.map(x=>'-'+x).join('\n') + (before.endsWith('\n') ? '\n' : '\n\\ No newline at end of file\n') + b.map(x=>'+'+x).join('\n') + (after.endsWith('\n') ? '\n' : '\n\\ No newline at end of file\n');
+  return `--- a/${path}\n+++ b/${path}\n@@ -1,${a.length} +1,${b.length} @@\n` + a.map(x=>'-'+x).join('\n') + (before.endsWith('\n') ? '\n' : '\n\\ No newline at end of file\n') + b.map(x=>'+'+x).join('\n') + (after.endsWith('\n') ? '\n' : '\n\\ No newline at end of file\n');
 }

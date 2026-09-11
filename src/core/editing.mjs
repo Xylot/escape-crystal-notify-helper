@@ -1,5 +1,5 @@
 import { maskJava, parseJava, splitArgs, isNotifyRegion } from './java.mjs';
-import { validateEntrance } from './entrance.mjs';
+import { validateEntrance,entranceConstructor,entranceIsInstanced } from './entrance.mjs';
 import { entranceOverlay, mergeDraft } from './authoring.mjs';
 import {notificationChunks} from './encounter-export.mjs';
 
@@ -24,7 +24,8 @@ export function readEntrance(optionalArgs) {
   if (!raw) return {raw:null, value:undefined, reason:''};
   const unsupported = {raw, value:undefined, reason:'This entrance has special settings that need a source edit. Its existing configuration is preserved.'};
   try {
-    const clean = maskJava(raw).trim();
+    const masked=maskJava(raw).trim(),bossInstanced=entranceIsInstanced(masked);
+    const clean = entranceConstructor(masked);
     const args = splitArgs(clean.slice(clean.indexOf('(') + 1, -1));
     const takeEnum = prefix => args[0]?.startsWith(prefix) ? args.shift().slice(prefix.length) : '';
     const overlay = takeEnum('EscapeCrystalNotifyRegionEntranceOverlayType.');
@@ -34,18 +35,20 @@ export function readEntrance(optionalArgs) {
     const plane = takeEnum('EscapeCrystalNotifyRegionEntrancePlaneLevel.');
     const objectType = takeEnum('EscapeCrystalNotifyRegionEntranceObjectType.');
     if (!chunks || !objectType) return unsupported;
-    const value = {overlay, direction, chunks, plane, objectType, ids:args};
+    const value = {overlay, direction, chunks, plane, objectType, ids:args,...(bossInstanced?{bossInstanced:true}:{})};
     validateEntrance(value);
     return {raw, value, reason:''};
   } catch { return unsupported; }
 }
 
 export function existingDraft(entry) {
-  return {id:entry.id, name:entry.name, regionType:entry.regionType, deathType:entry.deathType, regions:[...entry.regions], baseRaw:entry.raw,
+  const instanced=entry.optionalArgs.some(a=>entranceIsInstanced(maskJava(a)));
+  return {...(entry.metadataBase?{metadataBase:entry.metadataBase,recommendedSeconds:entry.recommendedSeconds,petIcon:entry.petIcon}:{}),id:entry.id, name:entry.name, regionType:entry.regionType, deathType:entry.deathType, regions:[...entry.regions], baseRaw:entry.raw,
+    ...(instanced?{bossInstanced:true,entranceDangerous:false}:{}),
     ...(entry.entranceEntry?{entranceBaseRaw:entry.entranceEntry.raw,entranceDangerous:isNotifyRegion(entry.entranceEntry),entranceNotifyChunks:notificationChunks(entry.entranceEntry)}:{})};
 }
 
-export function editingBaseline(raw, entranceBaseRaw) {
+export function editingBaseline(raw, entranceBaseRaw, metadataBase) {
   const entry = baselineEntry(raw);
   const paired=entranceBaseRaw?baselineEntry(entranceBaseRaw):null;
   const entrance = readEntrance((paired??entry).optionalArgs);
@@ -55,11 +58,11 @@ export function editingBaseline(raw, entranceBaseRaw) {
   return {entry, entrance, chunks,
     coverageReason:quest ? 'Quest-gated coverage restrictions need a source edit.' : chunkExpression && !chunks ? 'These coverage restrictions need a source edit.' : '',
     entranceReason:quest ? 'This quest-gated entrance needs a source edit. Its existing configuration is preserved.' : entrance.reason,
-    draft:existingDraft({...entry,entranceEntry:paired})};
+    draft:existingDraft({...entry,entranceEntry:paired,...(metadataBase?{metadataBase,recommendedSeconds:metadataBase.recommendedSeconds,petIcon:metadataBase.petIcon}:{})})};
 }
 
 export function editableDraft(draft) {
-  const baseline = editingBaseline(draft.baseRaw,draft.entranceBaseRaw);
+  const baseline = editingBaseline(draft.baseRaw,draft.entranceBaseRaw,draft.metadataBase);
   return {...draft,
     chunks:draft.chunks ?? baseline.chunks,
     entrance:draft.entrance ?? (baseline.entrance.value ? {...baseline.entrance.value, overlay:entranceOverlay(draft)} : undefined)};
@@ -68,19 +71,19 @@ export function editableDraft(draft) {
 function entranceValue(value, omitOverlay = false) {
   if (!value) return null;
   return {...(!omitOverlay ? {overlay:value.overlay} : {}), direction:value.direction, plane:value.plane,
-    objectType:value.objectType, ids:unique(value.ids), chunks:unique(value.chunks)};
+    objectType:value.objectType, ids:unique(value.ids), chunks:unique(value.chunks),bossInstanced:!!value.bossInstanced};
 }
 
 export function sectionValues(draft, section) {
   const current = editableDraft(draft);
-  if (section === 'details') return {name:current.name, deathType:current.deathType};
+  if (section === 'details') return {name:current.name, deathType:current.deathType,...(current.metadataBase?{recommendedSeconds:current.recommendedSeconds,petIcon:current.petIcon}:{})};
   if (section === 'coverage') return {regions:unique(current.regions), chunks:unique(current.chunks ?? [])};
-  return {entrance:entranceValue(current.entrance), priority:entranceOverlay(current),dangerous:current.entranceDangerous??null,notifyChunks:unique(current.entranceNotifyChunks??[]),
+  return {entrance:entranceValue(current.entrance),bossInstanced:current.bossInstanced??!!current.entrance?.bossInstanced, priority:entranceOverlay(current),dangerous:current.entranceDangerous??null,notifyChunks:unique(current.entranceNotifyChunks??[]),
     region:current.entranceRegion ?? null, plane:current.entrancePlane ?? null};
 }
 
 export function changedSections(draft) {
-  const baseline = editingBaseline(draft.baseRaw,draft.entranceBaseRaw).draft;
+  const baseline = editingBaseline(draft.baseRaw,draft.entranceBaseRaw,draft.metadataBase).draft;
   return ['details','coverage', ...(baseline.regionType === 'DUNGEONS' ? [] : ['entrance'])]
     .filter(section => !equal(sectionValues(draft,section), sectionValues(baseline,section)));
 }
@@ -88,8 +91,8 @@ export function changedSections(draft) {
 // Keep hydration local to the form. Persist only deliberate edits, so unrelated
 // changes never replace preserved constructors or trip quest-gate validation.
 export function applySection(previous, working, section) {
-  const baseline = editingBaseline(previous.baseRaw,previous.entranceBaseRaw);
-  const keys = section === 'details' ? ['name','deathType'] : section === 'coverage' ? ['regions','chunks'] : ['entrance','entranceOverlay','entranceRegion','entrancePlane','entranceDangerous','entranceNotifyChunks'];
+  const baseline = editingBaseline(previous.baseRaw,previous.entranceBaseRaw,previous.metadataBase);
+  const keys = section === 'details' ? ['name','deathType','recommendedSeconds','petIcon'] : section === 'coverage' ? ['regions','chunks'] : ['entrance','entranceOverlay','entranceRegion','entrancePlane','entranceDangerous','entranceNotifyChunks','bossInstanced'];
   const patch = Object.fromEntries(keys.map(key => [key, working[key]]));
   if (patch.entrance) delete patch.entranceOverlay;
   const next = mergeDraft(previous, patch);

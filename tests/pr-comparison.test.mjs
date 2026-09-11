@@ -35,8 +35,8 @@ test('sparse metadata edits retain complete chunk coverage in both states, scree
     assert.ok(body.includes(`${phase==='before'?'100':'200'}_orient0.png`));
     assert.ok(!body.includes(`${phase==='before'?'200':'100'}_orient0.png`));
   }
-  assert.match(p.body,/### Additions[\s\S]*Display name: Updated entrance/);
-  assert.match(p.body,/### Removals[\s\S]*Display name: King Black Dragon Entrance/);
+  assert.match(p.body,/Encounter name: Updated entrance/);
+  assert.match(p.body,/Encounter name: King Black Dragon Entrance/);
   assert.match(section(p.body,'Before'),/Death classification: UNSAFE/);
   assert.match(section(p.body,'After'),/Death classification: UNSAFE\\_HCGIM/);
   data.presentation[id].beforeImages.push('300');
@@ -72,7 +72,7 @@ test('new encounters retain addition layout within a mixed batch',async()=>{
   assert.equal((p.body.match(/<summary>Before<\/summary>/g)||[]).length,1);
   assert.equal(p.states[change.id].before,null);
   assert.equal(p.evidence.panels.filter(p=>p.bossId===change.id).length,1);
-  assert.match(p.body,/## PR test[\s\S]*Map selections/);
+  assert.match(p.body,/## PR test[\s\S]*Region & Chunk screenshots/);
 });
 
 test('dungeon state comparisons include coverage only and detect restriction removal',async()=>{
@@ -92,7 +92,7 @@ test('special source settings are preserved in both collapsible states and escap
   const p=await prepare(data,'1',new FakeGitHub(),new MemoryStore(),env);
   assert.match(section(p.body,'Before'),/Entrance source settings/);
   assert.match(section(p.body,'After'),/false, true/);
-  assert.equal((p.body.match(/<details>/g)||[]).length,2);
+  assert.equal((p.body.match(/<details>/g)||[]).length,3);
 });
 
 test('state comparisons count both sides toward the screenshot limit',()=>{

@@ -1,4 +1,9 @@
 /* Light authoring workspace: one map, its settings, and a visible next action. */
+.encounter-metadata { border:1px solid var(--line,#dfe6e4); border-radius:12px; padding:20px; margin:0; min-width:0; background:var(--surface,#fff); }
+.encounter-metadata legend { font-weight:700; padding:0 8px; }
+.encounter-metadata .field { margin:8px 0; }
+.encounter-metadata input[type="number"] { max-width:200px; }
+.encounter-metadata p { font-size:13px; line-height:1.6; margin:8px 0 16px; }
 :root {
   color-scheme: light;
   --display: 'Manrope','Segoe UI',sans-serif;
@@ -2208,3 +2213,6 @@ button,input:not([type=checkbox]),select,summary {
   .authoring-view .object-studio-grid { grid-template-columns:1fr; }
 }
 .fresh-edit-note { margin:0; padding:10px 32px; color:var(--muted); font-size:13px; background:var(--surface); border-bottom:1px solid var(--line); }
+.pr-action-status{flex:1 1 260px;align-self:center}.pr-actions .pr-progress{margin:0;padding:10px 12px;color:var(--ink)}.pr-actions .export-issue{margin:0}.pr-actions>a{display:inline-flex;align-items:center;border-radius:8px;padding:12px 20px}.pr-diff h4{font:12px var(--mono);overflow-wrap:anywhere;margin:16px 0 8px}.pr-diff pre{padding:0;background:#fff;white-space:pre;max-height:420px}.pr-diff pre>span{display:block;min-width:max-content;padding:2px 12px}.pr-diff .diff-added{background:#e6f4e9;color:#185c30}.pr-diff .diff-removed{background:#fce9e7;color:#942b27}.diff-line-number{display:inline-block;width:5ch;margin-right:12px;text-align:right;opacity:.65;user-select:none}
+.pr-summary .pr-pet-icon{display:block;width:72px;height:64px;object-fit:contain;image-rendering:pixelated;margin:12px 0}.pr-summary h5{font-size:15px;margin:22px 0 12px}.pr-technical,.pr-before{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.pr-actions>.pr-success{flex-basis:100%;width:100%;margin:0}

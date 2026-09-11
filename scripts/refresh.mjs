@@ -5,12 +5,15 @@ import { parseJava } from '../src/core/java.mjs';
 import { importWiki } from '../src/core/wiki.mjs';
 import { fetchBossCatalog, reconcileCatalog } from '../src/core/catalog.mjs';
 import { PLUGIN_REPO, JAVA_PATH } from '../src/core/proposal.mjs';
+import {METADATA_PATHS,metadataFor} from '../src/core/encounter-metadata.mjs';
 const headers = { 'User-Agent':'EscapeCrystalContentEditor/0.1', ...(process.env.GH_TOKEN ? { Authorization:`Bearer ${process.env.GH_TOKEN}` } : {}) };
 async function get(url) { const r = await fetch(url,{headers,signal:AbortSignal.timeout(30000)}); if(!r.ok) throw new Error(`${url}: HTTP ${r.status}`); return r; }
 const old = JSON.parse(await readFile('public/data/snapshot.json','utf8'));
 const commit = await (await get(`https://api.github.com/repos/${PLUGIN_REPO}/commits/master`)).json();
 const source = await (await get(`https://raw.githubusercontent.com/${PLUGIN_REPO}/${commit.sha}/${JAVA_PATH}`)).text();
+const metadataSources=Object.fromEntries(await Promise.all(METADATA_PATHS.map(async path=>[path,await (await get(`https://raw.githubusercontent.com/${PLUGIN_REPO}/${commit.sha}/${path}`)).text()])));
 const parsed = parseJava(source), warnings = [];
+for(const entry of parsed.entries.filter(e=>['BOSSES','RAIDS'].includes(e.regionType)))metadataFor(entry.id,metadataSources);
 const aliases = JSON.parse(await readFile('config/aliases.json','utf8'));
 const entries = parsed.entries.map(e=>({...e,maps:[],warnings:[],links:[],wikiTitle:aliases[e.id]??e.name}));
 const [catalog,dungeonCatalog] = await Promise.all([fetchBossCatalog(Parser),fetchDungeonCatalog(Parser)]);
@@ -26,7 +29,7 @@ for(const boss of candidates.filter(b=>b.wikiTitle==='Shellbane gryphon'||proces
   catch(error){boss.warnings.push(`Location refresh failed: ${error.message}`);}
 }
 const now=new Date().toISOString();
-const snapshot = { version:1,generatedAt:now,baseCommit:commit.sha,source,entries,candidates,dungeons,warnings,catalog:{source:catalog.source,revision:catalog.revision,count:candidates.length,fetchedAt:now} };
+const snapshot = { version:1,generatedAt:now,baseCommit:commit.sha,source,metadataSources,entries,candidates,dungeons,warnings,catalog:{source:catalog.source,revision:catalog.revision,count:candidates.length,fetchedAt:now} };
 await mkdir('public/data',{recursive:true});
 await writeFile('public/data/snapshot.json',JSON.stringify(snapshot,null,2)+'\n');
 console.log(`Boss page revision ${catalog.revision}: ${candidates.length} bosses; ${candidates.filter(b=>!b.supportedBy.length).length} unsupported. Plugin ${commit.sha}.`);

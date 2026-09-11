@@ -1,4 +1,4 @@
-import { applyProposal, PLUGIN_REPO } from './proposal.mjs';
+import { applyProposalFiles, JAVA_PATH, PLUGIN_REPO } from './proposal.mjs';
 import { chunkOrigin, regionId } from './coordinates.mjs';
 import {notificationAreaChange} from './location-defaults.mjs';
 
@@ -33,8 +33,8 @@ export function mergeDraft(draft, change) {
 export function exportProblem(snapshot, changes) {
   if (!changes.length) return 'Choose at least one draft to export.';
   try {
-    applyProposal(snapshot.source, {
-      version: 2, repository: PLUGIN_REPO, baseCommit: snapshot.baseCommit, changes,
+    applyProposalFiles({[JAVA_PATH]:snapshot.source,...snapshot.metadataSources}, {
+      version: 4, repository: PLUGIN_REPO, baseCommit: snapshot.baseCommit, changes,
     });
     return '';
   } catch (error) {

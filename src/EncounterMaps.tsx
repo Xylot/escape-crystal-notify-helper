@@ -1,4 +1,4 @@
-import EntranceDanger from './EntranceDanger';
+import EntranceSetup from './EntranceSetup';
 import EntranceMapChoices,{type EntranceMapChoice} from './EntranceMapChoices';
 import {isDungeon} from './core/encounter-kind.mjs';
 import { useEffect,useMemo,useRef,useState } from 'react';
@@ -70,12 +70,12 @@ export default function EncounterMaps(props:Props){
       else {props.update(change);props.onEvidenceContext?.('entrance',location);setChosenLocation(location);setChoosingMap(false);}
     }catch(error){props.onError((error as Error).message);}
   };
-  if(props.focus==='entrance'&&choosingMap)return <><EntranceDanger draft={props.draft} update={props.update}/><EntranceMapChoices choices={choices} loading={findingEntrances} onChoose={chooseMap} onManual={()=>setChoosingMap(false)} onUse={useSuggestion} canUse={typeof props.draft.entranceDangerous==='boolean'} quickReview={!!props.onQuickReview}/></>;
+  if(props.focus==='entrance'&&choosingMap)return <EntranceSetup draft={props.draft} update={props.update} onLoad={props.onLoad} loading={props.loading}><EntranceMapChoices choices={choices} loading={findingEntrances} onChoose={chooseMap} onManual={()=>setChoosingMap(false)} onUse={useSuggestion} canUse={typeof props.draft.entranceDangerous==='boolean'&&typeof props.draft.bossInstanced==='boolean'} quickReview={!!props.onQuickReview}/></EntranceSetup>;
   return <div className="encounter-workspace">
-    {props.focus==='entrance'&&<EntranceDanger draft={props.draft} update={props.update}/>}
+    {props.focus==='entrance'&&<div className="entrance-flow-refresh"><button type="button" onClick={()=>{props.update({entranceSetupProgress:0});setChoosingMap(true);}}>Edit entrance answers</button></div>}
     {!props.focus&&<div className="encounter-intro"><span>ENCOUNTER LOCATIONS</span><p>{shared?'Entrance and arena share a map region.':'Compare the approach and the fight without losing your place.'}</p>{locations.shared&&<button onClick={()=>setSplit(v=>!v)}>{split?'Combine maps':'Separate maps'}</button>}</div>}
     <div className={`encounter-grid ${shared||props.focus?'shared-map':''}`}>
-      {!shared&&!isDungeon(boss)&&props.focus!=='arena'&&<div><LocationPane {...props} kind="entrance" locations={entranceLocations} alternatives={boss.maps} fallback={fallback} initialLocation={chosenLocation} onChooseMap={()=>setChoosingMap(true)}/></div>}
+      {!shared&&!isDungeon(boss)&&props.focus!=='arena'&&<div><LocationPane {...props} kind="entrance" locations={entranceLocations} alternatives={boss.maps} fallback={fallback} initialLocation={chosenLocation} onChooseMap={()=>{props.update({entranceSetupProgress:2});setChoosingMap(true);}}/></div>}
       {props.focus!=='entrance'&&<div><LocationPane {...props} kind="arena" locations={locations.arena} alternatives={boss.maps} combined={shared}/></div>}
     </div>
   </div>;

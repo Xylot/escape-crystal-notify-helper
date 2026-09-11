@@ -14,6 +14,7 @@ import {parseIds, chunkOrigin, regionId} from './core/coordinates.mjs';
 import {originalEntranceChunks, mergeEvidenceContext} from './core/encounter.mjs';
 import type {Boss, Draft, EvidenceContexts, Snapshot} from './types';
 import './editing.css';
+import EncounterMetadata from './EncounterMetadata';
 
 type Section = 'details' | 'coverage' | 'entrance';
 type Context = EvidenceContexts[string];
@@ -34,13 +35,13 @@ const sameContext = (a:Context,b:Context) => JSON.stringify(a) === JSON.stringif
 
 function values(draft:Draft, section:Section):[string,string][] {
   const current = editableDraft(draft) as Draft;
-  const baseline = editingBaseline(draft.baseRaw,draft.entranceBaseRaw);
-  if (section === 'details') return [['Display name',draft.name],['Death behavior',deathLabels[draft.deathType] ?? draft.deathType]];
+  const baseline = editingBaseline(draft.baseRaw,draft.entranceBaseRaw,draft.metadataBase);
+  if (section === 'details') return [['Display name',draft.name],['Death behavior',deathLabels[draft.deathType] ?? draft.deathType],...(draft.metadataBase?([['Recommended inactivity time',`${draft.recommendedSeconds} seconds`],['Pet icon',draft.petIcon??'Not selected']] as [string,string][]):[])];
   if (section === 'coverage') return [['Regions',list(current.regions)],['Chunk restrictions',baseline.coverageReason && !current.chunks ? 'Preserved in source' : list(current.chunks,'Whole regions')]];
   const e = current.entrance;
   if (!e && !baseline.entrance.raw) return [['Detection','No entrance configured']];
   const knownPriority = e || /EscapeCrystalNotifyRegionEntranceOverlayType\.(PRIORITIZED_WITH_HIGHLIGHT|DEPRIORITIZED_WITH_HIGHLIGHT)/.test(baseline.entrance.raw??'');
-  return [['Entrance area',current.entranceDangerous===false?'Not dangerous · region notifications disabled':current.entranceDangerous===true?'Dangerous':'Existing coverage preserved'],['Entrance coverage chunks',list(current.entranceNotifyChunks,'Whole entrance area')],['Priority',knownPriority ? priority(entranceOverlay(current)) : 'Preserved in source'],
+  return [['Boss fight',current.bossInstanced?'Instanced · region notifications only inside the instance':'Not restricted to an instance'],['Entrance area',current.entranceDangerous===false?'Not dangerous · region notifications disabled':current.entranceDangerous===true?'Dangerous':'Existing coverage preserved'],['Entrance coverage chunks',list(current.entranceNotifyChunks,'Whole entrance area')],['Priority',knownPriority ? priority(entranceOverlay(current)) : 'Preserved in source'],
     ['Detection IDs',e ? list(e.ids) : 'Special configuration · preserved'],
     ['Interaction',e ? e.objectType.replaceAll('_',' ').toLowerCase() : 'Preserved in source'],
     ['Approach / plane',e ? `${e.direction.replaceAll('_',' ').toLowerCase() || 'Any direction'} / ${e.plane.replaceAll('_',' ').toLowerCase() || 'Any plane'}` : 'Preserved in source'],
@@ -64,7 +65,7 @@ function EntranceChunks({draft,update,onError}:{draft:Draft;update:(change:Parti
 }
 
 export default function EncounterEditor(p:Props) {
-  const baseline = useMemo(()=>editingBaseline(p.draft.baseRaw,p.draft.entranceBaseRaw),[p.draft.baseRaw,p.draft.entranceBaseRaw]);
+  const baseline = useMemo(()=>editingBaseline(p.draft.baseRaw,p.draft.entranceBaseRaw,p.draft.metadataBase),[p.draft.baseRaw,p.draft.entranceBaseRaw,p.draft.metadataBase]);
   const sourceBoss = useMemo(()=>({...p.boss,...baseline.entry,optionalArgs:(sourceEntry(p.draft.entranceBaseRaw)??baseline.entry).optionalArgs}) as Boss,[p.boss,baseline]);
   const dungeon = baseline.entry.regionType === 'DUNGEONS';
   const sections:Section[] = dungeon ? ['details','coverage'] : ['details','coverage','entrance'];
@@ -135,7 +136,7 @@ export default function EncounterEditor(p:Props) {
     const next = applySection(p.draft,working,section) as Draft;
     try {
       if(section==='entrance'&&!next.entrance&&!baseline.entrance.raw)throw new Error('Choose entrance object or NPC IDs before applying entrance settings.');
-      validateProposal({version:2,repository:PLUGIN_REPO,baseCommit:'0'.repeat(40),changes:[next]});
+      validateProposal({version:4,repository:PLUGIN_REPO,baseCommit:'0'.repeat(40),changes:[next]});
       generateEncounter(next,baseline.entry);
       p.onApply(next,context);
       setStatus(`${labels[section]} changes saved in this browser.`);
@@ -145,7 +146,7 @@ export default function EncounterEditor(p:Props) {
   function useSuggestionAndReview(change:Partial<Draft>,location:NonNullable<Context['entrance']>) {
     if(!working)return;
     const next=applySection(p.draft,mergeDraft(working,change),'entrance') as Draft;
-    validateProposal({version:2,repository:PLUGIN_REPO,baseCommit:'0'.repeat(40),changes:[next]});
+    validateProposal({version:4,repository:PLUGIN_REPO,baseCommit:'0'.repeat(40),changes:[next]});
     generateEncounter(next,baseline.entry);
     p.onApply(next,{...context,entrance:location});
     cancel();setReview(true);
@@ -179,7 +180,7 @@ export default function EncounterEditor(p:Props) {
     <p className="sr-only" role="status">{status}</p>
     {section&&working ? <div className="edit-session">
       <div className="edit-section-heading"><div><span className="eyebrow">{labels[section].toUpperCase()}</span><h2 ref={heading} tabIndex={-1}>Edit {labels[section].toLowerCase()}</h2><p>Changes stay here until you apply them to your draft.</p></div><span className="edit-session-state">{dirty?'Unapplied changes':'No changes yet'}</span></div>
-      {section==='details' ? <div className="edit-details-form"><label className="field">Display name<input value={working.name} maxLength={160} onChange={e=>update({name:e.target.value})}/></label><fieldset><legend>Death behavior</legend><p>Who loses hardcore status?</p>{Object.entries(deathLabels).map(([value,label])=><label className={`edit-death-choice ${working.deathType===value?'selected':''}`} key={value}><input type="radio" name="edit-death" value={value} checked={working.deathType===value} onChange={()=>update({deathType:value})}/><span><strong>{label}</strong><small>{value==='UNSAFE'?'All hardcore accounts.':value==='UNSAFE_HCGIM'?'Hardcore Group Ironman accounts only.':'No hardcore accounts.'}</small></span></label>)}</fieldset></div>
+      {section==='details' ? <div className="edit-details-form"><label className="field">Display name<input value={working.name} maxLength={160} onChange={e=>update({name:e.target.value})}/></label><fieldset><legend>Death behavior</legend><p>Who loses hardcore status?</p>{Object.entries(deathLabels).map(([value,label])=><label className={`edit-death-choice ${working.deathType===value?'selected':''}`} key={value}><input type="radio" name="edit-death" value={value} checked={working.deathType===value} onChange={()=>update({deathType:value})}/><span><strong>{label}</strong><small>{value==='UNSAFE'?'All hardcore accounts.':value==='UNSAFE_HCGIM'?'Hardcore Group Ironman accounts only.':'No hardcore accounts.'}</small></span></label>)}</fieldset>{!dungeon&&<EncounterMetadata boss={p.boss} draft={working} update={update}/>}</div>
       : section==='coverage' ? <div className="edit-map-layout" onPointerDownCapture={()=>{mapInteracted.current=true;}} onKeyDownCapture={()=>{mapInteracted.current=true;}}><EncounterMaps boss={sourceBoss} draft={working} update={update} focus="arena" onLoad={p.onLoad} onError={p.onError} loading={!!p.busy} evidenceContext={context} onEvidenceContext={saveMapContext}/><aside><CoveragePanel draft={working} update={update} guided editing deaths={[]} preview="" onDiscard={()=>{}} canDiscard={false}/>{dungeon&&<DungeonMapReference title={p.boss.wikiTitle}/>}</aside></div>
       : <>
         <label className="field edit-priority">Entrance priority<select aria-label="Entrance priority" aria-describedby="edit-priority-help" disabled={!priorityKnown} value={priorityKnown?entranceOverlay(working):''} onChange={e=>update({entranceOverlay:e.target.value})}>{!priorityKnown&&<option value="">Preserved in source</option>}<option value="DEPRIORITIZED_WITH_HIGHLIGHT">Deprioritized · right-click entry</option><option value="PRIORITIZED_WITH_HIGHLIGHT">Prioritized · left-click entry</option></select><small id="edit-priority-help">When an Escape Crystal is missing or inactive. Both options highlight the entrance.</small></label>
@@ -210,9 +211,9 @@ export default function EncounterEditor(p:Props) {
           </div>
         </section>;
       })}</div><aside className="edit-review-card"><button className="edit-collapse-toggle edit-contribution-toggle" aria-expanded={!contributionCollapsed} aria-controls="overview-contribution" onClick={()=>setContributionCollapsed(value=>!value)}><span className="edit-collapse-chevron" aria-hidden="true">›</span><span className="eyebrow">YOUR CONTRIBUTION</span></button><h3>{changed.length?`${changed.length} ${changed.length===1?'section':'sections'} changed`:'No changes yet'}</h3><div id="overview-contribution" hidden={contributionCollapsed}><p>{review?'Check the changes against the original entry, then export your contribution.':'Applied changes are saved in this browser. Review them before sharing.'}</p>
-      {!review?<button className="primary" disabled={!p.saved||!changed.length} onClick={()=>setReview(true)}>Review changes <Icon name="arrow" size={16}/></button>:<>{issue&&<p className="warning" role="status">{issue}</p>}{p.onCreatePR&&<button className="primary" disabled={!p.saved||!!issue||!changed.length} onClick={()=>p.onCreatePR?.([p.draft.id])}>Create pull request</button>}<button className={p.onCreatePR?'':'primary'} disabled={!p.saved||!!issue||!changed.length} onClick={()=>p.onExport('json',[p.draft.id])}>Download proposal</button><button disabled={!p.saved||!!issue||!changed.length} onClick={()=>p.onExport('patch',[p.draft.id])}>Download patch</button><button disabled={!p.saved||!!issue||!changed.length} onClick={()=>p.onExport('copy',[p.draft.id])}>Copy proposal</button></>}
+      {!review?<button className="primary" disabled={!p.saved||!changed.length} onClick={()=>setReview(true)}>Review changes <Icon name="arrow" size={16}/></button>:<>{issue&&<p className="warning" role="status">{issue}</p>}{p.onCreatePR&&<button className="primary" disabled={!p.saved||!!issue||!changed.length} onClick={()=>p.onCreatePR?.([p.draft.id])}>Review pull request</button>}<button className={p.onCreatePR?'':'primary'} disabled={!p.saved||!!issue||!changed.length} onClick={()=>p.onExport('json',[p.draft.id])}>Download proposal</button><button disabled={!p.saved||!!issue||!changed.length} onClick={()=>p.onExport('patch',[p.draft.id])}>Download patch</button><button disabled={!p.saved||!!issue||!changed.length} onClick={()=>p.onExport('copy',[p.draft.id])}>Copy proposal</button></>}
       {p.saved&&<button className="text-button" onClick={()=>{p.onDiscard();setStatus('Draft discarded. Original plugin settings restored.');setReview(false);}}>Discard this draft</button>}<small>Nothing is submitted automatically.</small></div></aside></div>
-      {review&&<div className="edit-review-evidence">{overlapWarnings([p.draft],p.snapshot.entries).map((warning:string)=><p className="warning" key={warning}>{warning}</p>)}<details><summary>Compare generated code</summary><h3>Original plugin entry</h3><pre>{[p.draft.baseRaw,p.draft.entranceBaseRaw].filter(Boolean).join(",\n")}</pre><h3>Your draft</h3><pre>{preview}</pre></details></div>}
+      {review&&<div className="edit-review-evidence">{overlapWarnings([p.draft],p.snapshot.entries).map((warning:string)=><p className="warning" key={warning}>{warning}</p>)}<details><summary>Compare generated code</summary><h3>Original plugin entry</h3><pre>{[p.draft.baseRaw,p.draft.entranceBaseRaw,p.draft.metadataBase].filter(Boolean).join(",\n")}</pre><h3>Your draft</h3><pre>{preview}</pre></details></div>}
     </>}
     <dialog className="modal edit-navigation-dialog" ref={dialog} aria-labelledby="edit-leave-title" onCancel={e=>{e.preventDefault();setPending(null);}}><h2 id="edit-leave-title">Keep your changes?</h2><p>This section has changes you haven’t applied to your draft.</p><div><button onClick={()=>setPending(null)} autoFocus>Keep editing</button><button onClick={()=>resolvePending(false)}>Discard changes</button><button className="primary" disabled={!!error} onClick={()=>resolvePending(true)}>Apply changes</button></div></dialog>
   </section>;

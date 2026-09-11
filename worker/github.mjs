@@ -1,5 +1,6 @@
 import { HttpError } from './security.mjs';
 import { JAVA_PATH } from '../src/core/proposal.mjs';
+import {METADATA_PATHS} from '../src/core/encounter-metadata.mjs';
 
 export class GitHub {
   constructor(token, fetcher=(...args)=>fetch(...args)){this.token=token;this.fetcher=fetcher;}
@@ -11,10 +12,12 @@ export class GitHub {
   async optional(path){try{return await this.request(path);}catch(e){if(e.githubStatus===404)return null;throw e;}}
   async upstream(repo,branch){
     const commit=await this.request(`/repos/${repo}/commits/${encodeURIComponent(branch)}`);
-    const blob=await this.request(`/repos/${repo}/contents/${JAVA_PATH}?ref=${commit.sha}`);
-    if(blob.encoding!=='base64')throw new HttpError(502,'GitHub did not return the plugin source.');
-    const source=new TextDecoder().decode(Uint8Array.from(atob(blob.content.replace(/\s/g,'')),c=>c.charCodeAt(0)));
-    return {sha:commit.sha,tree:commit.commit.tree.sha,source};
+    const sources=Object.fromEntries(await Promise.all([JAVA_PATH,...METADATA_PATHS].map(async path=>{
+      const blob=await this.request(`/repos/${repo}/contents/${path}?ref=${commit.sha}`);
+      if(blob.encoding!=='base64')throw new HttpError(502,'GitHub did not return the plugin source.');
+      return [path,new TextDecoder().decode(Uint8Array.from(atob(blob.content.replace(/\s/g,'')),c=>c.charCodeAt(0)))];
+    })));
+    return {sha:commit.sha,tree:commit.commit.tree.sha,source:sources[JAVA_PATH],sources};
   }
   async fork(repo,login){
     const target=await this.request(`/repos/${repo}`);
@@ -37,4 +40,14 @@ export class GitHub {
   async findPR(repo,head,base){const rows=await this.request(`/repos/${repo}/pulls?state=all&head=${encodeURIComponent(head)}&base=${encodeURIComponent(base)}`);return rows[0]??null;}
   async pullRequest(repo,number){return this.request(`/repos/${repo}/pulls/${number}`);}
   async createPR(repo,data){return this.request(`/repos/${repo}/pulls`,'POST',data);}
+  async updatePR(repo,number,data){return this.request(`/repos/${repo}/pulls/${number}`,'PATCH',data);}
+  async branchHead(repo,branch){return (await this.request(`/repos/${repo}/git/ref/heads/${branch}`)).object.sha;}
+  async advanceRef(repo,branch,expected,sha){
+    const current=await this.branchHead(repo,branch);
+    if(current===sha)return;
+    if(current!==expected)throw new HttpError(409,'The PR branch changed since preview. Prepare a fresh preview before updating.');
+    // Never force-push: concurrent commits cannot be overwritten.
+    try{await this.request(`/repos/${repo}/git/refs/heads/${branch}`,'PATCH',{sha,force:false});}
+    catch(error){if(await this.branchHead(repo,branch)!==sha)throw error;}
+  }
 }

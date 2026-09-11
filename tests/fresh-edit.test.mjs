@@ -34,14 +34,14 @@ test('fresh form has no plugin settings or fallback locations, retaining only en
 
 test('fresh drafts survive reload and produce the same update proposal as existing editing',()=>{
   const saved=JSON.parse(JSON.stringify(mergeDraft(freshEditDraft(boss),{
-    regions:[12682],entrance:{...entrance,ids:['456'],overlay:'DEPRIORITIZED_WITH_HIGHLIGHT'},
+    setupProgress:4,entranceSetupProgress:2,regions:[12682],entrance:{...entrance,ids:['456'],overlay:'DEPRIORITIZED_WITH_HIGHLIGHT'},
     entranceDangerous:true,entranceNotifyChunks:[],entranceRegion:12582,
   })));
-  assert.equal(saved.editFlow,'fresh');
+  assert.equal(saved.editFlow,'fresh');assert.equal(saved.setupProgress,4);assert.equal(saved.entranceSetupProgress,2);
   const change=proposalDraft(saved),normal={...existingDraft(boss),regions:[12682],chunks:[],deathType:'UNSAFE',
     entrance:{...entrance,ids:['456'],overlay:'DEPRIORITIZED_WITH_HIGHLIGHT'},entranceOverlay:'DEPRIORITIZED_WITH_HIGHLIGHT',
     entranceDangerous:true,entranceNotifyChunks:[],entranceRegion:12582};
-  assert.equal(change.editFlow,undefined);assert.equal(change.baseRaw,boss.raw);
+  assert.equal(change.editFlow,undefined);assert.equal(change.setupProgress,undefined);assert.equal(change.entranceSetupProgress,undefined);assert.equal(change.baseRaw,boss.raw);
   assert.deepEqual(cleanChanges([change]),cleanChanges([normal]));
   const result=applyProposal(source,proposal(change));
   assert.equal(parseJava(result).entries.filter(e=>e.id===boss.id).length,1);

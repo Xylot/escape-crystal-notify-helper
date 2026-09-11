@@ -9,6 +9,7 @@ export class MemoryStore{
   async create(r){const old=await this.byFingerprint(r.owner,r.fingerprint);if(old)return old;this.rows.set(r.id,structuredClone(r));return structuredClone(r);}
   async byFingerprint(owner,fingerprint){return structuredClone([...this.rows.values()].find(r=>r.owner===owner&&r.fingerprint===fingerprint)??null);}
   async submitted(owner,revision){return structuredClone([...this.rows.values()].filter(r=>r.owner===owner&&r.revision===revision&&r.pr));}
+  async history(owner){return structuredClone([...this.rows.values()].filter(r=>r.owner===owner&&r.pr));}
   async get(id,owner){const r=this.rows.get(id);return r?.owner===owner?structuredClone(r):null;}
   async save(r){this.rows.set(r.id,structuredClone(r));}
   async lock(id){if(this.locks.has(id))return false;this.locks.add(id);return true;}
@@ -25,6 +26,9 @@ export class FakeGitHub{
   async ensureRef(repo,branch,sha){this.calls.push(['ref',branch,sha]);if(this.refs.has(branch)&&this.refs.get(branch)!==sha)throw Error('Branch changed');this.refs.set(branch,sha);}
   async findPR(repo,head){return this.prs.find(p=>p.head===head)??null;}
   async pullRequest(repo,number){const pr=this.prs.find(p=>p.number===number);if(!pr)throw Error('PR not found');return pr;}
+  async branchHead(repo,branch){return this.refs.get(branch);}
+  async advanceRef(repo,branch,expected,sha){const head=this.refs.get(branch);if(head!==expected&&head!==sha)throw Error('Branch changed');this.refs.set(branch,sha);this.calls.push(['advance',branch,sha]);}
+  async updatePR(repo,number,data){const pr=await this.pullRequest(repo,number);Object.assign(pr,data);this.calls.push(['update-pr',number]);return pr;}
   async createPR(repo,data){this.calls.push(['pr',data]);const pr={...data,number:this.prs.length+1,html_url:`https://github.com/test/plugin/pull/${this.prs.length+1}`,state:'open',merged_at:null};this.prs.push(pr);if(this.losePRResponse){this.losePRResponse=false;throw Error('Response lost');}return pr;}
 }
 export function png(width,height){

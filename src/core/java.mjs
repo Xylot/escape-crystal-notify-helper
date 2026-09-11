@@ -1,4 +1,4 @@
-import { entranceJava } from './entrance.mjs';
+import { entranceJava, entranceConstructor, entranceIsInstanced, instanceSuffix } from './entrance.mjs';
 import { encounterType, isDungeon } from './encounter-kind.mjs';
 import { integer, chunkOrigin, regionId } from './coordinates.mjs';
 const sameIds = (a, b) => JSON.stringify([...new Set(a)].sort((x,y)=>x-y)) === JSON.stringify([...new Set(b)].sort((x,y)=>x-y));
@@ -74,7 +74,7 @@ export function parseJava(source) {
   if (!entries.length) throw new Error('No enum entries found.');
   return { entries, insertAt: entries[0].start, terminator: end };
 }
-export function enumName(name, type = 'BOSSES') { return (type === 'DUNGEONS' ? 'DUNGEON_' : 'BOSS_') + name.normalize('NFKD').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').toUpperCase(); }
+export function enumName(name, type = 'BOSSES') { return (type === 'DUNGEONS' ? 'DUNGEON_' : type === 'RAIDS' ? 'RAIDS_' : 'BOSS_') + name.normalize('NFKD').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '').toUpperCase(); }
 export function javaString(name) { return JSON.stringify(name).replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029'); }
 // Only top-level booleans control region notifications. Entrance constructors
 // have their own independent flags (for example, escapeCrystalDisabled).
@@ -94,7 +94,8 @@ export function exportCoverage(change, existing = null) {
   const optional = existing?.optionalArgs?.map(arg => maskJava(arg).trim()) ?? [];
   const preserved = optional.find(arg => arg.startsWith('new EscapeCrystalNotifyRegionEntrance('));
   const hasEntrance = !isDungeon(change) && !!(change.entrance || preserved);
-  const preservedChunks = preserved ? splitArgs(preserved.slice(preserved.indexOf('(') + 1, -1)).find(arg => arg.startsWith('List.')) : undefined;
+  const constructor=preserved?entranceConstructor(preserved):null;
+  const preservedChunks = constructor ? splitArgs(constructor.slice(constructor.indexOf('(') + 1, -1)).find(arg => arg.startsWith('List.')) : undefined;
   const entranceChunks = change.entrance?.chunks ?? literalChunks(preservedChunks);
   entranceChunks.forEach(id => integer(id, 0, 4194303, 'Entrance chunk ID'));
   if (change.entranceRegion !== undefined) integer(change.entranceRegion, 0, 65535, 'Entrance region');
@@ -128,7 +129,7 @@ export function exportCoverage(change, existing = null) {
 /** @param {any} change @param {any} existing */
 export function generateEntry(change, existing = null, exactCoverage = null) {
   const type=encounterType(change);
-  if(!['BOSSES','DUNGEONS'].includes(type))throw new Error('Unsupported encounter category.');
+  if(!['BOSSES','RAIDS','DUNGEONS'].includes(type))throw new Error('Unsupported encounter category.');
   if(isDungeon(change)&&(change.entrance||change.entranceOverlay))throw new Error('Dungeons do not have entrance settings.');
   const coverage = exactCoverage ?? exportCoverage(change, existing);
   let optional = existing ? [...existing.optionalArgs] : [];
@@ -145,6 +146,16 @@ export function generateEntry(change, existing = null, exactCoverage = null) {
     const i = optional.findIndex(a => maskJava(a).trim().startsWith('new EscapeCrystalNotifyRegionEntrance('));
     if (i >= 0) optional[i] = entranceJava(change.entrance);
     else optional.unshift(entranceJava(change.entrance));
+  }
+  if(change.bossInstanced!==undefined) {
+    if(typeof change.bossInstanced!=='boolean')throw new Error('Choose whether the boss fight is instanced.');
+    const index=optional.findIndex(a=>maskJava(a).trim().startsWith('new EscapeCrystalNotifyRegionEntrance('));
+    if(index<0&&change.bossInstanced)throw new Error('An instanced boss requires entrance detection.');
+    if(index>=0) {
+      const clean=maskJava(optional[index]),enabled=entranceIsInstanced(clean);
+      if(change.bossInstanced&&!enabled)optional[index]+='.withInstancedBoss()';
+      if(!change.bossInstanced&&enabled)optional[index]=optional[index].slice(0,instanceSuffix.exec(clean).index).trimEnd();
+    }
   }
   if (change.notifyRegion !== undefined) {
     if (typeof change.notifyRegion !== 'boolean') throw new Error('Invalid region notification flag.');

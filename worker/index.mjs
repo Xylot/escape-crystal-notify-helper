@@ -13,7 +13,7 @@ const scriptJSON = value => JSON.stringify(value).replaceAll('<','\\u003c');
 export async function handle(request,env){
   const url=new URL(request.url),store=new Store(env.DB),origin=request.headers.get('Origin');
   if(request.method==='OPTIONS')return new Response(null,{status:204});
-  if(url.pathname==='/config'&&request.method==='GET')return json({proposalVersion:2,enabled:env.PR_ENABLED==='true'&&!!env.GITHUB_CLIENT_ID&&!!env.GITHUB_CLIENT_SECRET&&!!env.TOKEN_ENCRYPTION_KEY,...target(env)});
+  if(url.pathname==='/config'&&request.method==='GET')return json({proposalVersion:4,enabled:env.PR_ENABLED==='true'&&!!env.GITHUB_CLIENT_ID&&!!env.GITHUB_CLIENT_SECRET&&!!env.TOKEN_ENCRYPTION_KEY,...target(env)});
   if(env.PR_ENABLED!=='true')throw new HttpError(503,'PR creation is not enabled on this backend yet.');
   if(url.pathname==='/auth/start'&&request.method==='GET'){
     const destination=returnURL(url.searchParams.get('returnTo'),env),challenge=url.searchParams.get('challenge');

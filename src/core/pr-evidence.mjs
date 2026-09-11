@@ -81,8 +81,8 @@ export function evidencePlan(changes, contexts, sources) {
 export function cleanChanges(changes) {
   if (!Array.isArray(changes) || changes.length > 100) throw new Error('Choose 1–100 encounters.');
   return changes.map(c => {
-    const result = Object.fromEntries(['id','name','regionType','regions','deathType','baseRaw','chunks','entranceOverlay','entranceRegion','entranceDangerous','entranceNotifyChunks','entranceBaseRaw'].filter(key=>c[key]!==undefined).map(key=>[key,c[key]]));
-    if (c.entrance) result.entrance = Object.fromEntries(['overlay','direction','plane','objectType','ids','chunks'].map(key=>[key,c.entrance[key]]));
+    const result = Object.fromEntries(['bossInstanced','recommendedSeconds','petIcon','metadataBase','id','name','regionType','regions','deathType','baseRaw','chunks','entranceOverlay','entranceRegion','entranceDangerous','entranceNotifyChunks','entranceBaseRaw'].filter(key=>c[key]!==undefined).map(key=>[key,c[key]]));
+    if (c.entrance) result.entrance = Object.fromEntries(['overlay','direction','plane','objectType','ids','chunks','bossInstanced'].map(key=>[key,c.entrance[key]]));
     return result;
   }).sort((a,b)=>a.id.localeCompare(b.id));
 }

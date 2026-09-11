@@ -1,0 +1,64 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {prepare,submit} from '../worker/pr-service.mjs';
+import {FakeGitHub,MemoryStore,input,env,png} from './pr-fixtures.mjs';
+import {panelSize} from '../src/core/pr-evidence.mjs';
+import {stableJSON} from '../src/core/pr-evidence.mjs';
+import {digest} from '../worker/security.mjs';
+const payload=p=>({title:p.title,introduction:p.introduction,images:p.evidence.panels.map(panel=>({id:panel.id,png:png(panelSize(panel).width,panelSize(panel).height)}))});
+const revised=()=>({...input,changes:input.changes.map(c=>({...c,name:'Updated encounter'}))});
+test('previews from an older generator are regenerated while keeping the open PR target',async()=>{
+  const gh=new FakeGitHub(),store=new MemoryStore();
+  const first=await prepare(input,'1',gh,store,env);
+  await submit(first.id,payload(first),'1','contributor',gh,store);
+  const old=await store.get(first.id,'1');
+  old.revision=await digest(stableJSON({generator:2,changes:old.changes,evidence:old.evidence,presentation:old.presentation,repo:old.repo,branch:old.branch}));
+  await store.save(old);
+  const fresh=await prepare(input,'1',gh,store,env);
+  assert.notEqual(fresh.id,old.id);assert.notEqual(fresh.revision,old.revision);
+  assert.equal(fresh.pr,null);assert.equal(fresh.updatePR.number,old.pr.number);
+});
+test('changed encounter updates the same PR with a descendant commit; repeated submission is idempotent',async()=>{
+  const gh=new FakeGitHub(),store=new MemoryStore();
+  const first=await prepare(input,'1',gh,store,env),created=await submit(first.id,payload(first),'1','contributor',gh,store);
+  const next=await prepare(revised(),'1',gh,store,env);
+  assert.equal(next.updatePR.number,created.pr.number);assert.equal(next.pr,null);
+  const result=await submit(next.id,payload(next),'1','contributor',gh,store);
+  assert.equal(result.pr.number,created.pr.number);assert.equal(gh.prs.length,1);
+  const old=await store.get(first.id,'1'),saved=await store.get(next.id,'1');
+  assert.equal(gh.refs.get(`codex/encounters-${first.id}`),saved.codeCommit);
+  assert.ok(gh.calls.some(c=>c[0]==='commit'&&c[1].includes(old.codeCommit)));
+  assert.match(gh.prs[0].body,/Updated encounter/);
+  await submit(next.id,payload(next),'1','contributor',gh,store);
+  assert.equal(gh.calls.filter(c=>c[0]==='update-pr').length,1);
+  assert.equal((await prepare(revised(),'1',gh,store,env)).pr.number,created.pr.number);
+});
+test('updating one encounter retains the other encounters in a batch',async()=>{
+  const gh=new FakeGitHub(),store=new MemoryStore(),other={...input.changes[0],id:'BOSS_PR_OTHER',name:'Other'};
+  const batch={...input,changes:[...input.changes,other],contexts:{...input.contexts,[other.id]:input.contexts[input.changes[0].id]},sources:{...input.sources,[other.id]:input.sources[input.changes[0].id]}};
+  const first=await prepare(batch,'1',gh,store,env);await submit(first.id,payload(first),'1','contributor',gh,store);
+  const next=await prepare(revised(),'1',gh,store,env);
+  assert.deepEqual(next.changes.map(c=>c.id).sort(),[other.id,input.changes[0].id].sort());
+  assert.match(next.patch,/BOSS_PR_OTHER/);assert.ok(next.evidence.panels.some(p=>p.bossId===other.id));
+});
+test('changed branches are rejected; closed PRs and other owners do not become update targets',async()=>{
+  const gh=new FakeGitHub(),store=new MemoryStore();
+  const first=await prepare(input,'1',gh,store,env);await submit(first.id,payload(first),'1','contributor',gh,store);
+  const next=await prepare(revised(),'1',gh,store,env);
+  assert.equal((await prepare(revised(),'2',gh,store,env)).updatePR,null);
+  gh.refs.set(`codex/encounters-${first.id}`,'manual-change');
+  await assert.rejects(submit(next.id,payload(next),'1','contributor',gh,store),/branch changed/);
+  assert.equal(gh.calls.filter(c=>c[0]==='update-pr').length,0);
+  gh.prs[0].state='closed';
+  assert.equal((await prepare(revised(),'1',gh,store,env)).updatePR,null);
+});
+test('lost update response retries the same commit and PR',async()=>{
+  const gh=new FakeGitHub(),store=new MemoryStore();
+  const first=await prepare(input,'1',gh,store,env);await submit(first.id,payload(first),'1','contributor',gh,store);
+  const next=await prepare(revised(),'1',gh,store,env),update=gh.updatePR.bind(gh);let fail=true;
+  gh.updatePR=async(...args)=>{const result=await update(...args);if(fail){fail=false;throw Error('Response lost');}return result;};
+  await assert.rejects(submit(next.id,payload(next),'1','contributor',gh,store),/Response lost/);
+  const commit=(await store.get(next.id,'1')).codeCommit;
+  const result=await submit(next.id,payload(next),'1','contributor',gh,store);
+  assert.equal(result.pr.number,1);assert.equal(gh.prs.length,1);assert.equal((await store.get(next.id,'1')).codeCommit,commit);
+});

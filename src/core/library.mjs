@@ -24,15 +24,15 @@ export function createLibraryResolver(candidates,imports,entries){
     const row={...b,...(direct??{}),wikiTitle:b.wikiTitle,maps:b.maps??[],links:b.links??[],warnings:b.warnings??[],categories:b.categories,locationTitles:b.locationTitles,supportKnown:entries.length>0,supportedBy:support.map(e=>({id:e.id,name:e.name}))};
     merged.set(row.id,row);
   }
-  for(const entry of entries.filter(e=>['BOSSES','DUNGEONS'].includes(e.regionType)))if(!merged.has(entry.id))merged.set(entry.id,{...entry,maps:[],links:[],warnings:[],wikiTitle:DUNGEON_ALIASES[entry.id]??entry.wikiTitle??entry.name,...(isDungeon(entry)?{categories:['Dungeons']}:{}),supportedBy:[{id:entry.id,name:entry.name}],supportKnown:true});
+  for(const entry of entries.filter(e=>['BOSSES','RAIDS','DUNGEONS'].includes(e.regionType)))if(!merged.has(entry.id))merged.set(entry.id,{...entry,maps:[],links:[],warnings:[],wikiTitle:DUNGEON_ALIASES[entry.id]??entry.wikiTitle??entry.name,...(isDungeon(entry)?{categories:['Dungeons']}:entry.regionType==='RAIDS'?{categories:['Raids']}:{}),supportedBy:[{id:entry.id,name:entry.name}],supportKnown:true});
   const catalog=merged;
-  const entrances=new Map(entries.filter(e=>e.regionType==='BOSSES'&&e.optionalArgs?.some(a=>a.includes('EscapeCrystalNotifyRegionEntrance('))).map(e=>[e.id,e]));
+  const entrances=new Map(entries.filter(e=>['BOSSES','RAIDS'].includes(e.regionType)&&e.optionalArgs?.some(a=>a.includes('EscapeCrystalNotifyRegionEntrance('))).map(e=>[e.id,e]));
   return drafts=>{
   const merged=new Map(catalog);
   for(const draft of Object.values(drafts))if(!merged.has(draft.id))merged.set(draft.id,{...draft,raw:draft.baseRaw,optionalArgs:[],maps:[],links:[],warnings:['Not present in the current catalog. Review source changes.'],wikiTitle:draft.name,...(isDungeon(draft)?{categories:['Dungeons']}:{}),supportedBy:[],supportKnown:entries.length>0});
   const pairedIds=new Set();
   for(const boss of merged.values()) {
-    if(!boss.id.startsWith('BOSS_')||boss.id.endsWith('_ENTRANCE'))continue;
+    if(! /^(BOSS|RAIDS)_/.test(boss.id)||boss.id.endsWith('_ENTRANCE'))continue;
     const entrance=entrances.get(`${boss.id}_ENTRANCE`);
     // Keep independently saved legacy entrance drafts reachable until exported or discarded.
     if(entrance&&boss.raw&&!drafts[entrance.id]&&(!drafts[boss.id]||drafts[boss.id].entranceBaseRaw!==undefined)) {

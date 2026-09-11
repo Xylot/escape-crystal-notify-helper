@@ -49,7 +49,7 @@ jobs:
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           BRANCH="content-editor/proposal-${GITHUB_RUN_ID}"
           git switch -c "$BRANCH"
-          git add src/main/java/com/escapecrystalnotify/EscapeCrystalNotifyRegion.java
+          git add src/main/java/com/escapecrystalnotify/EscapeCrystalNotifyRegion.java src/main/java/com/escapecrystalnotify/EscapeCrystalNotifyThresholdDefaults.java src/main/java/com/escapecrystalnotify/EscapeCrystalNotifyEncounters.java
           git commit -m 'Update reviewed Escape Crystal boss coverage'
           gh auth setup-git
           git push origin "$BRANCH"

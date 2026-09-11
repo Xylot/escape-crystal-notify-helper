@@ -184,7 +184,7 @@ test('preview, cleaning, JSON, patch and PR generation produce identical split e
   assert.equal((await store.get(result.id,'1')).after,after);assert.equal(result.changes.length,1);
   assert.deepEqual(result.evidence.panels.find(p=>p.kind==='arena').regions,[12682]);
   assert.deepEqual(result.evidence.panels.find(p=>p.kind==='notification').chunks,[entranceChunk,nearbyChunk]);
-  assert.deepEqual(result.evidence.panels.find(p=>p.kind==='entrance').chunks,[entranceChunk]);
+  assert.deepEqual(result.evidence.panels.find(p=>p.kind==='notification').detectionChunks,[entranceChunk]);
   assert.match(result.body,/Not dangerous; region notifications disabled/);
   assert.match(result.evidence.panels.find(p=>p.kind==='notification').label,/region notifications disabled/);
   const draft=existingDraft(buildLibrary([],[],parseJava(after).entries,{}).find(e=>e.id===boss.id));

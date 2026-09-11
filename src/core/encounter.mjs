@@ -1,11 +1,13 @@
 import {isDungeon} from './encounter-kind.mjs';
 import { regionId,regionOrigin,chunkOrigin } from './coordinates.mjs';
 import { splitArgs,maskJava } from './java.mjs';
+import {entranceConstructor} from './entrance.mjs';
 
 export function originalEntranceChunks(optionalArgs=[]) {
   const entrance=optionalArgs.find(s=>maskJava(s).trim().startsWith('new EscapeCrystalNotifyRegionEntrance('));
   if(!entrance)return [];
-  const args=splitArgs(entrance.slice(entrance.indexOf('(')+1,entrance.lastIndexOf(')')));
+  const constructor=entranceConstructor(maskJava(entrance));
+  const args=splitArgs(constructor.slice(constructor.indexOf('(')+1,-1));
   const list=args.find(a=>/^List\.of\([\d,\s]*\)$/.test(a));
   return list?list.slice(list.indexOf('(')+1,-1).split(',').map(s=>Number(s.trim())).filter(Number.isInteger):[];
 }

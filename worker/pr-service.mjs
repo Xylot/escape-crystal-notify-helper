@@ -1,5 +1,6 @@
+import {stateBody} from './pr-description.mjs';
 import {isDungeon} from '../src/core/encounter-kind.mjs';
-import { applyProposal, validateProposal, fullPatch, PLUGIN_REPO, JAVA_PATH } from '../src/core/proposal.mjs';
+import { applyProposalFiles, validateProposal, proposalPatch, PLUGIN_REPO, JAVA_PATH } from '../src/core/proposal.mjs';
 import { cleanChanges, panelSize, stableJSON } from '../src/core/pr-evidence.mjs';
 import {proposalStates, comparisonEvidence, stateDifferences} from '../src/core/pr-states.mjs';
 import { digest, HttpError, validatePNG, validatePixels } from './security.mjs';
@@ -12,22 +13,6 @@ export function target(env){
   return {repo,branch:env.BASE_BRANCH||'master'};
 }
 const md = value => String(value).replace(/[\\`*_{}[\]<>()!#|]/g,'\\$&').replace(/[\r\n]+/g,' ');
-function stateBody(record,c,images){
-    let text=`- ${isDungeon(c)?'Dungeon':'Arena'} regions: ${(c.arenaRegions??c.regions).join(', ')}\n- Death classification: ${md(c.deathType)}\n- ${isDungeon(c)?'Dungeon':'Arena'} chunks: ${c.chunks?.length?c.chunks.join(', '):'Whole selected regions'}\n`;
-    if(c.entranceRegions)text+=`- Entrance area: ${c.entranceDangerous===false?'Not dangerous; region notifications disabled':'Dangerous'}\n- Entrance regions: ${c.entranceRegions.join(', ')}\n- Entrance coverage chunks: ${c.entranceNotifyChunks?.join(', ')||'Whole entrance area'}\n`;
-    if(c.entrance)text+=`- Entrance: ${md(c.entrance.objectType)}; IDs: ${c.entrance.ids.map(md).join(', ')}\n- Entrance options: ${md(c.entrance.overlay)}, direction ${md(c.entrance.direction||'default')}, plane ${md(c.entrance.plane||'default')}\n- Entrance chunks: ${c.entrance.chunks.join(', ')||'None'}\n`;
-    else if(!isDungeon(c))text+=`- Entrance: ${Object.hasOwn(c,'entranceRaw')?(c.entranceRaw?'Special source settings (shown below)':'None'):c.entranceOverlay?`priority ${md(c.entranceOverlay)}; other settings preserved`:'existing configuration preserved, if present'}.\n`;
-    const models=record.presentation?.[c.id]?.images??[];
-    if(models.length) {
-      text+='\n### Entrance model references\n\nAvailable first-orientation images, including related model variants. These are visual references; detection uses only the IDs listed above. Images from MOID / Weird Gloop.\n\n';
-      for(const id of models){const image=moidImage(id);text+=`<a href="${image.url}"><img src="${image.url}" alt="Object ${image.id}" width="180" /></a>\n`;}
-      text+='\nModel sources: '+models.map(id=>{const image=moidImage(id);return `[Object ${image.id}](${image.source})`;}).join(' · ')+'\n\n';
-    }
-    text+='\n### Map selections\n\n';
-    for(const p of record.evidence.panels.filter(p=>p.bossId===c.id))text+=`![${md(c.name)} ${p.label??p.kind}, plane ${p.context.plane}; regions ${p.regions.join(', ')}](${images[p.id]})\n\n`;
-    text+='### Wiki sources\n\n'+record.evidence.sources[c.id].map((url,i)=>`- [${i===0?'Wiki source':'Additional wiki source'} ${i+1}](${url})`).join('\n')+'\n\n';
-    return text.trim();
-}
 const validationBody=record=>`## Validation\n\nStructured proposal validation and edited-entry conflict checks passed against \`${record.base.sha}\`. Screenshots show editor selections, not in-game verification. Plugin compilation and repository checks are left to the normal PR checks.\n\n<!-- escape-crystal-submission:${record.id} -->`;
 export function prBody(record,introduction,images){
   let text=`${introduction.trim()}\n\n`;
@@ -36,20 +21,13 @@ export function prBody(record,introduction,images){
     text+=`## ${md(change.name)}\n\n`;
     // Existing prepared/submitted records keep their original evidence contract.
     if(!pair){text+=stateBody(record,change,images)+'\n\n';continue;}
-    if(pair.before){
-      const diff=stateDifferences(pair.before,pair.after);
-      for(const [label,lines] of [['Additions',diff.added],['Removals',diff.removed]])
-        text+=`### ${label}\n\n${lines.length?lines.map(line=>`- ${md(line)}`).join('\n'):'None.'}\n\n`;
-    }
-    for(const phase of pair.before?['before','after']:['after']){
+    for(const phase of pair.before?['after','before']:['after']){
       const state=pair[phase],label=phase==='before'?'Before':'After';
       const presentation=record.presentation?.[change.id];
       const scoped={...record,changes:[state],presentation:{[state.id]:{...presentation,images:phase==='before'?presentation?.beforeImages??[]:presentation?.images??[]}},
         evidence:{...record.evidence,panels:record.evidence.panels.filter(p=>p.bossId===state.id&&(!pair.before||p.state===phase))}};
-      let body=`- Display name: ${md(state.name)}\n`+stateBody(scoped,state,images);
-      if(state.entranceRaw&&!state.entrance)body+='\n\n### Entrance source settings\n\n<pre>'+html(state.entranceRaw)+'</pre>';
-      if(state.extraSettings.length)body+='\n\n### Additional source settings\n\n<pre>'+html(state.extraSettings.join('\n'))+'</pre>';
-      if(pair.before)text+=`<details>\n<summary>${label}</summary>\n\n${body}\n\n</details>\n\n`;
+      const body=stateBody(scoped,state,images);
+      if(pair.before)text+=`<details${phase==='after'?' open':''}>\n<summary>${label}</summary>\n\n${body}\n\n</details>\n\n`;
       else text+=body+'\n\n';
     }
   }
@@ -58,7 +36,7 @@ export function prBody(record,introduction,images){
 const html=value=>String(value).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
 export function publicRecord(r){
   const images=Object.fromEntries(r.evidence.panels.map(p=>[p.id,r.evidenceCommit?`https://raw.githubusercontent.com/${r.fork}/${r.evidenceCommit}/${p.id}.png`:`evidence://${p.id}`]));
-  return {id:r.id,revision:r.revision,repo:r.repo,branch:r.branch,baseSha:r.base.sha,patch:r.patch,changes:r.changes,states:r.states,evidence:r.evidence,presentation:r.presentation,title:r.title,introduction:r.introduction,body:prBody(r,r.introduction,images),status:r.status,pr:r.pr??null,error:r.error??null};
+  return {id:r.id,revision:r.revision,repo:r.repo,branch:r.branch,baseSha:r.base.sha,patch:r.patch,changes:r.changes,states:r.states,evidence:r.evidence,presentation:r.presentation,title:r.title,introduction:r.introduction,body:prBody(r,r.introduction,images),status:r.status,pr:r.pr??null,updatePR:r.update?.pr??null,error:r.error??null};
 }
 
 function prReference(pr){
@@ -84,21 +62,45 @@ async function submittedRecords(owner,revision,gh,store){
 }
 
 export async function prepare(input,owner,gh,store,env){
-  const {repo,branch}=target(env),changes=cleanChanges(input.changes);
-  validateProposal({version:2,repository:PLUGIN_REPO,baseCommit:'0'.repeat(40),changes});
+  const {repo,branch}=target(env);
+  let changes=cleanChanges(input.changes),update;
+  validateProposal({version:4,repository:PLUGIN_REPO,baseCommit:'0'.repeat(40),changes});
+  const encounter=c=>c.metadataBase?.canonicalId??c.id.replace(/_ENTRANCE$/,'');
+  const selected=new Set(changes.map(encounter)),candidates=new Map();
+  for(const old of await store.history(owner)){
+    if(old.repo!==repo||old.branch!==branch||!old.changes.some(c=>selected.has(encounter(c))))continue;
+    await refreshPR(old,gh,store);
+    if(old.pr.state!=='open'||old.pr.merged)continue;
+    const headBranch=old.update?.headBranch??`codex/encounters-${old.id}`;
+    const head=await gh.branchHead(old.fork,headBranch);
+    // Several saved revisions can refer to one PR; use the one at its current head.
+    const candidate={old,headBranch,head,matched:head===old.codeCommit};
+    if(!candidates.has(old.pr.number)||candidate.matched)candidates.set(old.pr.number,candidate);
+  }
+  if(candidates.size>1)throw new HttpError(409,'These encounters belong to multiple open PRs. Update each PR separately.');
+  const candidate=[...candidates.values()][0];
+  if(candidate){
+    const {old,headBranch,head,matched}=candidate;
+    if(!matched)throw new HttpError(409,'The existing PR branch has changes outside this tool. Review those changes on GitHub before updating.');
+    changes=cleanChanges([...old.changes.filter(c=>!selected.has(encounter(c))),...changes]);
+    const previousContexts=Object.fromEntries(Object.entries(old.evidence.contexts).map(([id,phases])=>[id,phases.after??phases]));
+    input={...input,contexts:{...previousContexts,...input.contexts},sources:{...old.evidence.sources,...input.sources},presentation:{...old.presentation,...input.presentation}};
+    update={pr:old.pr,fork:old.fork,headBranch,head,lockId:old.update?.lockId??old.id};
+  }
   const states=proposalStates(changes);
   const evidence=comparisonEvidence(changes,states,input.contexts,input.sources);
   const presentation=cleanPresentation(changes,input.presentation);
-  const revision=await digest(stableJSON({changes,evidence,presentation,repo,branch}));
+  // Bump when generation changes so persisted previews cannot retain old output.
+  const revision=await digest(stableJSON({generator:6,changes,evidence,presentation,repo,branch}));
   const submitted=await submittedRecords(owner,revision,gh,store);
-  const blocking=submitted.find(r=>!canReplace(r.pr));if(blocking)return publicRecord(blocking);
-  const base=await gh.upstream(repo,branch),after=applyProposal(base.source,{version:2,repository:PLUGIN_REPO,baseCommit:base.sha,changes});
-  if(after===base.source)throw new HttpError(409,'These settings already match the plugin. There are no changes to submit.');
+  const blocking=submitted.find(r=>!canReplace(r.pr)&&(!update||r.codeCommit===update.head));if(blocking)return publicRecord(blocking);
+  const base=await gh.upstream(repo,branch),sources=base.sources??{[JAVA_PATH]:base.source},afterFiles=applyProposalFiles(sources,{version:4,repository:PLUGIN_REPO,baseCommit:base.sha,changes}),after=afterFiles[JAVA_PATH];
+  if(Object.entries(afterFiles).every(([path,text])=>text===sources[path]))throw new HttpError(409,'These settings already match the plugin. There are no changes to submit.');
   // Closed attempts keep their evidence and history. A deterministic new fingerprint
   // gives concurrent preparations one fresh submission, with separate branch names.
-  const fingerprint=await digest(revision+base.sha+submitted.map(r=>r.id).sort().join(',')),existing=await store.byFingerprint(owner,fingerprint);
+  const fingerprint=await digest(revision+base.sha+(update?.head??'')+submitted.map(r=>r.id).sort().join(',')),existing=await store.byFingerprint(owner,fingerprint);
   if(existing)return publicRecord(await refreshPR(existing,gh,store));
-  const record={id:crypto.randomUUID(),owner,revision,fingerprint,repo,branch,base,after,changes,states,evidence,presentation,patch:fullPatch(base.source,after),...defaultPRText(changes,presentation),status:'prepared'};
+  const record={id:crypto.randomUUID(),owner,revision,fingerprint,repo,branch,base,after,afterFiles,changes,states,evidence,presentation,patch:proposalPatch(sources,afterFiles),...defaultPRText(changes,presentation),...(update?{update,title:candidate.old.title,introduction:candidate.old.introduction}:{}),status:'prepared'};
   return publicRecord(await store.create(record));
 }
 
@@ -106,14 +108,32 @@ export async function submit(id,input,owner,login,gh,store){
   let r=await store.get(id,owner);if(!r)throw new HttpError(404,'Preview not found. Prepare your PR again.');
   if(r.pr)return publicRecord(await refreshPR(r,gh,store));
   if(!await store.lock(id))return {...publicRecord(r),status:'working'};
+  let updateLocked=false;
   const save=async status=>{r.status=status;r.error=null;await store.save(r);};
   try{
     r=await store.get(id,owner);
     if(r.pr)return publicRecord(await refreshPR(r,gh,store));
+    if(r.update){
+      updateLocked=await store.lock(r.update.lockId);
+      if(!updateLocked)return {...publicRecord(r),status:'working'};
+      const live=await gh.pullRequest(r.repo,r.update.pr.number);
+      if(live.state!=='open'||live.merged||live.merged_at)throw new HttpError(409,'This PR is no longer open. Prepare a new preview.');
+      if(live.head?.repo&&(live.head.repo.full_name!==r.update.fork||live.head.ref!==r.update.headBranch||live.base.ref!==r.branch))throw new HttpError(409,'The PR target changed. Prepare a new preview.');
+      const head=await gh.branchHead(r.update.fork,r.update.headBranch);
+      if(head!==r.update.head&&head!==r.codeCommit)throw new HttpError(409,'The PR branch changed since preview. Prepare a fresh preview before updating.');
+    }
     // Reconcile uncertain PR responses before rejecting a now-stale upstream preview.
-    if(r.fork){const found=await gh.findPR(r.repo,`${login}:codex/encounters-${r.id}`,r.branch);if(found){r.pr=prReference(found);await save(prStatus(r.pr));return publicRecord(r);}}
-    const blocking=(await submittedRecords(owner,r.revision,gh,store)).find(other=>other.id!==r.id&&!canReplace(other.pr));
+    if(r.fork&&!r.update){const found=await gh.findPR(r.repo,`${login}:codex/encounters-${r.id}`,r.branch);if(found){r.pr=prReference(found);await save(prStatus(r.pr));return publicRecord(r);}}
+    const blocking=(await submittedRecords(owner,r.revision,gh,store)).find(other=>other.id!==r.id&&!canReplace(other.pr)&&other.pr.number!==r.update?.pr.number);
     if(blocking)throw new HttpError(409,`Pull request #${blocking.pr.number} is ${blocking.pr.merged?'merged':'open'} for this draft revision. Refresh the preview to view it.`);
+    if(!r.update){
+      const ids=new Set(r.changes.map(c=>c.metadataBase?.canonicalId??c.id.replace(/_ENTRANCE$/,'')));
+      for(const other of await store.history(owner)){
+        if(other.repo!==r.repo||other.branch!==r.branch||!other.changes.some(c=>ids.has(c.metadataBase?.canonicalId??c.id.replace(/_ENTRANCE$/,''))))continue;
+        await refreshPR(other,gh,store);
+        if(other.pr.state==='open'&&!other.pr.merged)throw new HttpError(409,`Pull request #${other.pr.number} is now open for this encounter. Prepare again to update it.`);
+      }
+    }
     const current=await gh.upstream(r.repo,r.branch);
     if(current.sha!==r.base.sha)throw new HttpError(409,'Upstream changed. Prepare and review a fresh preview before creating the PR.');
     if(typeof input.title!=='string'||!input.title.trim()||input.title.length>200||/[\r\n\x00-\x1f]/.test(input.title))throw new HttpError(400,'Enter a PR title of 1–200 characters.');
@@ -126,7 +146,7 @@ export async function submit(id,input,owner,login,gh,store){
     if(r.imageHash&&r.imageHash!==imageHash)throw new HttpError(409,'The screenshot set changed after submission began. Restore the submitted preview or prepare a new draft revision.');
     r.imageHash=imageHash;r.title=input.title.trim();r.introduction=input.introduction;
     await save('creating-fork');
-    if(!r.fork){r.fork=await gh.fork(r.repo,login);await store.save(r);}
+    if(!r.fork){r.fork=r.update?.fork??await gh.fork(r.repo,login);await store.save(r);}
     if(!await gh.optional(`/repos/${r.fork}/git/commits/${r.base.sha}`))throw new HttpError(425,'GitHub is still preparing your fork. Retry in a few seconds.');
     await save('uploading-screenshots');
     if(!r.evidenceCommit){
@@ -139,12 +159,20 @@ export async function submit(id,input,owner,login,gh,store){
     }
     await gh.ensureRef(r.fork,`codex/evidence-${r.id}`,r.evidenceCommit);
     await save('committing-code');
-    if(!r.codeCommit){const blob=await gh.blob(r.fork,r.after),tree=await gh.tree(r.fork,[{path:JAVA_PATH,mode:'100644',type:'blob',sha:blob.sha}],r.base.tree);r.codeCommit=(await gh.commit(r.fork,tree.sha,[r.base.sha],r.title)).sha;await store.save(r);}
+    if(!r.codeCommit){const entries=[];for(const [path,text] of Object.entries(r.afterFiles??{[JAVA_PATH]:r.after})){if(text===(r.base.sources??{[JAVA_PATH]:r.base.source})[path])continue;const blob=await gh.blob(r.fork,text);entries.push({path,mode:'100644',type:'blob',sha:blob.sha});}const tree=await gh.tree(r.fork,entries,r.base.tree);r.codeCommit=(await gh.commit(r.fork,tree.sha,r.update?[...new Set([r.update.head,r.base.sha])]:[r.base.sha],r.title)).sha;await store.save(r);}
+    if(r.update){
+      const live=await gh.pullRequest(r.repo,r.update.pr.number);
+      if(live.state!=='open'||live.merged||live.merged_at)throw new HttpError(409,'This PR is no longer open. Prepare a new preview.');
+      await gh.advanceRef(r.fork,r.update.headBranch,r.update.head,r.codeCommit);
+      await save('updating-pr');
+      const pr=await gh.updatePR(r.repo,r.update.pr.number,{title:r.title,body:publicRecord(r).body});
+      r.pr=prReference(pr);await save(prStatus(r.pr));return publicRecord(r);
+    }
     await gh.ensureRef(r.fork,`codex/encounters-${r.id}`,r.codeCommit);
     await save('creating-pr');
     const head=`${login}:codex/encounters-${r.id}`;
     let pr=await gh.findPR(r.repo,head,r.branch);
     if(!pr){try{pr=await gh.createPR(r.repo,{title:r.title,body:publicRecord(r).body,head,base:r.branch,draft:false});}catch(e){pr=await gh.findPR(r.repo,head,r.branch);if(!pr)throw e;}}
     r.pr=prReference(pr);await save(prStatus(r.pr));return publicRecord(r);
-  }catch(e){r.status='retry';r.error=e.message;await store.save(r);throw e;}finally{await store.unlock(id);}
+  }catch(e){r.status='retry';r.error=e.message;await store.save(r);throw e;}finally{if(updateLocked)await store.unlock(r.update.lockId);await store.unlock(id);}
 }

@@ -1,5 +1,11 @@
 # PR backend setup
 
+## Updating an existing contribution
+
+Preparing changes checks the signed-in account's stored submissions for an open PR covering the same encounter. The preview offers **Update pull request #…** and includes the other encounters already in that PR. Submission adds a commit to its existing branch and refreshes its title, description, and immutable evidence image links. The PR number, comments, and review history remain intact.
+
+Closed or merged PRs are not update targets. Encounters spread across multiple open PRs must be updated separately. Branches edited outside the tool are rejected instead of overwritten. Preview and submission both check the branch; updates use a non-forced fast-forward, and retries reuse the saved commit. This discovery uses this backend's submission history; arbitrary manually created PRs are not adopted.
+
 ## Provisioned on September 5, 2026
 
 - Worker: https://crystal-pr.emmi.sh

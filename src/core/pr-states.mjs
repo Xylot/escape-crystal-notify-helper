@@ -9,6 +9,7 @@ import {isNotifyRegion} from './java.mjs';
 export function reviewState(raw) {
   const baseline=editingBaseline(raw),entry=baseline.entry;
   return {id:entry.id,name:entry.name,regionType:entry.regionType,deathType:entry.deathType,notifyRegion:isNotifyRegion(entry),
+    ...(baseline.draft.bossInstanced?{bossInstanced:true,entranceDangerous:false,arenaRegions:entry.regions,entranceRegions:entry.regions,entranceNotifyChunks:[]}:{}),
     regions:entry.regions,chunks:baseline.chunks??[],entrance:baseline.entrance.value,
     entranceRaw:baseline.entrance.raw,entranceChunks:baseline.entrance.value?.chunks??originalEntranceChunks(entry.optionalArgs),
     extraSettings:entry.optionalArgs.filter(arg=>arg!==baseline.entrance.raw&&!/^List\.of\([\d,\s]*\)$/.test(arg)&&!['null','true','false'].includes(arg))};
@@ -20,6 +21,7 @@ export function proposalStates(changes) {
     try {before=change.baseRaw?combinedState([change.baseRaw,...(change.entranceBaseRaw?[change.entranceBaseRaw]:[])]):null;}
     catch {throw new Error(`Conflict: ${change.id} has an invalid original entry. Refresh the plugin source.`);}
     const after=combinedState(expandEncounter(change).map(e=>e.raw));
+    if(change.metadataBase){if(before)Object.assign(before,change.metadataBase);Object.assign(after,{recommendedSeconds:change.recommendedSeconds,petIcon:change.petIcon});}
     if(hasEntrancePolicy(change)&&after.entranceRaw) {
       after.arenaRegions=[...change.regions];
       after.entranceDangerous=change.entranceDangerous??after.entranceDangerous??after.notifyRegion;
@@ -47,11 +49,14 @@ export function stateDifferences(before,after) {
   const list=(label,a=[],b=[])=>{const plus=b.filter(v=>!a.includes(v)),minus=a.filter(v=>!b.includes(v));if(plus.length)added.push(`${label}: ${plus.join(', ')}`);if(minus.length)removed.push(`${label}: ${minus.join(', ')}`);};
   scalar('Display name',before.name,after.name);
   scalar('Death classification',before.deathType,after.deathType);
+  scalar('Recommended inactivity time (seconds)',before.recommendedSeconds,after.recommendedSeconds);
+  scalar('Pet icon',before.petIcon,after.petIcon);
   list('Regions',before.regions,after.regions);
   list('Coverage chunks',before.chunks,after.chunks);
   list('Entrance regions',before.entranceRegions,after.entranceRegions);
   list('Entrance notification chunks',before.entranceNotifyChunks,after.entranceNotifyChunks);
   scalar('Entrance area dangerous',before.entranceDangerous,after.entranceDangerous);
+  scalar('Boss fight instanced',before.bossInstanced??false,after.bossInstanced??false);
   scalar('Coverage mode',before.chunks.length?'Selected chunks':'Whole regions',after.chunks.length?'Selected chunks':'Whole regions');
   if((before.entrance||!before.entranceRaw)&&(after.entrance||!after.entranceRaw)) {
     scalar('Entrance',before.entrance?'Configured':null,after.entrance?'Configured':null);
@@ -90,9 +95,11 @@ export function comparisonEvidence(changes,states,contexts,sources) {
       }
       if(state.entranceRegions?.length) {
         const notification=evidencePlan([{...c,regions:state.entranceRegions,chunks:state.entranceNotifyChunks??[],entrance:undefined}],{[c.id]:{arena:entranceContext}},sources);
-        plan.panels.push(...notification.panels.map(p=>({...p,id:p.id.replace('-arena-','-notification-'),kind:'notification',label:state.entranceDangerous===false?'Entrance coverage (region notifications disabled)':'Entrance notification coverage'})));
+        plan.panels=plan.panels.filter(p=>p.kind!=='entrance');
+        plan.panels.push(...notification.panels.map(p=>({...p,id:p.id.replace('-arena-','-notification-'),kind:'notification',detectionChunks:state.entranceChunks??[],label:state.bossInstanced?'Entrance (outside instance)':state.entranceDangerous===false?'Entrance coverage (region notifications disabled)':'Entrance notification coverage'})));
         plan.panels=plan.panels.map(p=>p.kind==='entrance'?{...p,label:'Entrance object detection'}:p);
       }
+      if(state.bossInstanced)plan.panels=plan.panels.map(p=>p.kind==='arena'?{...p,label:'Arena coverage (inside instance only)'}:p);
       result.panels.push(...plan.panels.map(p=>pair.before?{...p,id:p.id.replace(`${c.id}-`,`${c.id}-${phase}-`),state:phase}:p));
       result.contexts[c.id]={...result.contexts[c.id],[phase]:plan.contexts[c.id]};
       result.sources[c.id]=[...new Set([...(result.sources[c.id]??[]),...plan.sources[c.id]])].sort();

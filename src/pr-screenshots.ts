@@ -22,6 +22,8 @@ export async function renderEvidence(panels:any[],progress:(value:string)=>void)
     const ctx=canvas.getContext('2d')!;ctx.scale(scale,scale);ctx.imageSmoothingEnabled=false;ctx.fillStyle='#f7f7f4';ctx.fillRect(0,0,canvas.width,canvas.height);
     ctx.fillStyle='#263244';ctx.font='bold 18px sans-serif';ctx.fillText(`${p.name} · ${label} · Plane ${p.context.plane}`,16,28,width-32);
     ctx.font='12px sans-serif';ctx.fillText('North ↑ · Purple outlines: selected regions / chunks · Editor selections, not in-game verification',16,51,width-32);
+    const distinctDetection=p.detectionChunks?.length && (!p.restrictChunks || JSON.stringify([...p.detectionChunks].sort())!==JSON.stringify([...p.chunks].sort()));
+    if(distinctDetection){ctx.fillText('Teal outlines: entrance object detection',16,62,width-32);}
     const overlay=document.createElement('canvas');overlay.width=overlay.height=256*scale;overlay.getContext('2d')!.scale(scale,scale);
     // Fetch in groups of four, including when a large selection spans many panels.
     for(let offset=0;offset<p.regions.length;offset+=4){
@@ -34,6 +36,7 @@ export async function renderEvidence(panels:any[],progress:(value:string)=>void)
           for(const chunk of p.chunks){if(((chunk>>11)>>3)!==(id>>8)||(((chunk&2047)>>3)!==(id&255)))continue;const sx=((chunk>>11)&7)*32,sy=(7-(chunk&7))*32;ctx.drawImage(bitmaps[i],sx,sy,32,32,x+sx,y+sy,32,32);}
         }
         paintGrid(overlay.getContext('2d'),{region:id,selected:p.regions,existing:[],chunks:p.chunks,chunkMode:p.restrictChunks,fine:p.restrictChunks});ctx.drawImage(overlay,x,y,256,256);
+        if(distinctDetection){ctx.strokeStyle='#20d7be';ctx.lineWidth=2;for(const chunk of p.detectionChunks){if(((chunk>>11)>>3)!==(id>>8)||(((chunk&2047)>>3)!==(id&255)))continue;ctx.strokeRect(x+((chunk>>11)&7)*32+2,y+(7-(chunk&7))*32+2,28,28);}}
       }
     }
     let y=64+p.rows*256+22;ctx.font='12px monospace';ctx.fillStyle='#263244';
