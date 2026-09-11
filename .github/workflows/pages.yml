@@ -37,6 +37,9 @@ jobs:
       - name: Report stale snapshot
         if: steps.refresh.outcome == 'failure'
         run: echo '::warning::Refresh failed. Publishing the previous snapshot with its original timestamp.'
+      - name: Check refreshed boss Java round trips
+        if: steps.refresh.outcome == 'success'
+        run: npm run test:bosses
       - run: npm run build
         env:
           VITE_PR_API_URL: ${{ vars.VITE_PR_API_URL }}

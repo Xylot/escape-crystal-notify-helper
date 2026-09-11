@@ -115,7 +115,7 @@ test('dungeons retain their category and expose only details and coverage',()=>{
 test('existing draft comparisons keep their baseline after upstream changes',()=>{
   const e=entry('BOSS_SHELLBANE_GRYPHON'), draft=existingDraft(e);
   const next=applySection(draft,{...editableDraft(draft),name:'Draft name'},'details');
-  const upstream=snapshot.source.replace(e.raw,e.raw.replace('Shellbane gryphon','Upstream name'));
+  const upstream=snapshot.source.replace(e.raw,e.raw.replace(JSON.stringify(e.name),JSON.stringify('Upstream name')));
   assert.throws(()=>applyProposal(upstream,proposal(next)),/Conflict/);
   assert.deepEqual(changedSections(next),['details']);
   assert.equal(editingBaseline(next.baseRaw).draft.name,e.name);

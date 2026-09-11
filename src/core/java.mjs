@@ -1,6 +1,7 @@
 import { entranceJava } from './entrance.mjs';
 import { encounterType, isDungeon } from './encounter-kind.mjs';
 import { integer, chunkOrigin, regionId } from './coordinates.mjs';
+const sameIds = (a, b) => JSON.stringify([...new Set(a)].sort((x,y)=>x-y)) === JSON.stringify([...new Set(b)].sort((x,y)=>x-y));
 // A deliberately narrow Java scanner. It preserves opaque optional constructor
 // arguments; it never evaluates source and fails closed on unsupported syntax.
 export function maskJava(source, strings = false) {
@@ -155,8 +156,7 @@ export function generateEntry(change, existing = null, exactCoverage = null) {
   }
   const originalChunkArg = existing?.optionalArgs.map(a => maskJava(a).trim()).find(a => a.startsWith('List.'));
   const originalChunkIds = originalChunkArg ? literalChunks(originalChunkArg) : [];
-  const sameChunks = (a, b) => JSON.stringify([...new Set(a)].sort((x,y)=>x-y)) === JSON.stringify([...new Set(b)].sort((x,y)=>x-y));
-  if (coverage.chunks !== undefined && (change.chunks !== undefined || !sameChunks(coverage.chunks, originalChunkIds))) {
+  if (coverage.chunks !== undefined && !sameIds(coverage.chunks, originalChunkIds)) {
     const i = optional.findIndex(a => /^List\.of\([\d,\s]*\)$/.test(maskJava(a).trim()));
     if(i>=0) optional.splice(i,1);
     if(coverage.chunks.length) {
@@ -164,6 +164,9 @@ export function generateEntry(change, existing = null, exactCoverage = null) {
       optional.push(`List.of(${coverage.chunks.join(', ')})`);
     }
   }
-  const args = [javaString(change.name), `EscapeCrystalNotifyRegionType.${type}`, `EscapeCrystalNotifyRegionDeathType.${change.deathType}`, ...optional, ...coverage.regions];
+  const regions=existing&&sameIds(coverage.regions,existing.regions)?existing.regions:coverage.regions;
+  if(existing&&change.id===existing.id&&change.name===existing.name&&type===existing.regionType&&change.deathType===existing.deathType
+      &&JSON.stringify(optional)===JSON.stringify(existing.optionalArgs)&&JSON.stringify(regions)===JSON.stringify(existing.regions))return existing.raw;
+  const args = [javaString(change.name), `EscapeCrystalNotifyRegionType.${type}`, `EscapeCrystalNotifyRegionDeathType.${change.deathType}`, ...optional, ...regions];
   return `${change.id}(${args.join(', ')})`;
 }

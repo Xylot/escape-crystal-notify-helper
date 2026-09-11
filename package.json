@@ -12,6 +12,7 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "node --test tests/*.test.mjs",
     "test:core": "node --test tests/core.test.mjs",
+    "test:bosses": "node scripts/test-boss-roundtrip.mjs",
     "refresh": "node scripts/refresh.mjs",
     "refresh:gameval": "node scripts/refresh-gameval.mjs",
     "apply-proposal": "node scripts/apply-proposal.mjs",

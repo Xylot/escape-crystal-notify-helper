@@ -15,11 +15,22 @@ The included package-lock.json supports reproducible installs with npm ci.
 
 ```sh
 npm run test:core  # dependency-free scanner, coordinates, proposal tests
+npm run test:bosses # every boss in the checked-in Java snapshot
 npm test           # also tests actual WikiParser extraction
 npm run refresh    # live plugin + wiki snapshot; requires network
 npm run build     # typecheck + production bundle
 npm run preview
 ```
+
+To check a current plugin checkout without refreshing wiki data:
+
+```sh
+npm run test:bosses -- "../escape-crystal-notify/src/main/java/com/escapecrystalnotify/EscapeCrystalNotifyRegion.java"
+```
+
+The boss round-trip suite uses the same loading, section editing, saved-draft serialization, preview, validation, and export functions as the UI. It checks every `BOSSES` entry, including paired entrances, special constructors, and entries excluded from discovery. Unchanged drafts and restored edits must reproduce the original Java, except for explicitly confirmed source coverage corrections. The audit reports Bryophyta’s missing region `12698` and Maggot King’s missing region `10618` as `SOURCE COVERAGE DISCREPANCY`; it requires those generated additions and their PR differences, rather than suppressing correct entrance-derived coverage. All other differences fail, including in batch exports. Once those source entries are corrected, exact matching applies again. It also checks name, entrance priority, and danger edits. This is an offline model integration test, not a browser interaction or visual-layout test, and does not claim that a blank form can recreate special settings the UI preserves from source. Failures identify the boss and operation. It runs with `npm test`, and CI reruns it against newly refreshed source before publishing. Pass an explicit Java path (or set `PLUGIN_REGION_SOURCE`) to test newer local code; a missing file fails rather than falling back to the snapshot.
+
+`test:bosses` saves the latest detailed results to `work/boss-roundtrip.log` and JUnit results to `work/boss-roundtrip.xml`, including expected/actual assertion differences on failure. It returns a failing exit code for mismatches and continues testing the other bosses. Constructors that cannot be fully authored by the UI are explicitly listed as `PRESERVED ONLY`, with their source arguments; passing their imported round trip does not count as fresh-authoring support. The [initial audit](docs/boss-roundtrip-audit.md) records the concrete mismatches and distinguishes confirmed source mistakes from helper regressions.
 
 The snapshot contains the wiki Boss catalog and 190 entries from the wiki List of dungeons. Support is recalculated on sync. Shellbane includes enriched entrance and arena maps; load other locations on demand. Missing tiles leave a usable coordinate grid.
 
