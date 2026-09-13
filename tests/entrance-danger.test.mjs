@@ -5,10 +5,11 @@ import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {chunkId} from '../src/core/coordinates.mjs';
-import {parseJava,isNotifyRegion} from '../src/core/java.mjs';
+import {parseJava,isNotifyRegion,generateEntry} from '../src/core/java.mjs';
+import {entranceJava} from '../src/core/entrance.mjs';
 import {expandEncounter,generateEncounter,notificationChunks,detectionChunks,sourceEntry} from '../src/core/encounter-export.mjs';
 import {applyProposal,validateProposal,fullPatch,PLUGIN_REPO,JAVA_PATH} from '../src/core/proposal.mjs';
-import {existingDraft,editableDraft,applySection,changedSections} from '../src/core/editing.mjs';
+import {existingDraft,editableDraft,applySection,changedSections,readEntrance} from '../src/core/editing.mjs';
 import {mergeDraft} from '../src/core/authoring.mjs';
 import {buildLibrary} from '../src/core/library.mjs';
 import {cleanChanges} from '../src/core/pr-evidence.mjs';
@@ -156,10 +157,44 @@ test('combined-to-split conversion transfers source entrance settings without ar
   const original=generated(boss)[0];
   const result=generated({...safe,baseRaw:original.raw,entrance:undefined});
   assert.deepEqual(result[0].regions,[12682]);assert.deepEqual(result[1].regions,[12582]);
+  assert.equal(result[0].optionalArgs.some(arg=>arg.includes('EscapeCrystalNotifyRegionEntrance(')),false);
+  assert.notEqual(result[0].raw,original.raw);
   assert.deepEqual(detectionChunks(result[1]),[entranceChunk]);
   assert.equal(result[1].optionalArgs[0],original.optionalArgs[0]);
   const restricted=generated({...safe,chunks:[arenaChunk]})[0];
   assert.throws(()=>generated({...safe,baseRaw:restricted.raw,regions:[12683]}),/Arena restriction chunks/);
+});
+
+test('splitting inline entrance handling rewrites the boss and preserves arena settings',async()=>{
+  const replacement={...entrance,ids:['58440']};
+  const raw=`BOSS_SHELLBANE_GRYPHON("Shellbane gryphon", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, ${entranceJava(replacement)}, true, List.of(${arenaChunk}, ${entranceChunk}), 12582, 12682)`;
+  const original=sourceEntry(raw),draft=existingDraft(original);
+  const coverage=applySection(draft,{...editableDraft(draft),regions:[12682],chunks:[arenaChunk]},'coverage');
+  const working={...editableDraft(coverage),entrance:replacement,entranceRegion:12582,
+    entranceDangerous:false,entranceNotifyChunks:[entranceChunk]};
+  const change=applySection(coverage,working,'entrance');
+  const result=generated(change),[arenaEntry,entranceEntry]=result;
+  assert.equal(arenaEntry.name,original.name);assert.equal(arenaEntry.deathType,original.deathType);
+  assert.deepEqual(arenaEntry.regions,[12682]);assert.deepEqual(notificationChunks(arenaEntry),[arenaChunk]);
+  assert.equal(arenaEntry.optionalArgs.some(arg=>arg.includes('EscapeCrystalNotifyRegionEntrance(')),false);
+  assert.equal(arenaEntry.optionalArgs.some(arg=>/^(true|false)$/.test(arg)),false);
+  assert.deepEqual(entranceEntry.regions,[12582]);assert.deepEqual(detectionChunks(entranceEntry),[entranceChunk]);
+  assert.deepEqual(readEntrance(entranceEntry.optionalArgs).value.ids,['ObjectID.TT_LAIR_ENTRANCE_BLOCKED']);
+  assert.equal(generateEntry(existingDraft(original),original),raw);
+
+  const initial=`public enum EscapeCrystalNotifyRegion { ${raw}; }`;
+  const preview=generateEncounter(change),after=applyProposal(initial,proposal([change]));
+  assert.equal(preview,result.map(entry=>entry.raw).join(',\n'));
+  const afterEntries=parseJava(after).entries;
+  assert.deepEqual(afterEntries.map(entry=>entry.id).sort(),[boss.id,`${boss.id}_ENTRANCE`].sort());
+  const reloaded=existingDraft(buildLibrary([],[],afterEntries,{}).find(entry=>entry.id===boss.id));
+  const roundTrip=new Map(expandEncounter(reloaded).map(entry=>[entry.id,entry.raw]));
+  for(const entry of afterEntries)assert.equal(roundTrip.get(entry.id),entry.raw);
+  assert.throws(()=>applyProposal(initial.replace('"Shellbane gryphon"','"Upstream"'),proposal([change])),/Conflict/);
+  const gh=new FakeGitHub(),store=new MemoryStore();gh.source=initial;
+  const prepared=await prepare({changes:[change],contexts:{[boss.id]:{arena:{x:3179,y:8876},entrance:{x:3176,y:2477,region:12582}}},
+    sources:{[boss.id]:['https://oldschool.runescape.wiki/w/Shellbane_gryphon']}},'1',gh,store,env);
+  assert.equal((await store.get(prepared.id,'1')).after,after);
 });
 
 test('conflicts in either paired entry and generated identifier collisions reject the entire proposal',()=>{

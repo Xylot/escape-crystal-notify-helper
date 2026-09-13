@@ -127,7 +127,7 @@ export function exportCoverage(change, existing = null) {
 }
 
 /** @param {any} change @param {any} existing */
-export function generateEntry(change, existing = null, exactCoverage = null) {
+export function generateEntry(change, existing = null, exactCoverage = null, {preserveRaw=true} = {}) {
   const type=encounterType(change);
   if(!['BOSSES','RAIDS','DUNGEONS'].includes(type))throw new Error('Unsupported encounter category.');
   if(isDungeon(change)&&(change.entrance||change.entranceOverlay))throw new Error('Dungeons do not have entrance settings.');
@@ -176,7 +176,7 @@ export function generateEntry(change, existing = null, exactCoverage = null) {
     }
   }
   const regions=existing&&sameIds(coverage.regions,existing.regions)?existing.regions:coverage.regions;
-  if(existing&&change.id===existing.id&&change.name===existing.name&&type===existing.regionType&&change.deathType===existing.deathType
+  if(preserveRaw&&existing&&change.id===existing.id&&change.name===existing.name&&type===existing.regionType&&change.deathType===existing.deathType
       &&JSON.stringify(optional)===JSON.stringify(existing.optionalArgs)&&JSON.stringify(regions)===JSON.stringify(existing.regions))return existing.raw;
   const args = [javaString(change.name), `EscapeCrystalNotifyRegionType.${type}`, `EscapeCrystalNotifyRegionDeathType.${change.deathType}`, ...optional, ...regions];
   return `${change.id}(${args.join(', ')})`;

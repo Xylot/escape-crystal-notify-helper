@@ -79,14 +79,16 @@ export function expandEncounter(change, existing=sourceEntry(change.baseRaw), pa
     return [{id:change.id,baseRaw:change.baseRaw,raw:generateEntry({...clean,chunks:coverage.chunks,notifyRegion:change.entranceDangerous},existing,coverage)}];
   }
   if(existing?.optionalArgs.some(a=>a.includes('Quest.')))throw new Error('Splitting quest-gated coverage requires manual Java review.');
-  const bossSource=existing?{...existing,optionalArgs:existing.optionalArgs.filter(a=>a!==entranceArg(existing)&&!/^(true|false)$/.test(maskJava(a).trim()))}:null;
+  const inlineEntrance=entranceArg(existing);
+  const bossSource=existing?{...existing,optionalArgs:existing.optionalArgs.filter(a=>a!==inlineEntrance&&(!inlineEntrance||!/^(true|false)$/.test(maskJava(a).trim())))}:null;
+  const bossSourceChanged=!!inlineEntrance;
   const bossChange={...clean,entrance:undefined,entranceOverlay:undefined,bossInstanced:undefined,entranceRegion:undefined,chunks:arenaChunks};
   // Transfer only the trusted entrance constructor, never the arena's restrictions.
-  const entranceSource=paired??(entranceArg(existing)?{...existing,optionalArgs:[entranceArg(existing)]}:null);
+  const entranceSource=paired??(inlineEntrance?{...existing,optionalArgs:[inlineEntrance]}:null);
   const entranceChange={...clean,id:entranceId,name:paired?.name??`${change.name} Entrance`,regions,chunks:notify,
     notifyRegion:change.entranceDangerous??isNotifyRegion(origin)};
   return [
-    {id:change.id,baseRaw:change.baseRaw,raw:generateEntry(bossChange,bossSource,{regions:sorted(change.regions),chunks:arenaChunks})},
+    {id:change.id,baseRaw:change.baseRaw,raw:generateEntry(bossChange,bossSource,{regions:sorted(change.regions),chunks:arenaChunks},{preserveRaw:!bossSourceChanged})},
     {id:entranceId,baseRaw:change.entranceBaseRaw??null,raw:generateEntry(entranceChange,entranceSource,{regions,chunks:sorted(notify)})},
   ];
 }
