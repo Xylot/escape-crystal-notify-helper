@@ -131,6 +131,8 @@ export function generateEntry(change, existing = null, exactCoverage = null, {pr
   const type=encounterType(change);
   if(!['BOSSES','RAIDS','DUNGEONS'].includes(type))throw new Error('Unsupported encounter category.');
   if(isDungeon(change)&&(change.entrance||change.entranceOverlay))throw new Error('Dungeons do not have entrance settings.');
+  if(preserveRaw&&existing&&change.id===existing.id&&change.name===existing.name&&type===existing.regionType&&change.deathType===existing.deathType
+      &&sameIds(change.regions,existing.regions)&&['entrance','entranceOverlay','bossInstanced','notifyRegion','chunks','entranceRegion'].every(key=>change[key]===undefined))return existing.raw;
   const coverage = exactCoverage ?? exportCoverage(change, existing);
   let optional = existing ? [...existing.optionalArgs] : [];
   if (!change.entrance && change.entranceOverlay) {

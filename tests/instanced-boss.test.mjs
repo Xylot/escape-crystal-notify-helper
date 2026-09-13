@@ -44,6 +44,9 @@ test('instanced constructors round trip, hydrate editing, and survive unrelated 
   assert.equal(readEntrance(sourceEntry(expandEncounter({...draft,entranceOverlay:'PRIORITIZED_WITH_HIGHLIGHT'})[0].raw).optionalArgs).value.overlay,'PRIORITIZED_WITH_HIGHLIGHT');
   const spaced=entry.optionalArgs.map(arg=>arg.replace('.withInstancedBoss()',' /* instance */ . withInstancedBoss ( )'));
   assert.equal(readEntrance(spaced).value.bossInstanced,true);assert.deepEqual(originalEntranceChunks(spaced),[approach]);
+  const multi=existingDraft(sourceEntry(expandEncounter({...boss,regions:[region,region+1],chunks:[],entranceNotifyChunks:[]})[0].raw));
+  const states=proposalStates([multi])[multi.id];
+  assert.deepEqual(stateDifferences(states.before,states.after),{added:[],removed:[]});
 });
 
 test('disabling instance restriction is explicit and incompatible layouts still fail closed',()=>{

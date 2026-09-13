@@ -96,6 +96,7 @@ export const generateEncounter = (change,existing) => expandEncounter(change,exi
 export function encounterCoverage(change,existing) {
   if(!hasEntrancePolicy(change))return exportCoverage(change,existing);
   const entries=expandEncounter(change,existing).map(e=>sourceEntry(e.raw));
+  const instanced=change.bossInstanced??change.entrance?.bossInstanced??entranceIsInstanced(maskJava(entranceArg(entries[0])??''));
   return {regions:sorted(entries.flatMap(e=>e.regions)),chunks:entries.length===1?notificationChunks(entries[0]):undefined,
-    entranceRegions:entries.length>1?entries[1].regions:sorted([...(change.entranceRegion===undefined?[]:[change.entranceRegion]),...(change.entrance?.chunks??detectionChunks(entries[0])).map(chunkRegion),...(change.entranceNotifyChunks??[]).map(chunkRegion)]),split:entries.length>1};
+    entranceRegions:entries.length>1?entries[1].regions:instanced?entries[0].regions:sorted([...(change.entranceRegion===undefined?[]:[change.entranceRegion]),...(change.entrance?.chunks??detectionChunks(entries[0])).map(chunkRegion),...(change.entranceNotifyChunks??[]).map(chunkRegion)]),split:entries.length>1};
 }

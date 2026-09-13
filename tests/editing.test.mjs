@@ -8,7 +8,7 @@ import {mergeDraft} from '../src/core/authoring.mjs';
 
 const snapshot=JSON.parse(readFileSync(new URL('../public/data/snapshot.json',import.meta.url)));
 const entry=id=>snapshot.entries.find(e=>e.id===id);
-const proposal=draft=>({version:1,repository:PLUGIN_REPO,baseCommit:snapshot.baseCommit,changes:[draft]});
+const proposal=draft=>({version:4,repository:PLUGIN_REPO,baseCommit:snapshot.baseCommit,changes:[draft]});
 const exportEntry=draft=>parseJava(applyProposal(snapshot.source,proposal(draft))).entries.find(e=>e.id===draft.id);
 
 test('opening every existing entry hydrates without changing its draft',()=>{

@@ -21,12 +21,12 @@ const proposal=changes=>({version:3,repository:PLUGIN_REPO,baseCommit:snapshot.b
 const json=v=>JSON.parse(JSON.stringify(v));
 
 test('joining an inline case puts the shared return on a new line using existing indentation',()=>{
-  for(const eol of ['\n','\r\n'])for(const tabs of [false,true])for(const id of ['BOSS_BRUTUS','BOSS_AARDVARK']){
+  for(const eol of ['\n','\r\n'])for(const tabs of [false,true])for(const id of ['BOSS_AARDVARK','BOSS_ZZZ_TEST']){
     const local=Object.fromEntries(Object.entries(sources).map(([path,text])=>[path,text.replace(/\r?\n/g,'\n').replace(/^ +/gm,spaces=>tabs?'\t'.repeat(spaces.length/4):spaces).replace(/\n/g,eol)]));
     const change={...withMetadata({id,name:'Test',regions:[13107],deathType:'UNSAFE'},local),recommendedSeconds:5,petIcon:'ItemID.COWBOSSPET'};
     const result=applyMetadata(local,[change]),code=result[THRESHOLDS_PATH];
     const indent=tabs?'\t\t\t':'            ',ret=tabs?'\t\t\t\t':'                ';
-    const cases=[id,'BOSS_BARROWS'].sort().map(name=>`${indent}case ${name}:`).join(eol);
+    const cases=[id,'BOSS_BARROWS','BOSS_BRUTUS'].sort().map(name=>`${indent}case ${name}:`).join(eol);
     assert.ok(code.includes(`${cases}${eol}${ret}return 5;`));
     assert.equal(metadataFor(id,result).recommendedSeconds,5);
   }
@@ -78,10 +78,10 @@ test('raid editing is reachable and uses shared canonical settings',()=>{
   assert.deepEqual(metadataFor('RAIDS_TOMBS_OF_AMASCUT',after),{canonicalId:'RAIDS_TOMBS_OF_AMASCUT',recommendedSeconds:6,petIcon:'ItemID.OLMPET'});
   assert.equal(after[JAVA_PATH],sources[JAVA_PATH]);
   assert.throws(()=>applyMetadata(sources,[d,{...draft('RAIDS_TOMBS_OF_AMASCUT'),recommendedSeconds:7}]),/Conflicting/);
-  const paired=withMetadata(existingDraft(library.find(e=>e.id==='RAIDS_CHAMBERS_OF_XERIC')),snapshot.metadataSources);
-  assert.ok(paired.entranceBaseRaw);
-  const pairedResult=applyProposalFiles(sources,proposal([{...paired,recommendedSeconds:5}]));
-  assert.equal(pairedResult[JAVA_PATH],sources[JAVA_PATH]);
+  const chambers=withMetadata(existingDraft(library.find(e=>e.id==='RAIDS_CHAMBERS_OF_XERIC')),snapshot.metadataSources);
+  assert.equal(chambers.entranceBaseRaw,undefined);assert.match(chambers.baseRaw,/\.withClosest\(\)/);
+  const chambersResult=applyProposalFiles(sources,proposal([{...chambers,recommendedSeconds:5}]));
+  assert.equal(chambersResult[JAVA_PATH],sources[JAVA_PATH]);
 });
 test('shared return groups, entrance aliases, comments and CRLF preserve unrelated entries',()=>{
   const d={...draft('BOSS_WINTERTODT'),recommendedSeconds:7,petIcon:'ItemID.FEDORA'};

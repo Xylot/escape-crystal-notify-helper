@@ -5,6 +5,7 @@ import {entranceJava} from '../src/core/entrance.mjs';
 import {generateEncounter,expandEncounter} from '../src/core/encounter-export.mjs';
 import {applyProposal,PLUGIN_REPO} from '../src/core/proposal.mjs';
 import {freshEditDraft,proposalDraft} from '../src/core/fresh-edit.mjs';
+import {buildLibrary} from '../src/core/library.mjs';
 import {prepare} from '../worker/pr-service.mjs';
 import {FakeGitHub,MemoryStore,env,snapshot} from './pr-fixtures.mjs';
 
@@ -28,7 +29,7 @@ test('object and NPC numeric IDs resolve independently; unknown IDs remain numer
 });
 
 test('Bryophyta numeric draft produces the same gameval code in preview, downloaded proposals and PRs',async()=>{
-  const boss=snapshot.entries.find(e=>e.id==='BOSS_BRYOPHYTA');
+  const boss=buildLibrary([],[],snapshot.entries,{}).find(e=>e.id==='BOSS_BRYOPHYTA');
   const draft={...freshEditDraft(boss),regions:[12955],entranceRegion:12698,entranceDangerous:true,
     entranceNotifyChunks:[812245,812246,814293,814294],entrance};
   const change=proposalDraft(draft),preview=generateEncounter(change);
