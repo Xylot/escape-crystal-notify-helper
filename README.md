@@ -18,6 +18,7 @@ npm run test:core  # dependency-free scanner, coordinates, proposal tests
 npm run test:bosses # every boss in the checked-in Java snapshot
 npm test           # also tests actual WikiParser extraction
 npm run refresh    # live plugin + wiki snapshot; requires network
+npm run refresh:definitions # stage and refresh all RuneLite definition tables at one commit
 npm run build     # typecheck + production bundle
 npm run preview
 ```
@@ -33,6 +34,10 @@ The boss round-trip suite uses the same loading, section editing, saved-draft se
 `test:bosses` saves the latest detailed results to `work/boss-roundtrip.log` and JUnit results to `work/boss-roundtrip.xml`, including expected/actual assertion differences on failure. It returns a failing exit code for mismatches and continues testing the other bosses. Constructors that cannot be fully authored by the UI are explicitly listed as `PRESERVED ONLY`, with their source arguments; passing their imported round trip does not count as fresh-authoring support. The [initial audit](docs/boss-roundtrip-audit.md) records the concrete mismatches and distinguishes confirmed source mistakes from helper regressions.
 
 The snapshot contains the wiki Boss catalog and 190 entries from the wiki List of dungeons. Support is recalculated on sync. Shellbane includes enriched entrance and arena maps; load other locations on demand. Missing tiles leave a usable coordinate grid.
+
+Plugin and wiki freshness are tracked independently. Sync plugin updates only the plugin timestamp; Refresh wiki catalog updates only the wiki timestamp. On reload, the browser selects the newest plugin source and newest wiki catalog separately, including migration from older saved snapshots. Saved drafts and their source baselines remain separate from these choices. Both dates appear in the sidebar.
+
+The daily publishing workflow continues to refresh wiki and plugin snapshots. A separate weekly **Refresh RuneLite definitions** workflow (also manually runnable) refreshes item names, item labels, and object/NPC constants from one RuneLite commit. Downloads and parsing finish in a staging directory before checked-in tables are updated. Tests and the production build must pass before it updates `codex/refresh-runelite-definitions`. It opens or updates a PR when repository settings allow Actions-created PRs; otherwise the run summary provides a compare link for the tested branch. Human changes on that branch stop the update. Definition changes require reviewing compatibility with the plugin's RuneLite release and deploying the frontend and Worker together after merging. Run `npm run refresh:definitions -- <full RuneLite commit SHA>` to reproduce a particular revision locally; `refresh:items` and `refresh:gameval` remain available individually.
 
 Raid headings within the Boss page's Raids section create standalone raid encounters, including raids without plugin support. Individual raid bosses retain their wiki section membership for matching but are hidden from the encounter library, including when also listed as quest bosses. Raids appear as whole encounters in Discover and the Raids collection; unsupported raids are included in Needs coverage. Older cached catalogs use their raid section categories for the same behavior. The bundled snapshot also includes The Fractured Archive as needing coverage; its map locations load on demand.
 

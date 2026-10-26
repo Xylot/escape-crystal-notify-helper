@@ -15,6 +15,8 @@
     "test:bosses": "node scripts/test-boss-roundtrip.mjs",
     "refresh": "node scripts/refresh.mjs",
     "refresh:gameval": "node scripts/refresh-gameval.mjs",
+    "refresh:items": "node scripts/refresh-item-ids.mjs",
+    "refresh:definitions": "node scripts/refresh-definitions.mjs",
     "apply-proposal": "node scripts/apply-proposal.mjs",
     "worker:dev": "wrangler dev --config worker/wrangler.jsonc --port 8787",
     "worker:check": "wrangler deploy --dry-run --config worker/wrangler.jsonc --outdir work/worker-build",

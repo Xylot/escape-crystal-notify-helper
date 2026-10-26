@@ -29,7 +29,7 @@ for(const boss of candidates.filter(b=>b.wikiTitle==='Shellbane gryphon'||proces
   catch(error){boss.warnings.push(`Location refresh failed: ${error.message}`);}
 }
 const now=new Date().toISOString();
-const snapshot = { version:1,generatedAt:now,baseCommit:commit.sha,source,metadataSources,entries,candidates,dungeons,warnings,catalog:{source:catalog.source,revision:catalog.revision,count:candidates.length,fetchedAt:now} };
+const snapshot = { version:1,generatedAt:now,pluginFetchedAt:now,wikiFetchedAt:now,baseCommit:commit.sha,source,metadataSources,entries,candidates,dungeons,warnings,catalog:{source:catalog.source,revision:catalog.revision,count:candidates.length,fetchedAt:now} };
 await mkdir('public/data',{recursive:true});
 await writeFile('public/data/snapshot.json',JSON.stringify(snapshot,null,2)+'\n');
 console.log(`Boss page revision ${catalog.revision}: ${candidates.length} bosses; ${candidates.filter(b=>!b.supportedBy.length).length} unsupported. Plugin ${commit.sha}.`);
