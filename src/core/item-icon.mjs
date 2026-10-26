@@ -5,7 +5,8 @@ export function itemIconId(value){return /^\d+$/.test(value??'')?value:ITEM_IDS.
 export function itemIconName(value){const id=itemIconId(value);return id?ITEM_LABELS[Number(id)]??'Unknown':value?'Unknown':'Not configured';}
 export function itemIcon(value) {
   if(/^ItemID\.[A-Z][A-Z0-9_]*$/.test(value))return value;
+  if(!/^[1-9]\d*$/.test(value)||Number(value)>2147483647)throw new Error('Enter a positive item ID or RuneLite ItemID constant.');
   const name=ITEM_NAMES[value];
-  if(!name)throw new Error(`No RuneLite ItemID constant found for item ${value}. Enter its ItemID constant or refresh the item definitions.`);
-  return `ItemID.${name}`;
+  // Wiki items can arrive before the pinned RuneLite definitions are refreshed.
+  return name?`ItemID.${name}`:value;
 }

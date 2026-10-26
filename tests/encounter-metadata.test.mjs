@@ -70,6 +70,15 @@ test('new boss proposal updates all three files and rejects unanswered setup',()
   for(const path of [JAVA_PATH,THRESHOLDS_PATH,ENCOUNTERS_PATH])assert.notEqual(after[path],sources[path]);
   assert.deepEqual(metadataFor(d.id,after),{canonicalId:d.id,recommendedSeconds:2,petIcon:'ItemID.MADANGELPET'});
 });
+
+test('new raid exports a wiki pet item absent from pinned RuneLite definitions',()=>{
+  const d=withMetadata({id:'RAIDS_THE_FRACTURED_ARCHIVE',regionType:'RAIDS',name:'The Fractured Archive',regions:[10018],deathType:'UNSAFE',baseRaw:null},snapshot.metadataSources);
+  d.petIcon='34646';
+  const after=applyProposalFiles(sources,proposal([d]));
+  assert.equal(metadataFor(d.id,after).petIcon,'34646');
+  assert.match(after[ENCOUNTERS_PATH],/return 34646;/);
+  assert.match(after[JAVA_PATH],/RAIDS_THE_FRACTURED_ARCHIVE/);
+});
 test('raid editing is reachable and uses shared canonical settings',()=>{
   const library=buildLibrary(snapshot.candidates,[],snapshot.entries,{});
   assert.ok(library.find(e=>e.id==='RAIDS_TOMBS_OF_AMASCUT'));

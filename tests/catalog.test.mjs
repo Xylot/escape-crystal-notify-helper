@@ -1,9 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import Parser from 'wikiparser-node';
+import {readFile} from 'node:fs/promises';
 import {extractBossCatalog,reconcileCatalog,supportFor} from '../src/core/catalog.mjs';
 import {buildLibrary,createLibraryResolver,encounterExclusion} from '../src/core/library.mjs';
 const page=text=>({text,title:'Boss',revision:123});
+
+test('bundled snapshot exposes The Fractured Archive as a raid needing coverage',async()=>{
+  const snapshot=JSON.parse(await readFile(new URL('../public/data/snapshot.json',import.meta.url),'utf8'));
+  const raid=buildLibrary(snapshot.candidates,[],snapshot.entries,{}).find(b=>b.wikiTitle==='The Fractured Archive');
+  assert.ok(raid);
+  assert.equal(raid.regionType,'RAIDS');
+  assert.ok(raid.categories.includes('Raids'));
+  assert.equal(raid.raw,null);
+  assert.deepEqual(raid.supportedBy,[]);
+});
 
 test('cached catalog matching preserves draft pairing behavior without rebuilding unchanged bosses',()=>{
   const candidates=[{id:'BOSS_TEST',name:'Test',wikiTitle:'Test',maps:[]},{id:'BOSS_NEW',name:'New',wikiTitle:'New',maps:[]}];
@@ -53,6 +64,7 @@ test('Boss column with colspan, multiple bosses, raid sections and missing locat
 |Unknown
 |[[Loot]]
 |}
+===Raids===
 ====Chambers of Xeric====
 {|
 !colspan=2|Boss
@@ -62,10 +74,73 @@ test('Boss column with colspan, multiple bosses, raid sections and missing locat
 |[[File:Tekton.png]]
 |[[Magic]]
 |}`));
-  assert.deepEqual(data.bosses.map(b=>b.name),['Alpha','Beta','Gamma','Tekton']);
+  assert.deepEqual(data.bosses.map(b=>b.name),['Alpha','Beta','Chambers of Xeric','Gamma','Tekton']);
   assert.deepEqual(data.bosses[0].locationTitles,['Cave']);
-  assert.deepEqual(data.bosses[2].locationTitles,[]);
-  assert.deepEqual(data.bosses[3].locationTitles,['Chambers of Xeric']);
+  assert.deepEqual(data.bosses[3].locationTitles,[]);
+  assert.deepEqual(data.bosses[4].locationTitles,['Chambers of Xeric']);
+});
+
+test('new raids are discoverable and authorable without plugin support',()=>{
+  const catalog=extractBossCatalog(Parser,page(`===Raids===
+====The Fractured Archive====
+{|
+!Boss
+|-
+|[[Archive Guardian]]
+|}
+=====Final encounter=====
+{|
+!Boss
+|-
+|[[Final guardian]]
+|}
+===World bosses===
+{|
+!Boss
+|-
+|[[Unrelated boss]]
+|}`));
+  const library=buildLibrary(catalog.bosses,[],entries,{});
+  const raid=library.find(b=>b.name==='The Fractured Archive');
+  assert.equal(raid.id,'RAIDS_THE_FRACTURED_ARCHIVE');
+  assert.equal(raid.regionType,'RAIDS');
+  assert.deepEqual(raid.categories,['Raids']);
+  assert.deepEqual(raid.supportedBy,[]);
+  assert.equal(raid.raw,null);
+  for(const name of ['Archive Guardian','Final guardian']){
+    assert.equal(catalog.bosses.find(b=>b.name===name).raidTitle,'The Fractured Archive');
+    assert.equal(library.find(b=>b.name===name),undefined);
+  }
+  assert.deepEqual(library.find(b=>b.name==='Unrelated boss').locationTitles,[]);
+  const supported=buildLibrary(catalog.bosses,[],[...entries,{...raid,raw:'raid source',regions:[1234]}],{}).filter(b=>b.id===raid.id);
+  assert.equal(supported.length,1);
+  assert.equal(supported[0].raw,'raid source');
+  assert.ok(supported[0].categories.includes('Raids'));
+});
+
+test('raid members stay hidden across cached catalogs, imports, source entries and drafts',()=>{
+  const raid={id:'RAIDS_FUTURE',name:'Future raid',wikiTitle:'Future raid',regionType:'RAIDS',categories:['World bosses','Raids']};
+  const member={id:'BOSS_RAID_GUARDIAN',name:'Raid guardian',wikiTitle:'Raid guardian',categories:['Future raid','Quest bosses']};
+  const unrelated={id:'BOSS_OUTSIDE',name:'Outside boss',wikiTitle:'Outside boss',categories:['World bosses'],locationTitles:['Future raid']};
+  const drafts={[member.id]:{...member,baseRaw:null}};
+  const before=JSON.stringify(drafts);
+  const library=buildLibrary([raid,member,unrelated],[{...member,categories:[]}],[{...member,regionType:'BOSSES',raw:'source'}],drafts);
+  assert.deepEqual(library.map(b=>b.name),['Future raid','Outside boss']);
+  assert.deepEqual(library.find(b=>b.id===raid.id).categories,['Raids']);
+  assert.equal(JSON.stringify(drafts),before);
+});
+
+test('legacy snapshot raid bosses are hidden without needing a wiki refresh',async()=>{
+  const snapshot=JSON.parse(await readFile(new URL('../public/data/snapshot.json',import.meta.url),'utf8'));
+  const library=buildLibrary(snapshot.candidates,[],snapshot.entries,{});
+  for(const name of ['Tekton','Akkha','Verzik Vitur'])assert.equal(library.find(b=>b.name===name),undefined);
+  for(const name of ['Chambers of Xeric','Theatre of Blood','Tombs of Amascut','The Fractured Archive'])assert.ok(library.find(b=>b.name===name)?.categories.includes('Raids'));
+});
+
+test('imported raids and saved raid drafts remain in the Raids collection',()=>{
+  const raid={id:'RAIDS_NEW',name:'New raid',wikiTitle:'New raid',regionType:'RAIDS',categories:[]};
+  assert.deepEqual(buildLibrary([], [raid], [], {})[0].categories,['Raids']);
+  assert.deepEqual(buildLibrary([], [], [], {[raid.id]:raid})[0].categories,['Raids']);
 });
 test('quest lists include boss subjects, nested variants, and multiple-boss quests',()=>{
   const data=extractBossCatalog(Parser,page(`==Quest bosses==

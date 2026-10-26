@@ -8,12 +8,12 @@ const linksIn = token => [...new Set(token.querySelectorAll('link').map(linkTitl
 /** Read table structure and quest list nodes from WikiParser, never scrape all page links. */
 export function extractBossCatalog(Parser, page) {
   const root=Parser.parse(page.text), found=new Map(), sections=[];
-  let category='', list=[];
-  const add=(title, locations=[], group=category)=>{
+  let category='', list=[], raidsLevel=0, raidTitle='';
+  const add=(title, locations=[], group=category, type='BOSSES')=>{
     const key=bossKey(title);if(!key)return;
     const prior=found.get(key);
-    if(prior){prior.categories=[...new Set([...prior.categories,group])];prior.locationTitles=[...new Set([...prior.locationTitles,...locations])];return;}
-    found.set(key,{id:enumName(title),name:title,wikiTitle:title,categories:[group],locationTitles:locations,
+    if(prior){prior.categories=[...new Set([...prior.categories,group])];prior.locationTitles=[...new Set([...prior.locationTitles,...locations])];if(raidTitle&&type!=='RAIDS')prior.raidTitle=raidTitle;return;}
+    found.set(key,{id:enumName(title,type),...(type==='RAIDS'?{regionType:type}:raidTitle?{raidTitle}:{}),name:title,wikiTitle:title,categories:[group],locationTitles:locations,
       catalogSource:wikiUrl('Boss'),catalogRevision:page.revision,regions:[],raw:null,deathType:'',optionalArgs:[],maps:[],links:[],warnings:[]});
   };
   const finishList=()=>{
@@ -30,7 +30,17 @@ export function extractBossCatalog(Parser, page) {
   };
   for(const node of root.childNodes){
     if(node.type==='heading'){
-      finishList();category=String(node).replace(/^=+|=+$/g,'').trim();sections.push(category);continue;
+      finishList();
+      const heading=String(node),level=heading.match(/^=+/)[0].length;
+      category=heading.replace(/^=+|=+$/g,'').trim();sections.push(category);
+      if(raidsLevel&&level<=raidsLevel){raidsLevel=0;raidTitle='';}
+      if(category==='Raids'){raidsLevel=level;raidTitle='';}
+      else if(raidsLevel&&level===raidsLevel+1){
+        raidTitle=category;
+        // A raid is authorable even before any plugin region supports it.
+        add(raidTitle,[raidTitle],'Raids','RAIDS');
+      }
+      continue;
     }
     if(node.type==='list'){finishList();if(category==='Quest bosses'||category==='Quests with multiple bosses')list=[node];continue;}
     if(list.length)list.push(node);
@@ -64,7 +74,7 @@ export function extractBossCatalog(Parser, page) {
       const loc=locationCol>=0?cellAt(locationCol,y):null;
       const locations=loc?linksIn(loc):[];
       // Raid tables have no location column; their enclosing heading supplies it.
-      if(['Chambers of Xeric','Theatre of Blood','Tombs of Amascut'].includes(category))locations.push(category);
+      if(raidTitle)locations.push(raidTitle);
       for(const title of linksIn(cell))add(title,locations);
     }
   }

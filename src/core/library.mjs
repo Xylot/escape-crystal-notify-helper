@@ -1,5 +1,5 @@
 import { bossKey,supportFor } from './catalog.mjs';
-import {isDungeon} from './encounter-kind.mjs';
+import {isDungeon,encounterType} from './encounter-kind.mjs';
 import {DUNGEON_ALIASES} from './dungeons.mjs';
 const EXCLUDED_ENCOUNTERS=new Map([
   ...['Callisto','Chaos Elemental','Chaos Fanatic','Scorpia','Venenatis',"Vet'ion",'Revenant maledictus'].map(name=>[bossKey(name),'Beyond the Escape Crystal’s Wilderness level limit.']),
@@ -15,13 +15,20 @@ export function buildLibrary(candidates,imports,entries,drafts){
 
 // Support matching depends on source/catalog data, not on authoring controls.
 export function createLibraryResolver(candidates,imports,entries){
+  const isRaid=value=>encounterType(value)==='RAIDS';
+  const raidKeys=new Set([...candidates,...imports,...entries].filter(isRaid).flatMap(raid=>[raid.name,raid.wikiTitle].filter(Boolean).map(bossKey)));
+  // Use explicit wiki section membership, including categories in older snapshots.
+  // Sharing a location alone does not make an unrelated boss a raid encounter.
+  const raidMembers=new Set([...candidates,...imports].filter(b=>!isRaid(b)&&(b.raidTitle||b.categories?.some(category=>raidKeys.has(bossKey(category))))).flatMap(b=>[b.name,b.wikiTitle].filter(Boolean).map(bossKey)));
+  const isRaidMember=b=>!isRaid(b)&&(b.raidTitle||[b.name,b.wikiTitle].filter(Boolean).some(name=>raidMembers.has(bossKey(name))));
   const input=new Map(candidates.map(b=>[b.id,b]));
   imports.forEach(b=>input.set(b.id,{...input.get(b.id),...b}));
   const merged=new Map();
   for(const b of input.values()){
     const support=isDungeon(b)?entries.filter(e=>bossKey(DUNGEON_ALIASES[e.id]??e.wikiTitle??e.name)===bossKey(b.wikiTitle)||bossKey(e.name)===bossKey(b.name)):supportFor(b,entries);
     const direct=support.find(e=>(!isDungeon(b)||e.regionType==='DUNGEONS')&&(bossKey(e.name)===bossKey(b.name)||bossKey(DUNGEON_ALIASES[e.id]??e.wikiTitle??e.name)===bossKey(b.wikiTitle)));
-    const row={...b,...(direct??{}),wikiTitle:b.wikiTitle,maps:b.maps??[],links:b.links??[],warnings:b.warnings??[],categories:b.categories,locationTitles:b.locationTitles,supportKnown:entries.length>0,supportedBy:support.map(e=>({id:e.id,name:e.name}))};
+    const categories=isRaid(direct??b)?['Raids']:b.categories;
+    const row={...b,...(direct??{}),wikiTitle:b.wikiTitle,maps:b.maps??[],links:b.links??[],warnings:b.warnings??[],categories,locationTitles:b.locationTitles,supportKnown:entries.length>0,supportedBy:support.map(e=>({id:e.id,name:e.name}))};
     merged.set(row.id,row);
   }
   for(const entry of entries.filter(e=>['BOSSES','RAIDS','DUNGEONS'].includes(e.regionType)))if(!merged.has(entry.id))merged.set(entry.id,{...entry,maps:[],links:[],warnings:[],wikiTitle:DUNGEON_ALIASES[entry.id]??entry.wikiTitle??entry.name,...(isDungeon(entry)?{categories:['Dungeons']}:entry.regionType==='RAIDS'?{categories:['Raids']}:{}),supportedBy:[{id:entry.id,name:entry.name}],supportKnown:true});
@@ -29,7 +36,7 @@ export function createLibraryResolver(candidates,imports,entries){
   const entrances=new Map(entries.filter(e=>['BOSSES','RAIDS'].includes(e.regionType)&&e.optionalArgs?.some(a=>a.includes('EscapeCrystalNotifyRegionEntrance('))).map(e=>[e.id,e]));
   return drafts=>{
   const merged=new Map(catalog);
-  for(const draft of Object.values(drafts))if(!merged.has(draft.id))merged.set(draft.id,{...draft,raw:draft.baseRaw,optionalArgs:[],maps:[],links:[],warnings:['Not present in the current catalog. Review source changes.'],wikiTitle:draft.name,...(isDungeon(draft)?{categories:['Dungeons']}:{}),supportedBy:[],supportKnown:entries.length>0});
+  for(const draft of Object.values(drafts))if(!merged.has(draft.id))merged.set(draft.id,{...draft,raw:draft.baseRaw,optionalArgs:[],maps:[],links:[],warnings:['Not present in the current catalog. Review source changes.'],wikiTitle:draft.name,...(isDungeon(draft)?{categories:['Dungeons']}:draft.regionType==='RAIDS'?{categories:['Raids']}:{}),supportedBy:[],supportKnown:entries.length>0});
   const pairedIds=new Set();
   for(const boss of merged.values()) {
     if(! /^(BOSS|RAIDS)_/.test(boss.id)||boss.id.endsWith('_ENTRANCE'))continue;
@@ -39,6 +46,6 @@ export function createLibraryResolver(candidates,imports,entries){
       merged.set(boss.id,{...boss,entranceEntry:entrance});pairedIds.add(entrance.id);
     }
   }
-  return [...merged.values()].filter(b=>!pairedIds.has(b.id)&&!encounterExclusion(b)).sort((a,b)=>a.name.localeCompare(b.name));
+  return [...merged.values()].filter(b=>!pairedIds.has(b.id)&&!isRaidMember(b)&&!encounterExclusion(b)).sort((a,b)=>a.name.localeCompare(b.name));
   };
 }

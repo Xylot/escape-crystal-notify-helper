@@ -26,6 +26,14 @@ test('shipped browser bundle supports map and catalog AST queries',()=>{
   assert.ok(JSON.stringify(catalog).includes('Shellbane gryphon'));
 });
 
+test('shipped browser parser discovers raid entries before plugin support exists',()=>{
+  const catalog=extractBossCatalog(Parser,{title:'Boss',revision:1,text:'===Raids===\n====The Fractured Archive====\n{|\n!Boss\n|-\n|[[Archive Guardian]]\n|}'});
+  const raid=catalog.bosses.find(b=>b.wikiTitle==='The Fractured Archive');
+  assert.equal(raid.regionType,'RAIDS');
+  assert.equal(raid.categories[0],'Raids');
+  assert.equal(catalog.bosses.find(b=>b.name==='Archive Guardian').locationTitles[0],raid.wikiTitle);
+});
+
 test('entrance search runs against the shipped browser bundle',async t=>{
   t.mock.method(globalThis,'fetch',async input=>{
     const url=new URL(input);

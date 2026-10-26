@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import Parser from 'wikiparser-node';
 import {bossPetCatalog,petItemIds,createPetResolver,canApplyPetLookup} from '../src/core/pet-icons.mjs';
+import {itemIcon,itemIconId} from '../src/core/item-icon.mjs';
 
 const catalog={title:'Pet',revision:1,text:`[[Unrelated pet]]
 ===Boss pets===
@@ -53,6 +54,25 @@ test('automatic lookup follows exactly one pet page, records provenance, and ded
   assert.equal(a.itemId,'34042');assert.equal(a.name,'Aggy');assert.equal(a.revision,2);
   assert.equal(a.source,'https://oldschool.runescape.wiki/w/Aggy');assert.deepEqual(a,b);
   assert.deepEqual(calls,['Pet','Aggy']);
+});
+
+test('Orion stays usable as a setup suggestion before the RuneLite item table is refreshed',async()=>{
+  const resolve=createPetResolver({read:async title=>title==='Pet'
+    ? {title:'Pet',revision:15382356,text:'===Boss pets===\n{|\n!colspan="2"|Pet\n!Source\n|-\n|{{plinkt|Orion}}||[[The Fractured Archive]]\n|}'}
+    : {title:'Orion',revision:15380784,text:'{{Infobox Item|name=Orion|id=34646}}'}});
+  const match=await resolve(Parser,'The Fractured Archive');
+  assert.equal(match.status,'found');
+  assert.equal(match.name,'Orion');
+  assert.equal(match.source,'https://oldschool.runescape.wiki/w/Orion');
+  const suggested=itemIcon(match.itemId);
+  assert.equal(itemIconId(suggested),'34646');
+  assert.equal(itemIcon(suggested),suggested);
+});
+
+test('item icons retain valid new IDs while rejecting malformed numeric values',()=>{
+  assert.equal(itemIcon('2147483647'),'2147483647');
+  assert.equal(itemIcon('27352'),'ItemID.WARDENPET_TUMEKEN');
+  for(const value of ['0','-1','2147483648','34646;','1.5','',null,undefined])assert.throws(()=>itemIcon(value),/positive item ID/);
 });
 test('missing and multiple pets are not guessed and never trigger a pet-page crawl',async()=>{
   const calls=[];

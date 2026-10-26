@@ -7173,6 +7173,29 @@
       "locationsLoaded": false
     },
     {
+      "id": "RAIDS_THE_FRACTURED_ARCHIVE",
+      "regionType": "RAIDS",
+      "name": "The Fractured Archive",
+      "wikiTitle": "The Fractured Archive",
+      "categories": [
+        "Raids"
+      ],
+      "locationTitles": [
+        "The Fractured Archive"
+      ],
+      "catalogSource": "https://oldschool.runescape.wiki/w/The_Fractured_Archive",
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_THE_HUEYCOATL",
       "name": "The Hueycoatl",
       "wikiTitle": "The Hueycoatl",
@@ -12128,7 +12151,7 @@
   "catalog": {
     "source": "https://oldschool.runescape.wiki/w/Boss",
     "revision": 15380992,
-    "count": 198,
+    "count": 199,
     "fetchedAt": "2026-10-25T13:45:07.606Z"
   }
 }
