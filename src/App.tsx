@@ -1,5 +1,5 @@
 import {withMetadata,METADATA_PATHS,metadataFor} from './core/encounter-metadata.mjs';
-import {isDungeon,encounterType} from './core/encounter-kind.mjs';
+import {isDungeon} from './core/encounter-kind.mjs';
 import {fetchDungeonCatalog,retainDungeonLocations} from './core/dungeons.mjs';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Authoring, { type AuthoringStep } from './Authoring';
@@ -83,7 +83,7 @@ export default function App() {
   const supported=(b:Boss)=>!!b.raw||!!b.supportedBy?.length;
   const unsupportedCount=bosses.filter(b=>!supported(b)).length;
   const categories=[...new Set(bosses.flatMap(b=>b.categories??[]))].sort();
-  const filtered=bosses.filter(b=>(filter==='drafts'||category!=='all'||(!isDungeon(b)&&encounterType(b)!=='RAIDS'&&!b.categories?.some(c=>/quest|event/i.test(c))))&&b.name.toLowerCase().includes(search.toLowerCase())&&(category==='all'||b.categories?.includes(category))&&(filter==='all'||filter==='supported'&&supported(b)||filter==='new'&&!supported(b)||filter==='drafts'&&drafts[b.id]||filter==='unresolved'&&!b.maps.length&&!b.raw));
+  const filtered=bosses.filter(b=>(filter==='drafts'||category!=='all'||(!isDungeon(b)&&!b.categories?.some(c=>/quest|event/i.test(c))))&&b.name.toLowerCase().includes(search.toLowerCase())&&(category==='all'||b.categories?.includes(category))&&(filter==='all'||filter==='supported'&&supported(b)||filter==='new'&&!supported(b)||filter==='drafts'&&drafts[b.id]||filter==='unresolved'&&!b.maps.length&&!b.raw));
   const changes=Object.values(drafts).filter(d=>!encounterExclusion(d)).map(d=>proposalDraft(d) as Draft), conflicts=changes.filter(c=>(snapshot.entries.find(b=>b.id===c.id)?.raw??null)!==c.baseRaw);
   function workspace():WorkspaceRevision{return {drafts,evidenceContexts};}
   function restore(next:WorkspaceRevision){
