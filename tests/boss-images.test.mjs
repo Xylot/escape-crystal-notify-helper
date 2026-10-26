@@ -11,6 +11,21 @@ test('portrait comes from the first NPC/monster infobox image, never an unrelate
   assert.equal(primaryBossImage(Parser, '{{Infobox NPC|name=No portrait}}'), null);
 });
 
+test('raid artwork comes from its activity infobox, never unrelated article images',async()=>{
+  const text='[[File:Unrelated banner.png]]\n{{Infobox Activity|name=The Fractured Archive|type=Raid|image=[[File:The Fractured Archive logo.png|250px]]|map=[[File:Map.png]]}}';
+  assert.equal(primaryBossImage(Parser,text),'File:The Fractured Archive logo.png');
+  assert.equal(primaryBossImage(Parser,text.replace('type=Raid','type=[[Raids|Raid]]')),'File:The Fractured Archive logo.png');
+  assert.equal(primaryBossImage(Parser,text.replace('type=Raid','type=Minigame')),null);
+  assert.equal(primaryBossImage(Parser,text,true),null);
+  const result=await resolveBossImage(Parser,'The Fractured Archive',async params=>{
+    assert.equal(params.titles,'File:The Fractured Archive logo.png');
+    return {query:{pages:[{imageinfo:[{url:'raid-logo',width:500,height:300,descriptionurl:'raid-file-page'}]}]}};
+  },async()=>({title:'The Fractured Archive',text}));
+  assert.equal(result.url,'raid-logo');
+  assert.equal(result.filePage,'raid-file-page');
+  assert.equal(result.source,'https://oldschool.runescape.wiki/w/The_Fractured_Archive');
+});
+
 test('resolved image retains canonical article, actual thumbnail, dimensions and file attribution', async () => {
   const image = await resolveBossImage(Parser, 'Alias', async params => {
     assert.equal(params.titles, 'File:Boss.png');

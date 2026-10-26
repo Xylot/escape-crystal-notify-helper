@@ -3,8 +3,11 @@ import { api, fetchPage, wikiTitle, wikiUrl } from './wiki.mjs';
 export function primaryBossImage(Parser, text, object = false) {
   const root = Parser.parse(text);
   for (const token of root.querySelectorAll('template')) {
-    if (!(object ? /^infobox (scenery|object|npc)$/i : /^infobox (monster|npc)$/i).test(String(token.name).replace(/^Template:/i, '').replaceAll('_', ' ').trim())) continue;
+    const template=String(token.name).replace(/^Template:/i, '').replaceAll('_', ' ').trim();
+    if (!(object ? /^infobox (scenery|object|npc)$/i : /^infobox (monster|npc|activity)$/i).test(template)) continue;
     const args = Object.fromEntries(token.getAllArgs().map(arg => [arg.name.trim().toLowerCase(), String(arg.lastChild).trim()]));
+    // Raid pages use an activity infobox with the raid's own logo/artwork.
+    if(/^infobox activity$/i.test(template)&&!/^raids?$/i.test((args.type??'').replace(/^\[\[(?:[^|\]]+\|)?([^\]]+)\]\]$/,'$1')))continue;
     const key = ['image', ...Object.keys(args).filter(k => /^image\d+$/.test(k)).sort((a, b) => Number(a.slice(5)) - Number(b.slice(5)))].find(k => args[k]);
     if (!key) continue;
     const value = args[key];
