@@ -1,6 +1,7 @@
 {
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "escape-crystal-pr",
+  "account_id": "b608c340ac58edd939adeafd8857aebc",
   "main": "index.mjs",
   "compatibility_date": "2026-09-05",
   "routes": [{ "pattern": "crystal-pr.emmi.sh", "custom_domain": true }],

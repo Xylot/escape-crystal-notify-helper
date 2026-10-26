@@ -5,9 +5,14 @@ import {pathToFileURL} from 'node:url';
 
 let revision=process.argv[2];
 if(!revision){
-  const response=await fetch('https://api.github.com/repos/runelite/runelite/commits/master',{signal:AbortSignal.timeout(30000),headers:process.env.GH_TOKEN?{Authorization:`Bearer ${process.env.GH_TOKEN}`}:{}});
+  const metadata=await fetch('https://repo.runelite.net/net/runelite/client/maven-metadata.xml',{signal:AbortSignal.timeout(30000)});
+  if(!metadata.ok)throw new Error(`RuneLite release metadata request failed (${metadata.status}).`);
+  const release=(await metadata.text()).match(/<release>([0-9]+(?:\.[0-9]+){1,3})<\/release>/)?.[1];
+  if(!release)throw new Error('No stable RuneLite release was found. Existing definitions were preserved.');
+  const response=await fetch(`https://api.github.com/repos/runelite/runelite/commits/runelite-parent-${release}`,{signal:AbortSignal.timeout(30000),headers:process.env.GH_TOKEN?{Authorization:`Bearer ${process.env.GH_TOKEN}`}:{}});
   if(!response.ok)throw new Error(`RuneLite commit request failed (${response.status}).`);
   revision=(await response.json()).sha;
+  console.log(`Using published RuneLite release ${release}.`);
 }
 if(!/^[a-f0-9]{40}$/.test(revision))throw new Error('Provide a full RuneLite commit SHA.');
 await mkdir('work',{recursive:true});

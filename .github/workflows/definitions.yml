@@ -5,7 +5,7 @@ on:
     - cron: '10 9 * * 1'
 permissions:
   contents: write
-  pull-requests: write
+  actions: write
 concurrency:
   group: refresh-runelite-definitions
   cancel-in-progress: false
@@ -26,46 +26,47 @@ jobs:
           GH_TOKEN: ${{ github.token }}
       - run: npm test
       - run: npm run build
-      - name: Save tested update for review
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Detect changed tables
+        id: tables
         shell: bash
         run: |
-          files=(src/core/item-ids.mjs src/core/item-labels.mjs src/core/gameval-ids.mjs)
-          if git diff --quiet -- "${files[@]}"; then
+          if git diff --quiet -- src/core/item-ids.mjs src/core/item-labels.mjs src/core/gameval-ids.mjs; then
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
             echo 'RuneLite definitions are already current.' >> "$GITHUB_STEP_SUMMARY"
-            exit 0
+          else
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi
-          branch=codex/refresh-runelite-definitions
+      - name: Check backend deployment credential
+        if: steps.tables.outputs.changed == 'true'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo '::error::Add the CLOUDFLARE_API_TOKEN Actions secret before committing refreshed definitions. The frontend and PR backend must deploy together.'
+            exit 1
+          fi
+      - name: Commit validated definitions directly
+        if: steps.tables.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          gh auth setup-git
-          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
-            git fetch origin "$branch:refs/remotes/origin/$branch"
-            author=$(git show -s --format='%ae' "origin/$branch")
-            if [ "$author" != '41898282+github-actions[bot]@users.noreply.github.com' ]; then
-              echo 'The refresh branch has human changes. Review it before refreshing again.' >&2
-              exit 1
-            fi
-          fi
-          git add -- "${files[@]}"
+          git add -- src/core/item-ids.mjs src/core/item-labels.mjs src/core/gameval-ids.mjs
           git commit -m 'Refresh RuneLite item, object and NPC definitions'
-          git push --force-with-lease origin "HEAD:$branch"
-          echo "Tested definitions: [review changes](https://github.com/$GITHUB_REPOSITORY/compare/main...$branch)" >> "$GITHUB_STEP_SUMMARY"
-          cat > "$RUNNER_TEMP/definitions-pr.md" <<'BODY'
-          Refresh item names, item labels, and object/NPC constants from the same RuneLite commit. The complete test suite and production build passed before this branch was updated.
-
-          Review compatibility with the plugin's RuneLite release. Deploy the frontend and PR Worker together after merging, and reinstall the maintainer validator where used, so generated Java stays consistent across export paths.
-          BODY
-          existing=$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')
-          if [ -n "$existing" ]; then
-            gh pr edit "$existing" --body-file "$RUNNER_TEMP/definitions-pr.md"
-          elif ! gh pr create --base main --head "$branch" --title 'Refresh RuneLite definitions' --body-file "$RUNNER_TEMP/definitions-pr.md" > "$RUNNER_TEMP/definitions-pr-result" 2>&1; then
-            if grep -qi 'not permitted to create or approve pull requests' "$RUNNER_TEMP/definitions-pr-result"; then
-              echo '::warning::Repository settings disable Actions-created pull requests. The tested refresh branch and review link are available in the run summary.'
-              echo 'Automatic PR creation is disabled by repository settings. Open a PR using the review link above.' >> "$GITHUB_STEP_SUMMARY"
-            else
-              cat "$RUNNER_TEMP/definitions-pr-result" >&2
-              exit 1
-            fi
-          fi
+          gh auth setup-git
+          # Never force-push main or silently rebase onto untested concurrent code.
+          git push origin HEAD:main
+      - name: Deploy matching PR backend
+        if: steps.tables.outputs.changed == 'true'
+        run: npm run worker:deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      - name: Publish matching frontend
+        if: steps.tables.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # GITHUB_TOKEN commits do not trigger a new push workflow.
+          gh workflow run pages.yml --ref main
+          echo 'Committed the validated definitions to main, deployed the PR backend, and started website publication.' >> "$GITHUB_STEP_SUMMARY"
