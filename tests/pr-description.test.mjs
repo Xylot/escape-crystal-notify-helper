@@ -13,4 +13,8 @@ test('description orders readable settings and images before collapsed IDs',()=>
   assert.match(body,/### Pet: Beef/);
   const numeric=stateBody(record,{...c,petIcon:'27352'},{});
   assert.match(numeric,/icon\/27352.png/);
+  const orion=stateBody(record,{...c,petIcon:'34646'},{});
+  assert.match(orion,/### Pet: Orion/);
+  assert.match(orion,/icon\/34646.png/);
+  assert.doesNotMatch(orion,/Pet: Unknown/);
 });

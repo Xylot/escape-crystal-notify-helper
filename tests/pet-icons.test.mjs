@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import Parser from 'wikiparser-node';
 import {bossPetCatalog,petItemIds,createPetResolver,canApplyPetLookup} from '../src/core/pet-icons.mjs';
-import {itemIcon,itemIconId} from '../src/core/item-icon.mjs';
+import {itemIcon,itemIconId,itemIconName} from '../src/core/item-icon.mjs';
 
 const catalog={title:'Pet',revision:1,text:`[[Unrelated pet]]
 ===Boss pets===
@@ -66,6 +66,9 @@ test('Orion stays usable as a setup suggestion before the RuneLite item table is
   assert.equal(match.source,'https://oldschool.runescape.wiki/w/Orion');
   const suggested=itemIcon(match.itemId);
   assert.equal(itemIconId(suggested),'34646');
+  assert.equal(itemIconName(suggested),'Orion');
+  assert.equal(itemIconName('2147483647'),'Unknown');
+  assert.equal(itemIconName(''),'Not configured');
   assert.equal(itemIcon(suggested),suggested);
 });
 
