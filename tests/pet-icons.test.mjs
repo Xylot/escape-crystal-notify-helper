@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import Parser from 'wikiparser-node';
-import {bossPetCatalog,petItemIds,createPetResolver,canApplyPetLookup} from '../src/core/pet-icons.mjs';
+import {bossPetCatalog,petItemIds,createPetResolver,canApplyPetLookup,PET_STORAGE} from '../src/core/pet-icons.mjs';
 import {itemIcon,itemIconId,itemIconName} from '../src/core/item-icon.mjs';
 
 const catalog={title:'Pet',revision:1,text:`[[Unrelated pet]]
@@ -98,4 +98,24 @@ test('manual edits and existing selections win over a delayed automatic lookup',
   assert.equal(canApplyPetLookup(0,1,''),false);
   assert.equal(canApplyPetLookup(0,0,'123',true),true);
   assert.equal(canApplyPetLookup(0,1,'123',true),false);
+});
+
+test('new wiki pet names survive reloads and wiki outages without an item-table update',async()=>{
+  let stored='{}',time=1,reads=0;
+  const storage={getItem:key=>{assert.equal(key,PET_STORAGE);return stored;},setItem:(key,value)=>{assert.equal(key,PET_STORAGE);stored=value;}};
+  const read=async title=>{reads++;return title==='Pet'
+    ? {title:'Pet',revision:80,text:'===Boss pets===\n{|\n!Pet!!Source\n|-\n|{{plinkt|Future pet}}||[[Future raid]]\n|}'}
+    : {title:'Future pet',revision:81,text:'{{Infobox Item|name=Future pet|id=2000000001}}'};};
+  const first=await createPetResolver({read,storage,now:()=>time,ttl:10})(Parser,'Future raid');
+  assert.equal(itemIconName(first.itemId,first),'Future pet');
+  assert.equal(itemIconName('2000000002',first),'Unknown');
+  assert.equal(reads,2);
+  const offline=async()=>{throw Error('Offline');};
+  const reloaded=await createPetResolver({read:offline,storage,now:()=>time,ttl:10})(Parser,'Future raid');
+  assert.equal(reloaded.name,'Future pet');
+  time=20;
+  const stale=await createPetResolver({read:offline,storage,now:()=>time,ttl:10})(Parser,'Future raid');
+  assert.equal(stale.name,'Future pet');
+  assert.equal(stale.source,'https://oldschool.runescape.wiki/w/Future_pet');
+  assert.equal(stale.revision,81);
 });

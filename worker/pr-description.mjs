@@ -10,9 +10,11 @@ export function stateBody(record,c,images){
     text+=`- Recommended inactivity time: ${c.recommendedSeconds!==undefined?`${c.recommendedSeconds} seconds`:'Unchanged'}\n`;
     text+=`- Entrance priority: ${overlay?overlay.startsWith('DEPRIORITIZED')?'Deprioritized':'Prioritized':c.entranceRaw?'Preserved source settings':'No entrance'}\n`;
     text+=`- Entrance dangerous: ${c.entranceDangerous===false?'No':c.entranceDangerous===true?'Yes':c.entranceRaw?'Same as encounter':'Not applicable'}\n`;
-    text+=`- Boss instanced: ${c.bossInstanced?'Yes':'No'}\n\n### Pet: ${md(itemIconName(c.petIcon))}\n\n`;
+    const pet=record.presentation?.[c.id]?.pet;
+    text+=`- Boss instanced: ${c.bossInstanced?'Yes':'No'}\n\n### Pet: ${md(itemIconName(c.petIcon,pet))}\n\n`;
     const petId=itemIconId(c.petIcon);
     text+=petId?`![Pet icon](https://static.runelite.net/cache/item/icon/${petId}.png)\n\n`:c.petIcon?'Icon unavailable for this item constant.\n\n':'Not configured.\n\n';
+    if(pet?.itemId===petId)text+=`[Pet name and inventory ID: OSRS Wiki](${pet.source}?oldid=${pet.revision})\n\n`;
     text+='### Entrance Model\n\n';
     const models=record.presentation?.[c.id]?.images??[];
     for(const id of models){const image=moidImage(id);text+=`<a href="${image.source}"><img src="${image.url}" alt="Entrance model reference" width="180" /></a>\n`;}

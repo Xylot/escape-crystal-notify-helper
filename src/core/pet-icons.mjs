@@ -1,4 +1,5 @@
 import {fetchPage,wikiTitle,wikiUrl} from './wiki.mjs';
+import {cleanPetReference} from './item-icon.mjs';
 
 const normalized=value=>String(value).replace(/^Template:/i,'').replaceAll('_',' ').trim().toLowerCase();
 const titleKey=value=>wikiTitle(value).split('#')[0].normalize('NFKC').replaceAll('’',"'").toLowerCase();
@@ -62,8 +63,11 @@ export function petItemIds(Parser,page,requested=page.title) {
   return [...new Set(found)];
 }
 
-export function createPetResolver({read=fetchPage,now=Date.now,ttl=3600000}={}) {
+export const PET_STORAGE='escape-crystal-pets:v1';
+export function createPetResolver({read=fetchPage,now=Date.now,ttl=3600000,storage}={}) {
   const cache=new Map();
+  let saved={};
+  try{const value=JSON.parse(storage?.getItem(PET_STORAGE)??'{}');if(value&&typeof value==='object'&&!Array.isArray(value))saved=value;}catch{}
   const page=title=>{
     const key=titleKey(title),saved=cache.get(key);
     if(saved&&now()-saved.at<ttl)return saved.promise;
@@ -72,7 +76,7 @@ export function createPetResolver({read=fetchPage,now=Date.now,ttl=3600000}={}) 
     entry.promise.catch(()=>{if(cache.get(key)===entry)cache.delete(key);});
     return entry.promise;
   };
-  return async (Parser,title)=>{
+  const resolve=async (Parser,title)=>{
     const catalogPage=await page('Pet'),catalog=bossPetCatalog(Parser,catalogPage);
     const matches=[...new Set(catalog.filter(pet=>pet.sources.some(source=>titleKey(source)===titleKey(title))).map(pet=>pet.name))];
     if(matches.length!==1)return {status:matches.length?'ambiguous':'not-found',pets:matches};
@@ -80,8 +84,22 @@ export function createPetResolver({read=fetchPage,now=Date.now,ttl=3600000}={}) 
     if(ids.length!==1)return {status:ids.length?'ambiguous':'not-found',pets:matches};
     return {status:'found',name:petPage.title,itemId:ids[0],source:wikiUrl(petPage.title),revision:petPage.revision,catalogRevision:catalogPage.revision};
   };
+  return async(Parser,title)=>{
+    const key=titleKey(title);let prior;
+    try{const entry=saved[key],pet=cleanPetReference(entry?.pet);if(pet&&Number.isFinite(entry.at))prior={...pet,status:'found',at:entry.at};}catch{}
+    if(prior&&now()-prior.at<ttl){const {at,...pet}=prior;return pet;}
+    try{
+      const result=await resolve(Parser,title);
+      if(result.status==='found'){
+        saved[key]={at:now(),pet:cleanPetReference(result)};
+        try{storage?.setItem(PET_STORAGE,JSON.stringify(saved));}catch{}
+      }
+      return result;
+    }catch(error){if(prior){const {at,...pet}=prior;return pet;}throw error;}
+  };
 }
-export const resolvePetIcon=createPetResolver();
+let petStorage;try{petStorage=globalThis.localStorage;}catch{}
+export const resolvePetIcon=createPetResolver({storage:petStorage});
 
 // A delayed lookup must never replace a value typed while the request ran.
 export const canApplyPetLookup=(startedRevision,currentRevision,currentValue,replace=false)=>startedRevision===currentRevision&&(replace||!currentValue);

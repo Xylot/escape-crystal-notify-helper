@@ -1,5 +1,6 @@
 import {moidImage} from './moid-images.mjs';
 import {isDungeon} from './encounter-kind.mjs';
+import {cleanPetReference} from './item-icon.mjs';
 
 export function encounterScope(boss) {
   if(isDungeon(boss))return 'dungeon';
@@ -23,7 +24,8 @@ export function cleanPresentation(changes, input = {}) {
     count += ids.length+beforeIds.length;
     if (count > 256) throw new Error('Split contributions with more than 256 model images into smaller PRs.');
     if(isDungeon(c)&&(ids.length||beforeIds.length))throw new Error('Dungeons do not have entrance model references.');
-    output[c.id] = {scope:isDungeon(c)?'dungeon':scope, images: [...new Set(ids.map(id => moidImage(id).id))],...(c.baseRaw?{beforeImages:[...new Set(beforeIds.map(id=>moidImage(id).id))]}:{})};
+    const pet=isDungeon(c)?undefined:cleanPetReference(item.pet);
+    output[c.id] = {scope:isDungeon(c)?'dungeon':scope, images: [...new Set(ids.map(id => moidImage(id).id))],...(c.baseRaw?{beforeImages:[...new Set(beforeIds.map(id=>moidImage(id).id))]}:{}),...(pet?{pet}:{})};
   }
   return output;
 }

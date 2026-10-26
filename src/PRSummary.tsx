@@ -3,7 +3,7 @@ import {itemIconId,itemIconName} from './core/item-icon.mjs';
 import {MoidThumbnail} from './EntrancePortraits';
 import type {EvidenceImage} from './pr-screenshots';
 
-function StateSummary({state,models,sources,images}:{state:any;models:string[];sources:string[];images:EvidenceImage[]}){
+function StateSummary({state,models,sources,images,pet}:{state:any;models:string[];sources:string[];images:EvidenceImage[];pet?:any}){
   const dungeon=isDungeon(state),entrance=state.entrance,overlay=entrance?.overlay??state.entranceOverlay,petId=itemIconId(state.petIcon);
   return <>
     <p>Encounter name: {state.name}</p>
@@ -13,7 +13,8 @@ function StateSummary({state,models,sources,images}:{state:any;models:string[];s
       <p>Entrance priority: {overlay?overlay.startsWith('DEPRIORITIZED')?'Deprioritized':'Prioritized':state.entranceRaw?'Preserved source settings':'No entrance'}</p>
       <p>Entrance dangerous: {state.entranceDangerous===false?'No':state.entranceDangerous===true?'Yes':state.entranceRaw?'Same as encounter':'Not applicable'}</p>
       <p>Boss instanced: {state.bossInstanced?'Yes':'No'}</p>
-      <h5>Pet: {itemIconName(state.petIcon)}</h5>
+      <h5>Pet: {itemIconName(state.petIcon,pet)}</h5>
+      {pet?.itemId===petId&&<p><a href={`${pet.source}?oldid=${pet.revision}`} target="_blank" rel="noreferrer">Pet name and inventory ID · OSRS Wiki ↗</a></p>}
       {petId?<img className="pr-pet-icon" src={`https://static.runelite.net/cache/item/icon/${petId}.png`} alt={`Pet icon for ${state.name}`}/>:<p>{state.petIcon?'Icon unavailable for this item constant.':'Not configured.'}</p>}
       <h5>Entrance Model</h5>
       {models.length?<div className="entrance-portraits">{models.map(id=><MoidThumbnail key={id} id={id}/>)}</div>:<p>No model reference selected.</p>}
@@ -36,6 +37,6 @@ function StateSummary({state,models,sources,images}:{state:any;models:string[];s
 
 export function EncounterSummary({change,preview,images}:{change:any;preview:any;images:EvidenceImage[]}){
   const pair=preview.states?.[change.id],presentation=preview.presentation?.[change.id];
-  const render=(phase:'before'|'after')=><StateSummary state={pair?.[phase]??change} models={(phase==='before'?presentation?.beforeImages:presentation?.images)??[]} sources={preview.evidence.sources[change.id]??[]} images={images.filter(image=>preview.evidence.panels.some((p:any)=>p.id===image.id&&p.bossId===change.id&&(!pair?.before||p.state===phase)))}/>;
+  const render=(phase:'before'|'after')=><StateSummary state={pair?.[phase]??change} pet={presentation?.pet} models={(phase==='before'?presentation?.beforeImages:presentation?.images)??[]} sources={preview.evidence.sources[change.id]??[]} images={images.filter(image=>preview.evidence.panels.some((p:any)=>p.id===image.id&&p.bossId===change.id&&(!pair?.before||p.state===phase)))}/>;
   return <article><h4>{change.name}</h4>{render('after')}{pair?.before&&<details className="pr-before"><summary>Before</summary>{render('before')}</details>}</article>;
 }

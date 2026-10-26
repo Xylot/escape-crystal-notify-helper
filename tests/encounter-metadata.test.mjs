@@ -133,6 +133,21 @@ test('PR preparation and submission include metadata-only changes in a single co
   const r=await submit(p.id,submission(p),'1','contributor',gh,store);assert.equal(r.status,'complete');
   const tree=gh.calls.find(c=>c[0]==='tree'&&c[2]==='tree-base');assert.deepEqual(tree[1].map(e=>e.path).sort(),[THRESHOLDS_PATH,ENCOUNTERS_PATH].sort());
 });
+
+test('a future wiki pet name survives PR preparation, saved records and submission',async()=>{
+  const gh=new FakeGitHub(),store=new MemoryStore(),d={...draft('BOSS_MAD_ANGEL'),petIcon:'2000000001'};
+  gh.upstream=async()=>({sha:gh.sha,tree:'tree-base',source:gh.source,sources});
+  const pet={name:'Future pet',itemId:'2000000001',source:'https://oldschool.runescape.wiki/w/Future_pet',revision:81};
+  const data={...input,changes:[d],contexts:{[d.id]:Object.values(input.contexts)[0]},sources:{[d.id]:Object.values(input.sources)[0]},presentation:{[d.id]:{pet}}};
+  const preview=await prepare(data,'1',gh,store,env);
+  assert.match(preview.body,/### Pet: Future pet/);
+  assert.deepEqual((await store.get(preview.id,'1')).presentation[d.id].pet,pet);
+  assert.doesNotMatch(preview.patch,/Future pet|Future_pet/);
+  const result=await submit(preview.id,submission(preview),'1','contributor',gh,store);
+  assert.equal(result.status,'complete');
+  assert.match(result.body,/### Pet: Future pet/);
+  assert.match(result.body,/Future_pet\?oldid=81/);
+});
 test('installed maintainer workflow applies all files and leaves them untouched on metadata conflict',()=>{
   const root=mkdtempSync(path.join(tmpdir(),'escape-metadata-'));
   try {

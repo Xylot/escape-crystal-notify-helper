@@ -4,6 +4,9 @@ import {loadGameval} from './core/gameval.mjs';
 import {modelFamily, modelVariants, moidImage} from './core/moid-images.mjs';
 import {encounterScope} from './core/pr-presentation.mjs';
 import {proposalStates} from './core/pr-states.mjs';
+import {resolvePetIcon} from './core/pet-icons.mjs';
+import {cleanPetReference} from './core/item-icon.mjs';
+import {loadParser} from './parser';
 import type {Boss,Draft,EvidenceContexts} from './types';
 
 function imageAvailable(id:string):Promise<boolean> {
@@ -55,14 +58,20 @@ export async function loadEntranceModels(selectedIds:string[],objectType:string,
 }
 
 export async function prepareModels(drafts:Draft[],bosses:Boss[],contexts:EvidenceContexts) {
-  const result:Record<string,{scope:string;images:string[];beforeImages?:string[]}> = {};
+  const result:Record<string,{scope:string;images:string[];beforeImages?:string[];pet?:ReturnType<typeof cleanPetReference>}> = {};
   const states=proposalStates(drafts);
   for (const draft of drafts) {
     const selected = contexts[draft.id]?.entranceImage;
     const pair=states[draft.id];
     const images = isDungeon(draft)?[]:await loadEntranceModels(pair.after.entrance?.ids??[],pair.after.entrance?.objectType??'GAME_OBJECT',selected);
     const beforeImages=pair.before&&!isDungeon(draft)?await loadEntranceModels(pair.before.entrance?.ids??[],pair.before.entrance?.objectType??'GAME_OBJECT'):[];
-    result[draft.id] = {scope:encounterScope(bosses.find(b=>b.id===draft.id)??draft),images,...(pair.before?{beforeImages}:{})};
+    const boss=bosses.find(b=>b.id===draft.id)??draft;
+    let pet;
+    if(!isDungeon(draft))try{
+      const match=await resolvePetIcon(await loadParser(),'wikiTitle' in boss?boss.wikiTitle:boss.name);
+      if(match.status==='found')pet=cleanPetReference(match);
+    }catch{/* Wiki outages do not block contributions; existing labels remain available. */}
+    result[draft.id] = {scope:encounterScope(boss),images,...(pair.before?{beforeImages}:{}),...(pet?{pet}:{})};
   }
   return result;
 }
