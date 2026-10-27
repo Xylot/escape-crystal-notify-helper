@@ -1,8 +1,8 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-26T16:10:57.126Z",
-  "pluginFetchedAt": "2026-10-26T16:10:57.126Z",
-  "wikiFetchedAt": "2026-10-26T16:10:57.126Z",
+  "generatedAt": "2026-10-27T15:25:01.727Z",
+  "pluginFetchedAt": "2026-10-27T15:25:01.727Z",
+  "wikiFetchedAt": "2026-10-27T15:25:01.727Z",
   "baseCommit": "9f171912f7da87138318149afaa28512772d24fe",
   "source": "package com.escapecrystalnotify;\n\nimport lombok.Getter;\nimport net.runelite.api.gameval.NpcID;\nimport net.runelite.api.gameval.ObjectID;\nimport net.runelite.api.Quest;\nimport net.runelite.api.coords.WorldPoint;\nimport net.runelite.api.gameval.VarbitID;\n\nimport java.util.*;\nimport java.util.stream.Collectors;\n\npublic enum EscapeCrystalNotifyRegion {\n\n    /*\n    Credit to the 'discord' Runelite plugin for many of the region IDs:\n\n    https://github.com/runelite/runelite/blob/master/runelite-client/src/main/java/net/runelite/client/plugins/discord/DiscordGameEventType.java\n     */\n\n    BOSS_BRUTUS(\"Brutus\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(833947), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.FENCEGATE_R_COWBOSS_START, ObjectID.FENCEGATE_L_COWBOSS_START).withInstancedBoss(), List.of(829849, 829850, 829851, 829852, 831894, 831895, 831896, 831897, 831898, 831899, 831900, 833942, 833943, 833944, 833945, 833946, 833947, 833948, 835990, 835991, 835992, 835993, 835994, 835995, 835996), 12850, 12851, 13106, 13107),\n    BOSS_SHELLBANE_GRYPHON(\"Shellbane Gryphon\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12682),\n    BOSS_SHELLBANE_GRYPHON_ENTRANCE(\"Shellbane Gryphon Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, null, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, 58439), false, 12582),\n    BOSS_MAGGOT_KING(\"Maggot King\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11645),\n    BOSS_MAGGOT_KING_ENTRANCE(\"Maggot King Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(685013), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.DARKWOOD_TREE_DOORWAY01_4X3), List.of(685013), 10618),\n    BOSS_MAD_ANGEL(\"Mad Angel\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.WESTWARD, List.of(649492, 649493), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, 62250), 10018),\n    BOSS_ABYSSAL_SIRE(\"Abyssal Sire\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.PRIORITIZED_WITH_HIGHLIGHT, List.of(774740, 774742, 780884, 780886), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.NEXUS_EYE_YELLOW_MIDDLE, ObjectID.NEXUS_EYE_YELLOW_LEFT, ObjectID.NEXUS_EYE_YELLOW_RIGHT, ObjectID.NEXUS_EYE_GREEN_MIDDLE, ObjectID.NEXUS_EYE_GREEN_LEFT, ObjectID.NEXUS_EYE_GREEN_RIGHT), 11851, 11850, 12106, 12363, 12362),\n    BOSS_AMOXLIATL(\"Amoxliatl\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(410803, 410804), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.VMQ3_RUINS_DOOR_MULTI), 5446, 6294, 6550),\n    BOSS_ARAXXOR(\"Araxxor\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(935114, 935115, 937162, 937163), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.ARAXXOR_BOSS_TUNNEL_MULTI), 14489, 14745),\n    BOSS_ARTIO(\"Artio\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.PRIORITIZED_WITH_HIGHLIGHT, List.of(797131), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.WILD_CALLISTO_SINGLES_ENTRANCE01), 7092, 12345),\n    BOSS_BARROWS(\"Barrows\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 14131, 14231),\n    BOSS_BRYOPHYTA(\"Bryophyta\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12955),\n    BOSS_BRYOPHYTA_ENTRANCE(\"Bryophyta Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(812245), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.GB_MOSS_DOOR_IN), List.of(812245), 12698),\n    BOSS_CALVARION(\"Calvar'ion\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.PRIORITIZED_WITH_HIGHLIGHT, List.of(813516), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.WILD_VETION_SINGLES_ENTRANCE01), 7604, 12601),\n    BOSS_CERBERUS(\"Cerberus\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(329884, 333982, 340124), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.HELLHOUND_WINCH), 4883, 5139, 5140, 5395),\n    BOSS_COMMANDER_ZILYANA(\"Commander Zilyana\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.WESTWARD_INCLUSIVE, List.of(744082), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.GODWARS_DUNGEON_DOOR_SARADOMIN), 11601, 11602, 11858),\n    BOSS_CORP(\"Corporeal Beast\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.EASTWARD, List.of(760339, 760340), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.CORP_BEAST_ENTRANCE), 11842, 11844),\n    BOSS_CRAZY_ARCHAEOLOGIST(\"Crazy Archaeologist\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11833),\n    BOSS_DERANGED_ARCHAEOLOGIST(\"Deranged Archaeologist\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.SOUTHWARD, List.of(942544), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.FOSSIL_FLORA_SWAMP_FALLEN_TRUNK), 14650, 14649),\n    BOSS_DKS(\"Dagannoth Kings\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(487969), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.DAGEXP_BOSSROOMLADDER_DOWN), 7492, 11588, 11589),\n    BOSS_DOOM_OF_MOKHAIOTL(\"Doom of Mokhaiotl\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(335018, 337066), false, true, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.DOM_ENTRANCE), 5268, 5269, 13668, 14180),\n    BOSS_DUKE_SUCELLUS(\"Duke Sucellus\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.NORTHWARD, List.of(776996), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.DT2_GHORROCK_GATE_BOSS), 12132),\n    BOSS_GAUNTLET_LOBBY(\"The Gauntlet Lobby\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(776958), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.GAUNTLET_ENTRANCE_HM_ENABLED, ObjectID.GAUNTLET_ENTRANCE), 12127),\n    BOSS_GAUNTLET(\"The Gauntlet\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 7512),\n    BOSS_CORRUPTED_GAUNTLET(\"Corrupted Gauntlet\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 7768),\n    BOSS_FORTIS_COLOSSEUM(\"Fortis Colosseum\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(464036), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.COLOSSEUM_ENTRANCE), 7216, 7316),\n    BOSS_GENERAL_GRAARDOR(\"General Graardor\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.EASTWARD_INCLUSIVE, List.of(731805), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.GODWARS_DUNGEON_DOOR_BANDOS), 11347),\n    BOSS_GIANT_MOLE(\"Giant Mole\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 6993, 6992),\n    BOSS_GROTESQUE_GUARDIANS(\"Grotesque Guardians\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(876986, 876987), EscapeCrystalNotifyRegionEntrancePlaneLevel.SECOND_FLOOR, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.SLAYER_ROOF_ENTRANCE_UNLOCKED, ObjectID.SLAYER_ROOF_ENTRANCE), 6727, 13623),\n    BOSS_HESPORI(\"Hespori\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(318700, 318701, 320748, 320749), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.HESPORI_PLANT_FULLYGROWN, ObjectID.HESPORI_PATCH), 5021),\n    BOSS_HUEYCOATL(\"The Hueycoatl\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.SOUTHWARD, List.of(389530, 391578), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.HUEY_FIGHT_ENTRANCE_OUTAREA, ObjectID.HUEY_FIGHT_ENTRANCE), List.of(383384, 383385, 383386, 383387, 383388, 385432, 385433, 385434, 385435, 385436, 387480, 387481, 387482, 387483, 387484, 389528, 389529, 389530, 389531, 389532, 391576, 391577, 391578, 391579, 391580), 5939),\n    BOSS_HYDRA(\"Alchemical Hydra\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.EASTWARD, null, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.KARUULM_HYDRA_ROOM_DOOR, ObjectID.KARUULM_HYDRA_ROOM_DOOR_M), 5536),\n    BOSS_INFERNO(\"The Inferno\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE_HCGIM, 9043),\n    BOSS_INFERNO_ENTRANCE(\"The Inferno Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE_HCGIM, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(637567, 637568, 637569, 639615, 639616, 639617), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.INFERNO_ENTRANCE_OP, ObjectID.INFERNO_ENTRANCE), 9807, 9808, 10063, 10064),\n    BOSS_KING_BLACK_DRAGON(\"King Black Dragon\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9033, 12448),\n    BOSS_KING_BLACK_DRAGON_ENTRANCE(\"King Black Dragon Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.PRIORITIZED_WITH_HIGHLIGHT, List.of(785665), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.DRAGONKINGINLEVER), List.of(785665, 785666), 12192),\n    BOSS_KQ(\"Kalphite Queen\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(898211), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.KALPHITE_CHAMBER_ENTRANCE_UPDATE, ObjectID.KALPHITE_CHAMBER_ENTRANCE_WITHROPE_NORMAL), 13972),\n    BOSS_KRAKEN(\"Kraken\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.NORTHWARD, List.of(584932), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.SLAYER_CAVE_KRAKEN_BOSS_ENTRANCE), 9116),\n    BOSS_KREEARRA(\"Kree'arra\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.NORTHWARD_INCLUSIVE, List.of(725653), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.GODWARS_DUNGEON_DOOR_ARMADYL), 11346),\n    BOSS_KRIL_TSUTSAROTH(\"K'ril Tsutsaroth\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.SOUTHWARD_INCLUSIVE, List.of(748186), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.GODWARS_DUNGEON_DOOR_ZAMORAK), 11603),\n    BOSS_MIMIC(\"The Mimic\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10819),\n    BOSS_MIMIC_ENTRANCE(\"The Mimic Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(420286), EscapeCrystalNotifyRegionEntrancePlaneLevel.FIRST_FLOOR, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.TRAIL_MIMIC_ENABLER), false, List.of(420286), 6455),\n    BOSS_MYSTERIOUS_FIGURE(\"Mysterious Figure\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, null, true, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.DT2_HIDEOUT_ALTAR_OP), 12432),\n    BOSS_NEX(\"Nex\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.EASTWARD, List.of(744074), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.NEX_FIGHT_BARRIER, ObjectID.NEX_FIGHT_BARRIER_BUSY), 11344, 11345, 11600, 11601),\n    BOSS_NIGHTMARE(\"Nightmare of Ashihama\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 15515),\n    BOSS_NIGHTMARE_ENTRANCE(\"Nightmare of Ashihama Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(974019, 974020, 974022, 976067, 976068, 976070), EscapeCrystalNotifyRegionEntranceObjectType.ANY, NpcID.NIGHTMARE_ENTRY_READY, NpcID.NIGHTMARE_ENTRY_OPEN, NpcID.NIGHTMARE_ENTRY_CLOSED_01, NpcID.NIGHTMARE_ENTRY_CLOSED_02, NpcID.NIGHTMARE_ENTRY_CLOSED_03, ObjectID.NIGHTMARE_CHALLENGE_PORTAL), 15256),\n    BOSS_OBOR(\"Obor\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(791757), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.HILLGIANT_BOSS_ENTRANCE_R, ObjectID.HILLGIANT_BOSS_ENTRANCE_L), 12441),\n    BOSS_PERILOUS_MOONS(\"Perilous Moons\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(361652, 369847, 375988), EscapeCrystalNotifyRegionEntrancePlaneLevel.GROUND, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.PMOON_ENTRY_STATUE_BLOOD, ObjectID.PMOON_ENTRY_STATUE_BLUE, ObjectID.PMOON_ENTRY_STATUE_ECLIPSE), 5525, 5526, 5527, 5528, 5782, 5783, 6037, 6038, 6039),\n    BOSS_PHANTOM_MUSPAH(\"Phantom Muspah\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(744713), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.GHORROCK_DUNGEON_CAVE_ENTRY), 11330, 11681),\n    BOSS_PRIFDDINAS_RABBIT(\"Prifddinas Rabbit\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 13252),\n    BOSS_PRIFDDINAS_RABBIT_ENTRANCE(\"Prifddinas Rabbit Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(580011), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.PRIF_RABBIT_CAVE_ENTRANCE), false, List.of(577962, 577963, 580011), 9013),\n    BOSS_ROYAL_TITANS(\"Royal Titans\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(754860), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.ROYAL_TITANS_ENTRANCE), 11669, 11925),\n    BOSS_SARACHNIS(\"Sarachnis\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.SOUTHWARD, List.of(472279), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.HOSDUN_SARACHNIS_ENTRANCE), 7322),\n    BOSS_SCURRIUS(\"Scurrius\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.EASTWARD, List.of(840913), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.RAT_BOSS_ENTRANCE), 13210),\n    BOSS_SKOTIZO(\"Skotizo\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9048),\n    BOSS_SPINDEL(\"Spindel\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.PRIORITIZED_WITH_HIGHLIGHT, List.of(815572), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.WILD_VENENATIS_SINGLES_ENTRANCE01), 6580, 12602),\n    BOSS_SMOKE_DEVIL(\"Thermonuclear smoke devil\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.PRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.WESTWARD, List.of(609437), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.SLAYER_CAVE_SMOKEDEVIL_BOSS_ENTRANCE), 9363, 9619),\n    BOSS_THE_LEVIATHAN(\"The Leviathan\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 8291),\n    BOSS_THE_LEVIATHAN_ENTRANCE(\"The Leviathan Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(529188), false, true, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.DT2_SCAR_BOAT_CAMP), 8292),\n    BOSS_THE_WHISPERER(\"The Whisperer\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, null, EscapeCrystalNotifyRegionEntranceObjectType.NPC, NpcID.WHISPERER_SPAWN), 10595),\n    BOSS_TZHAAR_FIGHT_CAVES(\"Tzhaar Fight Caves\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE_HCGIM, 9551),\n    BOSS_TZHAAR_FIGHT_CAVES_ENTRANCE(\"Tzhaar Fight Caves Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE_HCGIM, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(623237), true, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.TZHAAR_FIGHTCAVE_WALL_ENTRANCE), 9808),\n    BOSS_VARDORVIS(\"Vardorvis\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(285100), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.DT2_STRANGLEWOOD_BOSS_ENTRY_OP, ObjectID.DT2_STRANGLEWOOD_BOSS_ENTRY), 4405, 4661),\n    BOSS_VORKATH(\"Vorkath\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.NORTHWARD, List.of(582138), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.UNGAEL_CRATER_ENTRANCE), 9023),\n    BOSS_WINTERTODT(\"Wintertodt\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 6462),\n    BOSS_WINTERTODT_ENTRANCE(\"Wintertodt Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.PRIORITIZED_WITH_HIGHLIGHT, List.of(416239, 418287), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.WINT_DOOR), List.of(416238, 416239, 418287, 418287), 6461),\n    BOSS_YAMA(\"Yama\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(367851, 367852, 369899, 369900, 384237), EscapeCrystalNotifyRegionEntranceObjectType.NPC, NpcID.YAMA_THRONE_OCCUPIED, NpcID.VOICE_OF_YAMA_3OP), 5789, 6045),\n    BOSS_ZALCANO(\"Zalcano\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, EscapeCrystalNotifyRegionEntranceDirection.SOUTHWARD, List.of(776949), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.ZALCANO_BARRIER), 12126),\n    BOSS_ZULRAH(\"Zulrah\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9007, 9008),\n    BOSS_ZULRAH_ENTRANCE(\"Zulrah Entrance\", EscapeCrystalNotifyRegionType.BOSSES, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(565630, 567678), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.SNAKEBOSS_BOAT, ObjectID.SNAKEBOSS_BOAT_2OPS), List.of(561533, 561534, 563581, 563582, 565630, 567678),8751),\n    DUNGEON_ANCIENT_CAVERN(\"Ancient Cavern\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 6483, 6995),\n    DUNGEON_ANCIENT_GUTHIXIAN_TEMPLE(\"Ancient Guthixian Temple\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 15943, 16199, 16455, 16196, 16197, 16452, 16453),\n    DUNGEON_APE_ATOLL(\"Ape Atoll Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11150, 10894),\n    DUNGEON_ASGARNIAN_ICE_CAVES(\"Asgarnian Ice Caves\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11925, 12181),\n    DUNGEON_BRIMHAVEN(\"Brimhaven Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10901, 10900, 10899, 10645, 10644, 10643),\n    DUNGEON_BRINE_RAT_CAVERN(\"Brine Rat Cavern\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10910),\n    DUNGEON_CATACOMBS_OF_KOUREND(\"Catacombs of Kourend\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 6557, 6556, 6813, 6812),\n    DUNGEON_CHAMPIONS_CHALLENGE(\"Champions' Challenge\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12696),\n    DUNGEON_CHASM_OF_FIRE(\"Chasm of Fire\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 5789),\n    DUNGEON_CORSAIR_COVE(\"Corsair Cove Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 8076, 8332),\n    DUNGEON_CRANDOR(\"Crandor Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11414),\n    DUNGEON_CRASH_SITE_CAVERN(\"Crash Site Cavern\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 8280, 8536),\n    DUNGEON_DARKMEYER(\"Darkmeyer\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 14388),\n    DUNGEON_DORGESHKAAN(\"Dorgesh-Kaan South Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10833),\n    DUNGEON_DORGESHUUN_MINES(\"Dorgeshuun Mines\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12950, 13206),\n    DUNGEON_EDGEVILLE(\"Edgeville Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12441, 12442, 12443, 12698),\n    DUNGEON_ELEMENTAL_WORKSHOP(\"Elemental Workshop\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10906, 7760),\n    DUNGEON_ELVEN_RABBIT_CAVE(\"Elven rabbit cave\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 13252),\n    DUNGEON_EVIL_CHICKENS_LAIR(\"Evil Chicken's Lair\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9796),\n    DUNGEON_EXPERIMENT_CAVE(\"Experiment Cave\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 14235, 13979),\n    DUNGEON_FORTHOS(\"Forthos Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 7323),\n    DUNGEON_FREMENNIK_SLAYER(\"Fremennik Slayer Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10907, 10908, 11164),\n    DUNGEON_FREMENNIK_ISLES(\"Fremennik Isles\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9276, 9532),\n    DUNGEON_GIANTS_DEN(\"Giant's Den\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 5785),\n    DUNGEON_GLARIALS_TOMB(\"Glarial's Tomb\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10137),\n    DUNGEON_GOD_WARS(\"God Wars Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11578),\n    DUNGEON_HEROES_GUILD(\"Heroes' Guild Mine\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11674),\n    DUNGEON_IORWERTH(\"Iorwerth Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12737, 12738, 12993, 12994),\n    DUNGEON_ISLE_OF_SOULS(\"Isle of Souls Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 8593),\n    DUNGEON_JATIZSO_MINES(\"Jatizso Mines\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9631),\n    DUNGEON_JIGGIG_BURIAL_TOMB(\"Jiggig Burial Tomb\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9875, 9874),\n    DUNGEON_JOGRE(\"Jogre Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11412),\n    DUNGEON_KARAMJA(\"Karamja Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11413),\n    DUNGEON_KARUULM(\"Karuulm Slayer Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 5280, 5279, 5278, 5023, 5535, 5022, 4766, 4510, 4511, 4767, 4768, 4512),\n    DUNGEON_KRUK(\"Kruk's Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9358, 9359, 9360, 9615, 9616, 9871, 10125, 10126, 10127, 10128, 10381, 10382, 10383, 10384, 10637, 10638, 10639, 10640),\n    DUNGEON_LEGENDS_GUILD(\"Legends' Guild Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10904),\n    DUNGEON_LIGHTHOUSE(\"Lighthouse\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10140),\n    DUNGEON_LITHKREN(\"Lithkren\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 6223),\n    DUNGEON_LIZARDMAN_CAVES(\"Lizardman Caves\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 5275),\n    DUNGEON_LIZARDMAN_TEMPLE(\"Lizardman Temple\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 5277),\n    DUNGEON_LUMBRIDGE_SWAMP_CAVES(\"Lumbridge Swamp Caves\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12693, 12949),\n    DUNGEON_LUNAR_ISLE_MINE(\"Lunar Isle Mine\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9377),\n    DUNGEON_MOS_LE_HARMLESS_CAVES(\"Mos Le'Harmless Caves\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 14994, 14995, 15251),\n    DUNGEON_MOURNER_TUNNELS(\"Mourner Tunnels\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 7752, 8008),\n    DUNGEON_MYREDITCH_LABORATORIES(\"Myreditch Laboratories\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 14232, 14233, 14487, 14488),\n    DUNGEON_MYTHS_GUILD(\"Myths' Guild Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 7564, 7820, 7821),\n    DUNGEON_OBSERVATORY(\"Observatory Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9362),\n    DUNGEON_OGRE_ENCLAVE(\"Ogre Enclave\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10387),\n    DUNGEON_OURANIA(\"Ourania Cave\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12119),\n    DUNGEON_RASHILIYIAS_TOMB(\"Rashiliyta's Tomb\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11668),\n    DUNGEON_SHADE_CATACOMBS(\"Shade Catacombs\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 13975),\n    DUNGEON_SHADOW(\"Shadow Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10575, 10831),\n    DUNGEON_SHAYZIEN_CRYPTS(\"Shayzien Crypts\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 6043),\n    DUNGEON_SISTERHOOD_SANCTUARY(\"Sisterhood Sanctuary\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 14999, 15000, 15001, 15255, 15256, 15257, 15511, 15512, 15513),\n    DUNGEON_SLAYER_TOWER(\"Slayer Tower\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 13623, 13723),\n    DUNGEON_SMOKE(\"Smoke Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12690, 12946, 13202),\n    DUNGEON_SOPHANEM(\"Sophanem Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 13200),\n    DUNGEON_SOURHOG_CAVE(\"Sourhog Cave\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12695),\n    DUNGEON_STRONGHOLD_SECURITY(\"Stronghold of Security\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 7505, 8017, 8530, 9297),\n    DUNGEON_STRONGHOLD_SLAYER(\"Stronghold Slayer Cave\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9624, 9625, 9880, 9881),\n    DUNGEON_TARNS_LAIR(\"Tarn's Lair\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12616, 12615),\n    DUNGEON_TAVERLEY(\"Taverley Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11416, 11417, 11671, 11672, 11673, 11928, 11929),\n    DUNGEON_TEMPLE_OF_IKOV(\"Temple of Ikov\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10649, 10905, 10650),\n    DUNGEON_TEMPLE_OF_LIGHT(\"Temple of Light\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 7496),\n    DUNGEON_TEMPLE_OF_MARIMBO(\"Temple of Marimbo\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11151),\n    DUNGEON_TOLNA(\"Dungeon of Tolna\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 13209),\n    DUNGEON_UNDERGROUND_PASS(\"Underground Pass\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9369, 9370),\n    DUNGEON_VIYELDI_CAVES(\"Viyeldi Caves\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9545, 11153),\n    DUNGEON_WARRIORS_GUILD(\"Warriors' Guild Basement\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11675),\n    DUNGEON_WATERBIRTH(\"Waterbirth Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 9886, 10142, 7492, 7748),\n    DUNGEON_WATERFALL(\"Waterfall Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10394),\n    DUNGEON_WHITE_WOLF_MOUNTAIN_CAVES(\"White Wolf Mountain Caves\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 11418, 11419),\n    DUNGEON_WITCHAVEN_SHRINE(\"Witchhaven Shrine Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10903),\n    DUNGEON_WOODCUTTING_GUILD(\"Woodcutting Guild Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 6298),\n    DUNGEON_WYVERN_CAVE(\"Wyvern Cave\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 14495, 14496),\n    DUNGEON_YANILLE_AGILITY(\"Yanille Agility Dungeon\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 10388),\n    DUNGEON_ZEMOUREGALS_BASE(\"Zemouregal's Base\", EscapeCrystalNotifyRegionType.DUNGEONS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 14151, 14407),\n    RAIDS_CHAMBERS_OF_XERIC(\"Chambers of Xeric\", EscapeCrystalNotifyRegionType.RAIDS, EscapeCrystalNotifyRegionDeathType.UNSAFE_HCGIM, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, null, EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.RAIDS_DOORWAY).withClosest().withVarbitConstraints(List.of(Map.of(VarbitID.RAIDS_CLIENT_PROGRESS, value -> value == 0), Map.of(VarbitID.RAIDS_TIMER, value -> value == 0))), 12889, 13136, 13137, 13138, 13139, 13140, 13141, 13145, 13393, 13394, 13395, 13396, 13397, 13401),\n    RAIDS_THEATRE_OF_BLOOD(\"Theatre of Blood\", EscapeCrystalNotifyRegionType.RAIDS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 12611, 12612, 12613, 12867, 12869, 13122, 13123, 13125, 13379),\n    RAIDS_THEATRE_OF_BLOOD_ENTRANCE(\"Theatre of Blood Entrance\", EscapeCrystalNotifyRegionType.RAIDS, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(940434), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.TOB_SURFACE_RAID_ENTRANCE), List.of(938385, 938386, 938387, 940433, 940434, 940435), 14642),\n    RAIDS_TOMBS_OF_AMASCUT(\"Tombs of Amascut\", EscapeCrystalNotifyRegionType.RAIDS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 14160, 14162, 14164, 14674, 14676, 15184, 15186, 15188, 15696, 15698, 15700),\n    RAIDS_TOMBS_OF_AMASCUT_ENTRANCE(\"Tombs of Amascut Entrance\", EscapeCrystalNotifyRegionType.RAIDS, EscapeCrystalNotifyRegionDeathType.UNSAFE, new EscapeCrystalNotifyRegionEntrance(EscapeCrystalNotifyRegionEntranceOverlayType.DEPRIORITIZED_WITH_HIGHLIGHT, List.of(859251, 861299), EscapeCrystalNotifyRegionEntranceObjectType.GAME_OBJECT, ObjectID.TOA_LOBBY_RAID_ENTRY), 13454),\n    RAIDS_OSMUMTENS_BURIAL_CHAMBER(\"Osmumten's Burial Chamber\", EscapeCrystalNotifyRegionType.RAIDS, EscapeCrystalNotifyRegionDeathType.UNSAFE, 14672),\n    MG_BARBARIAN_ASSAULT(\"Barbarian Assault\", EscapeCrystalNotifyRegionType.MINIGAMES, EscapeCrystalNotifyRegionDeathType.UNSAFE_HCGIM, 7508, 7509, 10322),\n    MG_NIGHTMARE_ZONE(\"Nightmare Zone\", EscapeCrystalNotifyRegionType.MINIGAMES, EscapeCrystalNotifyRegionDeathType.UNSAFE_HCGIM, 9033),\n    MG_PEST_CONTROL(\"Pest Control\", EscapeCrystalNotifyRegionType.MINIGAMES, EscapeCrystalNotifyRegionDeathType.UNSAFE_HCGIM, 10536),\n    MG_PYRAMID_PLUNDER(\"Pyramid Plunder\", EscapeCrystalNotifyRegionType.MINIGAMES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 7749),\n    MG_TEMPLE_TREKKING(\"Temple Trekking\", EscapeCrystalNotifyRegionType.MINIGAMES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 8014, 8270, 8256, 8782, 9038, 9294, 9550, 9806),\n    MG_VOLCANIC_MINE(\"Volcanic Mine\", EscapeCrystalNotifyRegionType.MINIGAMES, EscapeCrystalNotifyRegionDeathType.UNSAFE, 15263, 15262),\n    TD_DONTKNOWWHAT_FIGHT(\"Making Friends WIth My Arm Don't Know What Fight\", EscapeCrystalNotifyRegionType.TELEPORT_DISABLED, EscapeCrystalNotifyRegionDeathType.UNSAFE, Quest.MAKING_FRIENDS_WITH_MY_ARM, 11425),\n    TD_EMISSARY_ENFORCER(\"Emissary Enforcer\", EscapeCrystalNotifyRegionType.TELEPORT_DISABLED, EscapeCrystalNotifyRegionDeathType.UNSAFE, Quest.THE_FINAL_DAWN, 6807),\n    TD_LUNAR_DREAMS(\"Lunar Dreams\", EscapeCrystalNotifyRegionType.TELEPORT_DISABLED, EscapeCrystalNotifyRegionDeathType.UNSAFE, 7247, 7248),\n    TD_MOVARIOS_BASE(\"Movario's Base\", EscapeCrystalNotifyRegionType.TELEPORT_DISABLED, EscapeCrystalNotifyRegionDeathType.UNSAFE, 16461, 16717);\n\n    @Getter\n    private final String regionName;\n    @Getter\n    private final EscapeCrystalNotifyRegionType regionType;\n    @Getter\n    private final int[] regionIds;\n    @Getter\n    private final List<Integer> chunkIds;\n    @Getter\n    private final EscapeCrystalNotifyRegionDeathType regionDeathType;\n    @Getter\n    private final EscapeCrystalNotifyRegionEntrance regionEntrance;\n    @Getter\n    private final Quest questNotCompleted;\n    @Getter\n    private final boolean notifyRegion;\n\n    private static final Map<Integer, EscapeCrystalNotifyRegion[]> ENTRANCES_BY_ID = buildEntranceIndex();\n\n    EscapeCrystalNotifyRegion(String regionName, EscapeCrystalNotifyRegionType regionType, EscapeCrystalNotifyRegionDeathType regionDeathType, int... regionIds) {\n        this.regionName = regionName;\n        this.regionType = regionType;\n        this.regionDeathType = regionDeathType;\n        this.regionEntrance = null;\n        this.questNotCompleted = null;\n        this.regionIds = regionIds;\n        this.chunkIds = null;\n        this.notifyRegion = true;\n    }\n\n    EscapeCrystalNotifyRegion(String regionName, EscapeCrystalNotifyRegionType regionType, EscapeCrystalNotifyRegionDeathType regionDeathType, List<Integer> chunkIds, int... regionIds) {\n        this.regionName = regionName;\n        this.regionType = regionType;\n        this.regionDeathType = regionDeathType;\n        this.regionEntrance = null;\n        this.questNotCompleted = null;\n        this.regionIds = regionIds;\n        this.chunkIds = chunkIds;\n        this.notifyRegion = true;\n    }\n\n    EscapeCrystalNotifyRegion(String regionName, EscapeCrystalNotifyRegionType regionType, EscapeCrystalNotifyRegionDeathType regionDeathType, EscapeCrystalNotifyRegionEntrance regionEntrance, int... regionIds) {\n        this(regionName, regionType, regionDeathType, regionEntrance, true, regionIds);\n    }\n\n    EscapeCrystalNotifyRegion(String regionName, EscapeCrystalNotifyRegionType regionType, EscapeCrystalNotifyRegionDeathType regionDeathType, EscapeCrystalNotifyRegionEntrance regionEntrance, boolean notifyRegion, int... regionIds) {\n        this(regionName, regionType, regionDeathType, regionEntrance, notifyRegion, null, regionIds);\n    }\n\n    EscapeCrystalNotifyRegion(String regionName, EscapeCrystalNotifyRegionType regionType, EscapeCrystalNotifyRegionDeathType regionDeathType, EscapeCrystalNotifyRegionEntrance regionEntrance, List<Integer> chunkIds, int... regionIds) {\n        this(regionName, regionType, regionDeathType, regionEntrance, true, chunkIds, regionIds);\n    }\n\n    EscapeCrystalNotifyRegion(String regionName, EscapeCrystalNotifyRegionType regionType, EscapeCrystalNotifyRegionDeathType regionDeathType, EscapeCrystalNotifyRegionEntrance regionEntrance, boolean notifyRegion, List<Integer> chunkIds, int... regionIds) {\n        this.regionName = regionName;\n        this.regionType = regionType;\n        this.regionDeathType = regionDeathType;\n        this.regionEntrance = regionEntrance;\n        this.questNotCompleted = null;\n        this.regionIds = regionIds;\n        this.chunkIds = chunkIds;\n        this.notifyRegion = notifyRegion;\n    }\n\n    EscapeCrystalNotifyRegion(String regionName, EscapeCrystalNotifyRegionType regionType, EscapeCrystalNotifyRegionDeathType regionDeathType, Quest questNotCompleted, int... regionIds) {\n        this.regionName = regionName;\n        this.regionType = regionType;\n        this.regionDeathType = regionDeathType;\n        this.regionEntrance = null;\n        this.questNotCompleted = questNotCompleted;\n        this.regionIds = regionIds;\n        this.chunkIds = null;\n        this.notifyRegion = true;\n    }\n\n    public static List<Integer> getAllRegionIds() {\n        return Arrays.stream(EscapeCrystalNotifyRegion.values())\n                .flatMap(regionType -> Arrays.stream(regionType.getRegionIds()).boxed())\n                .collect(Collectors.toList());\n    }\n\n    public static List<Integer> getAllEntranceIds() {\n        return Arrays.stream(EscapeCrystalNotifyRegion.values())\n                .map(EscapeCrystalNotifyRegion::getRegionEntrance)\n                .filter(Objects::nonNull)\n                .flatMap(entrance -> Arrays.stream(entrance.getEntranceIds()).boxed())\n                .collect(Collectors.toList());\n    }\n\n    public static List<Integer> getEntranceIdsFromTypes(List<EscapeCrystalNotifyRegionEntranceObjectType> selectedEntranceTypes, List<EscapeCrystalNotifyRegionDeathType> selectedRegionDeathTypes) {\n        return Arrays.stream(EscapeCrystalNotifyRegion.values())\n                .filter(region -> selectedRegionDeathTypes.contains(region.getRegionDeathType()))\n                .map(EscapeCrystalNotifyRegion::getRegionEntrance)\n                .filter(Objects::nonNull)\n                .filter(entrance -> selectedEntranceTypes.contains(entrance.getObjectType()))\n                .flatMap(entrance -> Arrays.stream(entrance.getEntranceIds()).boxed())\n                .collect(Collectors.toList());\n    }\n\n    public static List<Integer> getRegionIdsFromTypes(List<EscapeCrystalNotifyRegionType> selectedRegionTypes, List<EscapeCrystalNotifyRegionDeathType> selectedRegionDeathTypes) {\n        return Arrays.stream(EscapeCrystalNotifyRegion.values())\n                .filter(EscapeCrystalNotifyRegion::isNotifyRegion)\n                .filter(region -> selectedRegionTypes.contains(region.getRegionType()))\n                .filter(region -> selectedRegionDeathTypes.contains(region.getRegionDeathType()))\n                .flatMap(region -> Arrays.stream(region.getRegionIds()).boxed())\n                .collect(Collectors.toList());\n    }\n\n    public static Set<Integer> getEntranceOnlyRegionIdsFromTypes(List<EscapeCrystalNotifyRegionType> selectedRegionTypes, List<EscapeCrystalNotifyRegionDeathType> selectedRegionDeathTypes) {\n        return Arrays.stream(values())\n                .filter(region -> region.regionEntrance != null\n                    && (!region.notifyRegion || region.regionEntrance.isBossInstanced()))\n                .filter(region -> selectedRegionTypes.contains(region.regionType))\n                .filter(region -> selectedRegionDeathTypes.contains(region.regionDeathType))\n                .flatMap(region -> Arrays.stream(region.regionIds).boxed())\n                .collect(Collectors.toSet());\n    }\n\n    public static List<Integer> getRegionIdsFromRegions(List<EscapeCrystalNotifyRegion> selectedRegions) {\n        return selectedRegions.stream()\n                .flatMap(subRegionType -> Arrays.stream(subRegionType.getRegionIds()).boxed())\n                .collect(Collectors.toList());\n    }\n\n    public static Set<Integer> getInstancedOnlyRegionIdsFromTypes(List<EscapeCrystalNotifyRegionType> types, List<EscapeCrystalNotifyRegionDeathType> deaths) {\n        Set<Integer> instanced = new HashSet<>();\n        Set<Integer> unrestricted = new HashSet<>();\n        for (EscapeCrystalNotifyRegion region : values()) {\n            if (!region.notifyRegion || !types.contains(region.regionType) || !deaths.contains(region.regionDeathType)) continue;\n            Set<Integer> destination = region.regionEntrance != null && region.regionEntrance.isBossInstanced()\n                ? instanced : unrestricted;\n            Arrays.stream(region.regionIds).forEach(destination::add);\n        }\n        // Another enabled encounter may still make the ordinary region dangerous.\n        instanced.removeAll(unrestricted);\n        return instanced;\n    }\n\n    public static Map<Integer, EscapeCrystalNotifyRegionEntrance> getRegionEntranceMap() {\n        Map<Integer, EscapeCrystalNotifyRegionEntrance> regionEntranceMap = new HashMap<>();\n        for (EscapeCrystalNotifyRegion e : values()) {\n            for (int regionId : e.regionIds) {\n                if (e.regionEntrance != null) {\n                    regionEntranceMap.put(regionId, e.regionEntrance);\n                }\n            }\n        }\n        return regionEntranceMap;\n    }\n\n    public static Map<Integer, List<Integer>> getRegionChunkRequirementsMap() {\n        Map<Integer, List<Integer>> regionChunkRequirementsMap = new HashMap<>();\n        for (EscapeCrystalNotifyRegion e : values()) {\n            for (int regionId : e.regionIds) {\n                if (e.chunkIds != null) {\n                    regionChunkRequirementsMap.put(regionId, e.chunkIds);\n                }\n            }\n        }\n        return regionChunkRequirementsMap;\n    }\n\n    static EscapeCrystalNotifyRegionEntrance findEntrance(int id, WorldPoint location, EscapeCrystalNotifyRegionEntranceObjectType type) {\n        EscapeCrystalNotifyRegion[] candidates = ENTRANCES_BY_ID.get(id);\n        if (candidates == null) return null;\n        int chunkId = EscapeCrystalNotifyLocatedEntrance.computeChunkIdFromWorldPoint(location);\n        int regionId = location.getRegionID();\n        for (EscapeCrystalNotifyRegion region : candidates) {\n            EscapeCrystalNotifyRegionEntrance entrance = region.regionEntrance;\n            if (entrance.getObjectType() != type\n                && entrance.getObjectType() != EscapeCrystalNotifyRegionEntranceObjectType.ANY) continue;\n\n            if (entrance.getChunkIds() != null) {\n                if (entrance.getChunkIds().contains(chunkId)) return entrance;\n            } else {\n                for (int allowedRegionId : region.regionIds) {\n                    if (allowedRegionId == regionId) return entrance;\n                }\n            }\n        }\n        return null;\n    }\n\n    private static Map<Integer, EscapeCrystalNotifyRegion[]> buildEntranceIndex() {\n        Map<Integer, List<EscapeCrystalNotifyRegion>> candidates = new HashMap<>();\n        for (EscapeCrystalNotifyRegion region : values()) {\n            if (region.regionEntrance == null) continue;\n            for (int id : region.regionEntrance.getEntranceIds()) {\n                candidates.computeIfAbsent(id, key -> new ArrayList<>()).add(region);\n            }\n        }\n        // Keep every candidate in declaration order, including entrances which share an ID.\n        Map<Integer, EscapeCrystalNotifyRegion[]> index = new HashMap<>();\n        candidates.forEach((id, regions) -> index.put(id, regions.toArray(new EscapeCrystalNotifyRegion[0])));\n        return Collections.unmodifiableMap(index);\n    }\n\n    public static Set<Integer> getTeleportDisabledRegionIds() {\n        return Arrays.stream(EscapeCrystalNotifyRegion.values())\n                .filter(region -> region.getRegionType() == EscapeCrystalNotifyRegionType.TELEPORT_DISABLED)\n                .flatMap(region -> Arrays.stream(region.getRegionIds()).boxed())\n                .collect(Collectors.toSet());\n    }\n\n    public static Set<Integer> getSafeForRegularHardcoreRegionIds() {\n        return Arrays.stream(EscapeCrystalNotifyRegion.values())\n                .filter(region -> region.getRegionDeathType() == EscapeCrystalNotifyRegionDeathType.UNSAFE_HCGIM)\n                .flatMap(region -> Arrays.stream(region.getRegionIds()).boxed())\n                .collect(Collectors.toSet());\n    }\n}\n",
   "metadataSources": {
@@ -3116,7 +3116,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3139,7 +3139,7 @@
         "Abyssal Nexus"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3157,17 +3157,15 @@
       "locationsLoaded": false
     },
     {
-      "id": "BOSS_AGRITH_NA_NA",
-      "name": "Agrith Na-Na",
-      "wikiTitle": "Agrith Na-Na",
+      "id": "BOSS_AGRITH_NAAR",
+      "name": "Agrith Naar",
+      "wikiTitle": "Agrith Naar",
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Recipe for Disaster"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3180,15 +3178,15 @@
       "locationsLoaded": false
     },
     {
-      "id": "BOSS_AGRITH_NAAR",
-      "name": "Agrith-Naar",
-      "wikiTitle": "Agrith-Naar",
+      "id": "BOSS_AGRITH_NA_NA",
+      "name": "Agrith-Na-Na",
+      "wikiTitle": "Agrith-Na-Na",
       "categories": [
         "Quest bosses"
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3211,7 +3209,7 @@
         "Barrows"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3240,7 +3238,7 @@
         "Tombs of Amascut"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3268,7 +3266,7 @@
         "Karuulm Slayer Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3294,11 +3292,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "Ruins of Tapoyauik",
-        "The Heart of Darkness"
+        "Ruins of Tapoyauik"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3324,7 +3321,28 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_ANCIENT_GUARDIAN_DESERT_TREASURE_II",
+      "name": "Ancient Guardian (Desert Treasure II)",
+      "wikiTitle": "Ancient Guardian (Desert Treasure II)",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3345,7 +3363,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3368,7 +3386,7 @@
         "Morytania Spider Cave"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3397,7 +3415,28 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_ARIANWYN",
+      "name": "Arianwyn",
+      "wikiTitle": "Arianwyn",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3416,11 +3455,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "The Curse of Arrav"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3441,7 +3478,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3467,7 +3504,7 @@
         "Wilderness Medium Diary"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3485,15 +3522,36 @@
       "locationsLoaded": false
     },
     {
-      "id": "BOSS_ARZINIAN_AVATAR",
-      "name": "Arzinian Avatar",
-      "wikiTitle": "Arzinian Avatar",
+      "id": "BOSS_ARZINIAN_BEING_OF_BORDANZAN",
+      "name": "Arzinian Being of Bordanzan",
+      "wikiTitle": "Arzinian Being of Bordanzan",
       "categories": [
         "Quest bosses"
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_ASSASSIN",
+      "name": "Assassin",
+      "wikiTitle": "Assassin",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3512,11 +3570,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "The Final Dawn"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3540,7 +3596,7 @@
         "Tombs of Amascut"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3558,17 +3614,36 @@
       "locationsLoaded": false
     },
     {
+      "id": "BOSS_BABY_ROC",
+      "name": "Baby Roc",
+      "wikiTitle": "Baby Roc",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_BALANCE_ELEMENTAL",
       "name": "Balance Elemental",
       "wikiTitle": "Balance Elemental",
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "While Guthix Sleeps"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3589,7 +3664,28 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_BIG_SNAKE",
+      "name": "Big Snake",
+      "wikiTitle": "Big Snake",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3610,7 +3706,28 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_BLACK_EYE_BETHEL",
+      "name": "Black Eye Bethel",
+      "wikiTitle": "Black Eye Bethel",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3629,11 +3746,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Spirits of the Elid"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3654,7 +3769,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3671,13 +3786,14 @@
       "name": "Blood Moon",
       "wikiTitle": "Blood Moon",
       "categories": [
-        "World bosses"
+        "World bosses",
+        "Quest bosses"
       ],
       "locationTitles": [
         "Neypotzli"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3699,13 +3815,14 @@
       "name": "Blue Moon",
       "wikiTitle": "Blue Moon",
       "categories": [
-        "World bosses"
+        "World bosses",
+        "Quest bosses"
       ],
       "locationTitles": [
         "Neypotzli"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3734,7 +3851,7 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3755,7 +3872,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3776,7 +3893,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3793,13 +3910,14 @@
       "name": "Brutus",
       "wikiTitle": "Brutus",
       "categories": [
-        "Instanced bosses"
+        "Instanced bosses",
+        "Quest bosses"
       ],
       "locationTitles": [
         "Lumbridge cow field"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3827,7 +3945,7 @@
         "Varrock Sewers"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3858,7 +3976,7 @@
         "Wilderness Medium Diary"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3884,7 +4002,7 @@
         "Wilderness Medium Diary"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3912,7 +4030,7 @@
         "Cerberus' Lair"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3941,7 +4059,7 @@
         "Chambers of Xeric"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3969,7 +4087,7 @@
         "Rogues' Castle"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -3992,7 +4110,7 @@
         "Lava Maze"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4011,11 +4129,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "The Final Dawn"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4036,7 +4152,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4057,7 +4173,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4078,7 +4194,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4101,7 +4217,7 @@
         "God Wars Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4129,7 +4245,7 @@
         "Corporeal Beast Lair"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4155,7 +4271,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4178,7 +4294,7 @@
         "The Corrupted Gauntlet"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4204,7 +4320,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4227,7 +4343,7 @@
         "Ruins (west)"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4255,7 +4371,7 @@
         "The Gauntlet"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4279,11 +4395,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Recipe for Disaster"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4296,15 +4410,15 @@
       "locationsLoaded": false
     },
     {
-      "id": "BOSS_CUTHBERT",
-      "name": "Cuthbert",
-      "wikiTitle": "Cuthbert",
+      "id": "BOSS_CUTHBERT_LORD_OF_DREAD",
+      "name": "Cuthbert, Lord of Dread",
+      "wikiTitle": "Cuthbert, Lord of Dread",
       "categories": [
         "Quest bosses"
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4325,7 +4439,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4339,14 +4453,14 @@
     },
     {
       "id": "BOSS_DAGANNOTH_MOTHER",
-      "name": "Dagannoth Mother",
-      "wikiTitle": "Dagannoth Mother",
+      "name": "Dagannoth mother",
+      "wikiTitle": "Dagannoth mother",
       "categories": [
         "Quest bosses"
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4369,7 +4483,7 @@
         "Waterbirth Island Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4397,7 +4511,7 @@
         "Waterbirth Island Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4425,7 +4539,7 @@
         "Waterbirth Island Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4454,7 +4568,7 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4478,7 +4592,7 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4497,11 +4611,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Desert Treasure I"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4522,7 +4634,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4545,7 +4657,7 @@
         "Lumbridge cow field"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4568,7 +4680,7 @@
         "Tar Swamp"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4586,17 +4698,36 @@
       "locationsLoaded": false
     },
     {
+      "id": "BOSS_DERWEN",
+      "name": "Derwen",
+      "wikiTitle": "Derwen",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_DESSOURT",
       "name": "Dessourt",
       "wikiTitle": "Dessourt",
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Recipe for Disaster"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4615,11 +4746,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Desert Treasure I"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4642,7 +4771,7 @@
         "Barrows"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4670,7 +4799,7 @@
         "Ruins of Mokhaiotl"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4688,48 +4817,6 @@
       "locationsLoaded": false
     },
     {
-      "id": "BOSS_DRAMEN_TREE_SPIRIT",
-      "name": "Dramen Tree Spirit",
-      "wikiTitle": "Dramen Tree Spirit",
-      "categories": [
-        "Quest bosses"
-      ],
-      "locationTitles": [],
-      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
-      "regions": [],
-      "raw": null,
-      "deathType": "",
-      "optionalArgs": [],
-      "maps": [],
-      "links": [],
-      "warnings": [],
-      "supportedBy": [],
-      "supportKnown": true,
-      "locationsLoaded": false
-    },
-    {
-      "id": "BOSS_DRAUGEN",
-      "name": "Draugen",
-      "wikiTitle": "Draugen",
-      "categories": [
-        "Quest bosses"
-      ],
-      "locationTitles": [],
-      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
-      "regions": [],
-      "raw": null,
-      "deathType": "",
-      "optionalArgs": [],
-      "maps": [],
-      "links": [],
-      "warnings": [],
-      "supportedBy": [],
-      "supportKnown": true,
-      "locationsLoaded": false
-    },
-    {
       "id": "BOSS_DREADNOTH_THE_JELLIED",
       "raidTitle": "The Fractured Archive",
       "name": "Dreadnoth the Jellied",
@@ -4741,7 +4828,7 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4762,11 +4849,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "Ghorrock Dungeon",
-        "Desert Treasure II - The Fallen Empire"
+        "Ghorrock Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4792,7 +4878,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4809,13 +4895,14 @@
       "name": "Eclipse Moon",
       "wikiTitle": "Eclipse Moon",
       "categories": [
-        "World bosses"
+        "World bosses",
+        "Quest bosses"
       ],
       "locationTitles": [
         "Neypotzli"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4844,7 +4931,7 @@
         "Tombs of Amascut"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4868,34 +4955,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Dragon Slayer I"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
-      "regions": [],
-      "raw": null,
-      "deathType": "",
-      "optionalArgs": [],
-      "maps": [],
-      "links": [],
-      "warnings": [],
-      "supportedBy": [],
-      "supportKnown": true,
-      "locationsLoaded": false
-    },
-    {
-      "id": "BOSS_ELVEN_TRAITOR",
-      "name": "Elven traitor",
-      "wikiTitle": "Elven traitor",
-      "categories": [
-        "Quest bosses"
-      ],
-      "locationTitles": [
-        "Song of the Elves"
-      ],
-      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4914,11 +4976,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "The Final Dawn"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4942,11 +5002,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "The Final Dawn"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4965,11 +5023,30 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Song of the Elves"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_EVELOT",
+      "name": "Evelot",
+      "wikiTitle": "Evelot",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -4990,7 +5067,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5004,14 +5081,14 @@
     },
     {
       "id": "BOSS_EVIL_SPIRIT",
-      "name": "Evil Spirit",
-      "wikiTitle": "Evil Spirit",
+      "name": "Evil spirit",
+      "wikiTitle": "Evil spirit",
       "categories": [
         "Quest bosses"
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5035,7 +5112,7 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5054,11 +5131,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Desert Treasure I"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5077,11 +5152,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Recipe for Disaster"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5100,11 +5173,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Song of the Elves"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5125,7 +5196,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5144,11 +5215,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Dragon Slayer II"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5167,11 +5236,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Recipe for Disaster"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5194,7 +5261,7 @@
         "Tlati Rainforest"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5215,7 +5282,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5238,7 +5305,7 @@
         "God Wars Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5264,7 +5331,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5287,7 +5354,7 @@
         "Falador Park"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5313,7 +5380,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5327,14 +5394,14 @@
     },
     {
       "id": "BOSS_GIANT_SCARAB",
-      "name": "Giant scarab",
-      "wikiTitle": "Giant scarab",
+      "name": "Giant Scarab",
+      "wikiTitle": "Giant Scarab",
       "categories": [
         "Quest bosses"
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5355,7 +5422,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5376,7 +5443,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5395,11 +5462,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Monkey Madness II"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5418,11 +5483,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "The Curse of Arrav"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5446,7 +5509,7 @@
         "Chambers of Xeric"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5470,11 +5533,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Spirits of the Elid"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5497,7 +5558,7 @@
         "Slayer Tower"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5525,7 +5586,7 @@
         "Barrows"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5543,17 +5604,39 @@
       "locationsLoaded": false
     },
     {
+      "id": "BOSS_HEADLESS_BEAST",
+      "name": "Headless Beast",
+      "wikiTitle": "Headless Beast",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_HESPORI",
       "name": "Hespori",
       "wikiTitle": "Hespori",
       "categories": [
-        "Sporadic bosses"
+        "Sporadic bosses",
+        "Quest bosses"
       ],
       "locationTitles": [
         "Farming Guild"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5577,11 +5660,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "A Night at the Theatre"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5602,7 +5683,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5623,7 +5704,49 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_JHALLAN",
+      "name": "Jhallan",
+      "wikiTitle": "Jhallan",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_JUDGE_OF_YAMA_A_KINGDOM_DIVIDED",
+      "name": "Judge of Yama (A Kingdom Divided)",
+      "wikiTitle": "Judge of Yama (A Kingdom Divided)",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5637,14 +5760,35 @@
     },
     {
       "id": "BOSS_JUNGLE_DEMON",
-      "name": "Jungle demon",
-      "wikiTitle": "Jungle demon",
+      "name": "Jungle Demon",
+      "wikiTitle": "Jungle Demon",
       "categories": [
         "Quest bosses"
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_JUSTICIAR_ZACHARIAH",
+      "name": "Justiciar Zachariah",
+      "wikiTitle": "Justiciar Zachariah",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5667,7 +5811,7 @@
         "God Wars Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5695,7 +5839,7 @@
         "Kalphite Lair"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5719,11 +5863,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Desert Treasure I"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5742,11 +5884,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Recipe for Disaster"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5769,7 +5909,7 @@
         "Barrows"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5787,17 +5927,57 @@
       "locationsLoaded": false
     },
     {
+      "id": "BOSS_KASONDE",
+      "name": "Kasonde",
+      "wikiTitle": "Kasonde",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_KASONDE_THE_CRAVEN",
+      "name": "Kasonde the Craven",
+      "wikiTitle": "Kasonde the Craven",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_KEEF",
       "name": "Keef",
       "wikiTitle": "Keef",
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Monkey Madness II"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5821,7 +6001,7 @@
         "Tombs of Amascut"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5839,6 +6019,27 @@
       "locationsLoaded": false
     },
     {
+      "id": "BOSS_KETLA_THE_UNWORTHY",
+      "name": "Ketla the Unworthy",
+      "wikiTitle": "Ketla the Unworthy",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_KHAZARD_OGRE",
       "name": "Khazard Ogre",
       "wikiTitle": "Khazard Ogre",
@@ -5847,7 +6048,49 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_KHAZARD_SCORPION",
+      "name": "Khazard Scorpion",
+      "wikiTitle": "Khazard Scorpion",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_KHAZARD_WARLORD",
+      "name": "Khazard warlord",
+      "wikiTitle": "Khazard warlord",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5870,7 +6113,7 @@
         "King Black Dragon Lair"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5888,6 +6131,27 @@
       "locationsLoaded": false
     },
     {
+      "id": "BOSS_KING_ROALD",
+      "name": "King Roald",
+      "wikiTitle": "King Roald",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_KING_SNAGWORT",
       "name": "King Snagwort",
       "wikiTitle": "King Snagwort",
@@ -5896,7 +6160,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5915,11 +6179,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Monkey Madness II"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5933,14 +6195,14 @@
     },
     {
       "id": "BOSS_KOSCHEI_THE_DEATHLESS",
-      "name": "Koschei the Deathless",
-      "wikiTitle": "Koschei the Deathless",
+      "name": "Koschei the deathless",
+      "wikiTitle": "Koschei the deathless",
       "categories": [
         "Quest bosses"
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5963,7 +6225,7 @@
         "Kraken Cove"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -5991,7 +6253,7 @@
         "God Wars Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6015,11 +6277,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Monkey Madness II"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6038,11 +6298,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "The Blood Moon Rises"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6061,11 +6319,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "The Final Dawn"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6082,13 +6338,14 @@
       "name": "Mad Angel",
       "wikiTitle": "Mad Angel",
       "categories": [
-        "Instanced bosses"
+        "Instanced bosses",
+        "Quest bosses"
       ],
       "locationTitles": [
         "Ardeaglais"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6116,7 +6373,7 @@
         "Vampyrium"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6142,7 +6399,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6161,11 +6418,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Dragon Slayer I"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6189,7 +6444,7 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6210,7 +6465,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6234,7 +6489,7 @@
         "Chambers of Xeric"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6252,6 +6507,53 @@
       "locationsLoaded": false
     },
     {
+      "id": "BOSS_MYSTERIOUS_FIGURE",
+      "name": "Mysterious Figure",
+      "wikiTitle": "Mysterious Figure",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [
+        {
+          "id": "BOSS_MYSTERIOUS_FIGURE",
+          "name": "Mysterious Figure"
+        }
+      ],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_NAZASTAROOL",
+      "name": "Nazastarool",
+      "wikiTitle": "Nazastarool",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_NEX",
       "name": "Nex",
       "wikiTitle": "Nex",
@@ -6262,7 +6564,7 @@
         "God Wars Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6288,7 +6590,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6310,11 +6612,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "Theatre of Blood",
-        "A Night at the Theatre"
+        "Theatre of Blood"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6342,7 +6643,7 @@
         "Edgeville Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6371,7 +6672,28 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_PERSTEN_THE_DECEITFUL",
+      "name": "Persten the Deceitful",
+      "wikiTitle": "Persten the Deceitful",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6393,11 +6715,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "Theatre of Blood",
-        "A Night at the Theatre"
+        "Theatre of Blood"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6419,13 +6740,14 @@
       "name": "Phantom Muspah",
       "wikiTitle": "Phantom Muspah",
       "categories": [
-        "Instanced bosses"
+        "Instanced bosses",
+        "Quest bosses"
       ],
       "locationTitles": [
         "Ghorrock Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6453,7 +6775,28 @@
         "Sisterhood Sanctuary"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_PORAZDIR",
+      "name": "Porazdir",
+      "wikiTitle": "Porazdir",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6472,11 +6815,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "The Heart of Darkness"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6497,7 +6838,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6520,7 +6861,7 @@
         "Revenant Caves"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6539,11 +6880,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Dragon Slayer II"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6566,7 +6905,7 @@
         "Asgarnian Ice Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6592,7 +6931,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6613,7 +6952,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6636,7 +6975,7 @@
         "Forthos Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6664,7 +7003,7 @@
         "Scorpion Pit"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6687,7 +7026,7 @@
         "Varrock Sewers"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6713,7 +7052,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6736,7 +7075,7 @@
         "The Great Conch"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6896,6 +7235,27 @@
       "locationsLoaded": true
     },
     {
+      "id": "BOSS_SHELLBANE_GRYPHON_TROUBLED_TORTUGANS",
+      "name": "Shellbane gryphon (Troubled Tortugans)",
+      "wikiTitle": "Shellbane gryphon (Troubled Tortugans)",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_SIGMUND",
       "name": "Sigmund",
       "wikiTitle": "Sigmund",
@@ -6904,7 +7264,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6925,7 +7285,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6946,7 +7306,28 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_SKELETON_HELLHOUND",
+      "name": "Skeleton Hellhound",
+      "wikiTitle": "Skeleton Hellhound",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6969,7 +7350,7 @@
         "Catacombs of Kourend"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -6995,7 +7376,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7016,7 +7397,28 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_SLUG_PRINCE",
+      "name": "Slug Prince",
+      "wikiTitle": "Slug Prince",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7039,7 +7441,7 @@
         "Fortis Colosseum"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7066,11 +7468,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "Theatre of Blood",
-        "A Night at the Theatre"
+        "Theatre of Blood"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7101,7 +7502,7 @@
         "Wilderness Medium Diary"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7119,17 +7520,15 @@
       "locationsLoaded": false
     },
     {
-      "id": "BOSS_SUROK_MAGIS",
-      "name": "Surok Magis",
-      "wikiTitle": "Surok Magis",
+      "id": "BOSS_STRANGE_CREATURE",
+      "name": "Strange Creature",
+      "wikiTitle": "Strange Creature",
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "While Guthix Sleeps"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7142,15 +7541,57 @@
       "locationsLoaded": false
     },
     {
-      "id": "BOSS_TARN_RAZORLOR",
-      "name": "Tarn Razorlor",
-      "wikiTitle": "Tarn Razorlor",
+      "id": "BOSS_SUROK_MAGIS",
+      "name": "Surok Magis",
+      "wikiTitle": "Surok Magis",
       "categories": [
         "Quest bosses"
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_TANGLEFOOT",
+      "name": "Tanglefoot",
+      "wikiTitle": "Tanglefoot",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_TARN",
+      "name": "Tarn",
+      "wikiTitle": "Tarn",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7174,7 +7615,7 @@
         "Chambers of Xeric"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7202,7 +7643,28 @@
         "Ruins of Unkah"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_THE_DRAUGEN",
+      "name": "The Draugen",
+      "wikiTitle": "The Draugen",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7221,11 +7683,30 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Dream Mentor"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_THE_FORSAKEN_ASSASSIN",
+      "name": "The Forsaken Assassin",
+      "wikiTitle": "The Forsaken Assassin",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7249,7 +7730,7 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7272,7 +7753,7 @@
         "Darkfrost"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7296,11 +7777,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Dream Mentor"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7319,11 +7798,30 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Dream Mentor"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_THE_KENDAL",
+      "name": "The Kendal",
+      "wikiTitle": "The Kendal",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7344,11 +7842,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "The Scar",
-        "Desert Treasure II - The Fallen Empire"
+        "The Scar"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7375,11 +7872,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "Theatre of Blood",
-        "A Night at the Theatre"
+        "Theatre of Blood"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7408,7 +7904,7 @@
         "Hosidius"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7436,7 +7932,7 @@
         "Sisterhood Sanctuary"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7465,7 +7961,7 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7484,11 +7980,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Dream Mentor"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7509,11 +8003,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "Lassar Undercity",
-        "Desert Treasure II - The Fallen Empire"
+        "Lassar Undercity"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7542,7 +8035,7 @@
         "Theatre of Blood"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7570,7 +8063,7 @@
         "Smoke Devil Dungeon"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7596,7 +8089,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7620,7 +8113,7 @@
         "Tombs of Amascut"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7648,7 +8141,7 @@
         "Barrows"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7666,6 +8159,48 @@
       "locationsLoaded": false
     },
     {
+      "id": "BOSS_TRAPPED_SOUL",
+      "name": "Trapped Soul",
+      "wikiTitle": "Trapped Soul",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_TREE_SPIRIT_LOST_CITY",
+      "name": "Tree spirit (Lost City)",
+      "wikiTitle": "Tree spirit (Lost City)",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_TREUS_DAYTH",
       "name": "Treus Dayth",
       "wikiTitle": "Treus Dayth",
@@ -7674,7 +8209,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7698,7 +8233,7 @@
         "Tombs of Amascut"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7726,7 +8261,7 @@
         "Inferno"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7754,7 +8289,7 @@
         "TzHaar Fight Cave"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7780,7 +8315,7 @@
       ],
       "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7804,7 +8339,7 @@
         "Chambers of Xeric"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7830,11 +8365,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "The Stranglewood",
-        "Desert Treasure II - The Fallen Empire"
+        "The Stranglewood"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7863,7 +8397,7 @@
         "Chambers of Xeric"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7894,7 +8428,7 @@
         "Wilderness Medium Diary"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7917,7 +8451,7 @@
         "Barrows"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7944,11 +8478,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "Theatre of Blood",
-        "A Night at the Theatre"
+        "Theatre of Blood"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -7977,7 +8510,7 @@
         "Chambers of Xeric"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8008,7 +8541,7 @@
         "Wilderness Medium Diary"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8029,11 +8562,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "Ungael",
-        "Dragon Slayer II"
+        "Ungael"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8057,11 +8589,9 @@
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "Spirits of the Elid"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8084,7 +8614,7 @@
         "Wintertodt Camp"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8102,17 +8632,57 @@
       "locationsLoaded": false
     },
     {
+      "id": "BOSS_WITCH_S_EXPERIMENT",
+      "name": "Witch's experiment",
+      "wikiTitle": "Witch's experiment",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
       "id": "BOSS_WYRD",
       "name": "Wyrd",
       "wikiTitle": "Wyrd",
       "categories": [
         "Quest bosses"
       ],
-      "locationTitles": [
-        "The Blood Moon Rises"
-      ],
+      "locationTitles": [],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
+      "regions": [],
+      "raw": null,
+      "deathType": "",
+      "optionalArgs": [],
+      "maps": [],
+      "links": [],
+      "warnings": [],
+      "supportedBy": [],
+      "supportKnown": true,
+      "locationsLoaded": false
+    },
+    {
+      "id": "BOSS_XAMPHUR",
+      "name": "Xamphur",
+      "wikiTitle": "Xamphur",
+      "categories": [
+        "Quest bosses"
+      ],
+      "locationTitles": [],
+      "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8134,11 +8704,10 @@
         "Quest bosses"
       ],
       "locationTitles": [
-        "Theatre of Blood",
-        "A Night at the Theatre"
+        "Theatre of Blood"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8167,7 +8736,7 @@
         "The Fractured Archive"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8190,7 +8759,7 @@
         "Chasm of Fire"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8218,7 +8787,7 @@
         "Prifddinas"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8247,7 +8816,7 @@
         "Tombs of Amascut"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -8275,7 +8844,7 @@
         "Zul-Andra"
       ],
       "catalogSource": "https://oldschool.runescape.wiki/w/Boss",
-      "catalogRevision": 15382382,
+      "catalogRevision": 15383423,
       "regions": [],
       "raw": null,
       "deathType": "",
@@ -12288,8 +12857,8 @@
   "warnings": [],
   "catalog": {
     "source": "https://oldschool.runescape.wiki/w/Boss",
-    "revision": 15382382,
-    "count": 202,
-    "fetchedAt": "2026-10-26T16:10:57.126Z"
+    "revision": 15383423,
+    "count": 233,
+    "fetchedAt": "2026-10-27T15:25:01.727Z"
   }
 }
